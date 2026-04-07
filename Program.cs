@@ -2,23 +2,28 @@ using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Features.Trees.GetTrees;
 
-
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+// Services
 builder.Services.AddOpenApi();
-builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<AppDbContext>(options => 
+    options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 
+// Middleware
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
 app.UseHttpsRedirection();
 
+// Endpoints
+var apiV1 = app.MapGroup("/api/v1")
+    .WithTags("V1Endpoints");
 
-GetTrees.MapEndpoint(app);
-
+GetTrees.MapEndpoint(apiV1);
 
 app.Run();

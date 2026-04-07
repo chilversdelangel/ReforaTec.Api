@@ -28,7 +28,7 @@ public static class GetTrees
         return Task.FromResult(treeList);
     }
 
-    public static void MapEndpoint(WebApplication app)
+    public static void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("/trees", Handle);
     }
