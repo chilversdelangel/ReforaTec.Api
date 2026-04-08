@@ -10,6 +10,6 @@ public class Tree
     public int SpeciesId { get; set; }
     public decimal? Height { get; set; }
     public decimal? Diameter { get; set; }
-    public Location? Location { get; set; }
+    public Location Location { get; set; }
     public string? Notes { get; set; }
 }
