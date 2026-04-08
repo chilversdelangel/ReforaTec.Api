@@ -1,10 +1,9 @@
+using ReforaTec.Api.Entities.Common;
+
 namespace ReforaTec.Api.Entities;
 
-public class Tree
+public class Tree : AuditableEntity
 {
-    public int Id { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime ModifiedAt { get; set; }
     public DateOnly? PlantingDate { get; set; }
     public int ValueId { get; set; }
     public int SpeciesId { get; set; }

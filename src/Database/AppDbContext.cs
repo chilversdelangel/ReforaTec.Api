@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Entities;
+using ReforaTec.Api.Entities.Common;
 
 namespace ReforaTec.Api.Database;
 
@@ -10,5 +11,27 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Tree>().OwnsOne(t => t.Location);
+    }
+    
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker.Entries<AuditableEntity>();
+        var now = DateTime.UtcNow;
+        
+        foreach (var entry in entries)
+        {
+            switch (entry)
+            {
+                case { State: EntityState.Added }:
+                    entry.Entity.CreatedAt = now;
+                    entry.Entity.ModifiedAt = now;
+                    break;
+                case { State: EntityState.Modified }:
+                    entry.Entity.ModifiedAt = now;
+                    break;
+            }
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
     }
 }
