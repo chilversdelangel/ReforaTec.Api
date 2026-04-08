@@ -3,7 +3,8 @@ namespace ReforaTec.Api.Features.Trees.GetTrees;
 public static class GetTrees
 {
     public record LocationResponse(
-        double[] Coordinates,
+        double? Latitude,
+        double? Longitude,
         string Street,
         string Neighborhood,
         string StreetNumber
