@@ -1,5 +1,7 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Features.Trees.CreateTree;
 using ReforaTec.Api.Features.Trees.GetTrees;
 using Scalar.AspNetCore;
 
@@ -8,7 +10,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 // Services
 builder.Services.AddOpenApi();
-builder.Services.AddDbContext<AppDbContext>(options => 
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 var app = builder.Build();
