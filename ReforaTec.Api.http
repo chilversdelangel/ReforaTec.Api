@@ -1,3 +1,23 @@
-@ReforaTec.Api_HostAddress = https://localhost:5210
+@host = localhost:5210
 
 ###
+POST {{host}}/api/v1/trees
+Content-Type: application/json
+
+{
+  "plantingDate": "2024-03-15",
+  "valueId": 0,
+  "speciesId": -5,
+  "height": -10.0,
+  "location": {
+    "latitude": 22.2167,
+    "longitude": -97.8500,
+    "street": "",
+    "neighborhood": "   ",
+    "streetNumber": ""
+  }
+}
+
+###
+GET {{host}}/api/v1/trees
+Content-Type: application/json
