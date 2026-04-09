@@ -30,5 +30,6 @@ var apiV1 = app.MapGroup("/api/v1")
     .WithTags("V1 Endpoints");
 
 GetTrees.MapEndpoint(apiV1);
+CreateTree.MapEndpoint(apiV1);
 
 app.Run();
