@@ -21,3 +21,12 @@ Content-Type: application/json
 ###
 GET {{host}}/api/v1/trees
 Content-Type: application/json
+
+###
+GET {{host}}/api/v1/trees/2
+Content-Type: application/json
+
+
+###
+GET {{host}}/api/v1/trees/0
+Content-Type: application/json

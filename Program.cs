@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Features.Trees.CreateTree;
+using ReforaTec.Api.Features.Trees.GetTreeById;
 using ReforaTec.Api.Features.Trees.GetTrees;
 using Scalar.AspNetCore;
 
@@ -30,6 +31,7 @@ var apiV1 = app.MapGroup("/api/v1")
     .WithTags("V1 Endpoints");
 
 GetTrees.MapEndpoint(apiV1);
+GetTreeById.MapEndpoint(apiV1);
 CreateTree.MapEndpoint(apiV1);
 
 app.Run();
