@@ -30,3 +30,8 @@ Content-Type: application/json
 ###
 GET {{host}}/api/v1/trees/0
 Content-Type: application/json
+
+
+###
+GET {{host}}/api/v1/values/1
+Content-Type: application/json
