@@ -40,6 +40,14 @@ Content-Type: application/json
   "valueName": "Esperanza"
 }
 
+###
+POST {{host}}/api/v1/values
+Content-Type: application/json
+
+{
+  "valueName": "   Esperanza  "
+}
+
 ### 
 POST {{host}}/api/v1/values
 Content-Type: application/json

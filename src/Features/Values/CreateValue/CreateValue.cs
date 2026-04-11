@@ -1,5 +1,6 @@
 using FluentValidation;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Entities;
 using ReforaTec.Api.Infrastructure.Filters;
@@ -33,7 +34,21 @@ public static class CreateValue
 
     public static async Task<IResult> Handle(Request request, AppDbContext context)
     {
+        var cleanName = request.ValueName.Trim();
+        var exists = await context.Values
+            .AnyAsync(v => v.ValueName.ToLower() == cleanName.ToLower());
+
+        if (exists)
+        {
+            return Results.Problem(
+                statusCode: 409,
+                title: "Value already exists",
+                detail: $"The value '{cleanName}' is already registered in the catalog."
+            );
+        }
+
         var newValue = request.Adapt<Value>();
+        newValue.ValueName = cleanName;
         
         context.Values.Add(newValue);
         await context.SaveChangesAsync();
