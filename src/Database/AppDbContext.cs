@@ -12,6 +12,16 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Tree>().OwnsOne(t => t.Location);
+        
+        modelBuilder.Entity<Value>(builder =>
+        {
+            builder.Property(v => v.ValueName)
+                .IsRequired()
+                .HasMaxLength(25);
+
+            builder.HasIndex(v => v.ValueName)
+                .IsUnique();
+        });
     }
     
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
