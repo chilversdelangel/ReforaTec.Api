@@ -32,6 +32,7 @@ app.UseHttpsRedirection();
 var apiV1 = app.MapGroup("/api/v1")
     .WithTags("V1 Endpoints");
 
+// Trees
 GetTrees.MapEndpoint(apiV1);
 GetTreeById.MapEndpoint(apiV1);
 CreateTree.MapEndpoint(apiV1);
