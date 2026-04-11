@@ -32,6 +32,30 @@ GET {{host}}/api/v1/trees/0
 Content-Type: application/json
 
 
+### 
+POST {{host}}/api/v1/values
+Content-Type: application/json
+
+{
+  "valueName": "Esperanza"
+}
+
+### 
+POST {{host}}/api/v1/values
+Content-Type: application/json
+
+{
+  "valueName": "   "
+}
+
+### 
+POST {{host}}/api/v1/values
+Content-Type: application/json
+
+{
+  "valueName": "Madera123!"
+}
+
 ###
 GET {{host}}/api/v1/values/1
 Content-Type: application/json
