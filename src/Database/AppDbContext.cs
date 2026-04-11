@@ -7,6 +7,7 @@ namespace ReforaTec.Api.Database;
 public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<Tree> Trees { get; set; }
+    public DbSet<Value> Values { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
