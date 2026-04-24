@@ -31,6 +31,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+var supportedCultures = new[] { "en" };
+app.UseRequestLocalization(options =>
+{
+    options.SetDefaultCulture("en");
+    options.AddSupportedCultures(supportedCultures);
+    options.AddSupportedUICultures(supportedCultures);
+});
+
 // Endpoints
 var apiV1 = app.MapGroup("/api/v1")
     .WithTags("V1 Endpoints");
