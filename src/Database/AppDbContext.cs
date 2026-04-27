@@ -34,15 +34,19 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             builder.Property(s => s.ScientificName)
                 .IsRequired()
                 .HasMaxLength(100);
-            
-            builder.HasIndex(s => s.ScientificName)
+
+            builder.Property(s => s.NormalizedScientificName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.HasIndex(s => s.NormalizedScientificName)
                 .IsUnique();
-            
+
             builder.Property(s => s.CommonNames)
                 .IsRequired()
                 .HasColumnType("varchar(50)[]")
                 .HasDefaultValueSql("'{}'::varchar(50)[]");
-            
+
             builder.Property(s => s.Description)
                 .IsRequired()
                 .HasMaxLength(1000);
