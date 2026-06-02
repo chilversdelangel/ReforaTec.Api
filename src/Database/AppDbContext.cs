@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ReforaTec.Api.Common.Interfaces;
 using ReforaTec.Api.Entities;
 using ReforaTec.Api.Entities.Common;
 
@@ -20,7 +21,11 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
                 .IsRequired()
                 .HasMaxLength(25);
 
-            builder.HasIndex(v => v.ValueName)
+            builder.Property(v => v.NormalizedValueName)
+                .IsRequired()
+                .HasMaxLength(25);
+
+            builder.HasIndex(v => v.NormalizedValueName)
                 .IsUnique();
         });
 
@@ -29,15 +34,19 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             builder.Property(s => s.ScientificName)
                 .IsRequired()
                 .HasMaxLength(100);
-            
-            builder.HasIndex(s => s.ScientificName)
+
+            builder.Property(s => s.NormalizedScientificName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.HasIndex(s => s.NormalizedScientificName)
                 .IsUnique();
-            
+
             builder.Property(s => s.CommonNames)
                 .IsRequired()
                 .HasColumnType("varchar(50)[]")
                 .HasDefaultValueSql("'{}'::varchar(50)[]");
-            
+
             builder.Property(s => s.Description)
                 .IsRequired()
                 .HasMaxLength(1000);
@@ -64,6 +73,14 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
                     entry.Entity.ModifiedAt = now;
                     break;
             }
+        }
+
+        var normalizableEntries = ChangeTracker.Entries<INormalizable>()
+            .Where(e => e.State is EntityState.Added or EntityState.Modified);
+
+        foreach (var entry in normalizableEntries)
+        {
+            entry.Entity.Normalize();
         }
 
         return base.SaveChangesAsync(cancellationToken);

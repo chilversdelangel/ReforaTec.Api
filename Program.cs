@@ -1,6 +1,8 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Features.Species.CreateSpecies;
+using ReforaTec.Api.Features.Species.GetSpeciesById;
 using ReforaTec.Api.Features.Trees.CreateTree;
 using ReforaTec.Api.Features.Trees.GetTreeById;
 using ReforaTec.Api.Features.Trees.GetTrees;
@@ -31,6 +33,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+var supportedCultures = new[] { "en" };
+app.UseRequestLocalization(options =>
+{
+    options.SetDefaultCulture("en");
+    options.AddSupportedCultures(supportedCultures);
+    options.AddSupportedUICultures(supportedCultures);
+});
+
 // Endpoints
 var apiV1 = app.MapGroup("/api/v1")
     .WithTags("V1 Endpoints");
@@ -43,5 +53,9 @@ CreateTree.MapEndpoint(apiV1);
 // Values
 GetValueById.MapEndpoint(apiV1);
 CreateValue.MapEndpoint(apiV1);
+
+//Species
+CreateSpecies.MapEndpoint(apiV1);
+GetSpeciesById.MapEndpoint(apiV1);
 
 app.Run();

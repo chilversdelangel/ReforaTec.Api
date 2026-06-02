@@ -1,6 +1,7 @@
 using FluentValidation;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using ReforaTec.Api.Common.Helpers;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Entities;
 using ReforaTec.Api.Infrastructure.Filters;
@@ -34,30 +35,30 @@ public static class CreateValue
 
     public static async Task<IResult> Handle(Request request, AppDbContext context)
     {
-        var cleanName = request.ValueName.Trim();
+        var normalizedName = request.ValueName.ToNormalized();
+
         var exists = await context.Values
-            .AnyAsync(v => v.ValueName.ToLower() == cleanName.ToLower());
+            .AnyAsync(v => v.NormalizedValueName == normalizedName);
 
         if (exists)
         {
             return Results.Problem(
                 statusCode: 409,
                 title: "Value already exists",
-                detail: $"The value '{cleanName}' is already registered in the catalog."
+                detail: $"The value '{request.ValueName}' is already registered in the catalog."
             );
         }
 
         var newValue = request.Adapt<Value>();
-        newValue.ValueName = cleanName;
-        
+
         context.Values.Add(newValue);
         await context.SaveChangesAsync();
-        
+
         var valueResponse = newValue.Adapt<Response>();
 
         return Results.CreatedAtRoute("GetValueById", new { id = valueResponse.Id }, valueResponse);
     }
-    
+
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/values", Handle)
