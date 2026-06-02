@@ -67,3 +67,51 @@ Content-Type: application/json
 ###
 GET {{host}}/api/v1/values/1
 Content-Type: application/json
+
+### Species - Create Species (Success)
+POST {{host}}/api/v1/species
+Content-Type: application/json
+
+{
+  "scientificName": "Nombre científico diferente 2",
+  "commonNames": [
+    "Pino carrasco",
+    "Pino de Alepo"
+  ],
+  "description": "Especie arbórea de la familia de las pináceas.",
+  "imageUrl": "https://example.com/pino.jpg"
+}
+
+### Species - Create Species (Validation Error)
+POST {{host}}/api/v1/species
+Content-Type: application/json
+
+{
+  "scientificName": "",
+  "commonNames": [
+    "Test"
+  ],
+  "description": "Descripción muy corta",
+  "imageUrl": null
+}
+
+### Species - Create Species (Conflict - Duplicate)
+POST {{host}}/api/v1/species
+Content-Type: application/json
+
+{
+  "scientificName": "Pinus halepensis",
+  "commonNames": [
+    "Otro nombre"
+  ],
+  "description": "Misma especie, diferente descripción",
+  "imageUrl": null
+}
+
+### Species - Get Species
+GET {{host}}/api/v1/species/3
+Content-Type: application/json
+
+### Species - Get Species (Species Not-Found)
+GET {{host}}/api/v1/species/1999
+Content-Type: application/json
