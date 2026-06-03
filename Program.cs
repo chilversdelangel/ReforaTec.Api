@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Features.Campaigns.GetCampaignById;
 using ReforaTec.Api.Features.Species.CreateSpecies;
 using ReforaTec.Api.Features.Species.GetSpeciesById;
 using ReforaTec.Api.Features.Trees.CreateTree;
@@ -57,5 +58,8 @@ CreateValue.MapEndpoint(apiV1);
 // Species
 CreateSpecies.MapEndpoint(apiV1);
 GetSpeciesById.MapEndpoint(apiV1);
+
+// Campaign
+GetCampaignById.MapEndpoint(apiV1);
 
 app.Run();
