@@ -11,6 +11,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Tree> Trees { get; set; }
     public DbSet<Value> Values { get; set; }
     public DbSet<Species> Species { get; set; }
+    public DbSet<Campaign> Campaigns { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
