@@ -117,13 +117,13 @@ GET {{host}}/api/v1/species/1999
 Content-Type: application/json
 
 ### Campaign - Get Campaign
-GET {{host}}/api/v1/campaign/3
+GET {{host}}/api/v1/campaigns/1
 Content-Type: application/json
 
 ### Campaign - Get Campaign (Campaign Not-Found)
-GET {{host}}/api/v1/campaign/1999
+GET {{host}}/api/v1/campaigns/1999
 Content-Type: application/json
 
 ### Campaign - Get Species (Bad request)
-GET {{host}}/api/v1/campaign/-3
+GET {{host}}/api/v1/campaigns/-3
 Content-Type: application/json

@@ -7,7 +7,7 @@ public static class GetCampaignById
 {
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/campaign/{id:int}", HandleRequest)
+        app.MapGet("/campaigns/{id:int}", HandleRequest)
             .WithName("GetCampaignById")
             .Produces<Response>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
