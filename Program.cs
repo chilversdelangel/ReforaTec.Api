@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Features.Campaigns.CreateCampaign;
 using ReforaTec.Api.Features.Campaigns.GetCampaignById;
 using ReforaTec.Api.Features.Species.CreateSpecies;
 using ReforaTec.Api.Features.Species.GetSpeciesById;
@@ -61,5 +62,6 @@ GetSpeciesById.MapEndpoint(apiV1);
 
 // Campaign
 GetCampaignById.MapEndpoint(apiV1);
+CreateCampaign.MapEndpoint(apiV1);
 
 app.Run();
