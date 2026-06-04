@@ -115,3 +115,66 @@ Content-Type: application/json
 ### Species - Get Species (Species Not-Found)
 GET {{host}}/api/v1/species/1999
 Content-Type: application/json
+
+### Campaign - Get Campaign
+GET {{host}}/api/v1/campaigns/1
+Content-Type: application/json
+
+### Campaign - Get Campaign (Campaign Not-Found)
+GET {{host}}/api/v1/campaigns/1999
+Content-Type: application/json
+
+### Campaign - Get Species (Bad request)
+GET {{host}}/api/v1/campaigns/-3
+Content-Type: application/json
+
+### Campaign - Create Campaign (Success)
+POST {{host}}/api/v1/campaigns
+Content-Type: application/json
+
+{
+  "campaignName": "Green Summer 2024",
+  "schoolName": "Lincoln Elementary",
+  "period": {
+    "startDate": "2024-06-01",
+    "endDate": "2024-08-31"
+  },
+  "location": {
+    "latitude": 22.2167,
+    "longitude": -97.8500,
+    "street": "Main Ave",
+    "neighborhood": "Central",
+    "streetNumber": "123"
+  }
+}
+
+### Campaign - Create Campaign (Validation Error)
+POST {{host}}/api/v1/campaigns
+Content-Type: application/json
+
+{
+  "campaignName": "",
+  "schoolName": "",
+  "period": null,
+  "location": null
+}
+
+### Campaign - Create Campaign (Conflict - Duplicate)
+POST {{host}}/api/v1/campaigns
+Content-Type: application/json
+
+{
+  "campaignName": "ReforaTec",
+  "schoolName": "Another School",
+  "period": {
+    "startDate": "2024-09-01",
+    "endDate": "2024-11-30"
+  },
+  "location": {
+    "latitude": 22.2200,
+    "longitude": -97.8600,
+    "street": "Oak St",
+    "neighborhood": "North",
+    "streetNumber": "456"
+  }
+}
