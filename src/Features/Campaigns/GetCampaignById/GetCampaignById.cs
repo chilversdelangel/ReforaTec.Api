@@ -1,5 +1,5 @@
-using ErrorOr;
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Infrastructure.Mapping;
 
 namespace ReforaTec.Api.Features.Campaigns.GetCampaignById;
 
@@ -21,29 +21,7 @@ public static class GetCampaignById
 
         return result.Match(
             value => Results.Ok(value),
-            errors => MapErrorsToResult(errors)
+            errors => errors.ToProblem()
         );
-    }
-
-    private static IResult MapErrorsToResult(List<Error> errors)
-    {
-        var firstError = errors[0];
-
-        return firstError.Type switch
-        {
-            ErrorType.NotFound => Results.NotFound(new
-            {
-                code = firstError.Code,
-                detail = firstError.Description
-            }),
-            ErrorType.Validation => Results.BadRequest(new
-            {
-                code = firstError.Code,
-                detail = firstError.Description
-            }),
-            _ => Results.Problem(
-                statusCode: 500
-            )
-        };
     }
 }
