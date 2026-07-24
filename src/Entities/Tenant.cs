@@ -11,8 +11,8 @@ public class Tenant : AuditableEntity, INormalizable
     
     public string InstitutionalEmailDomain { get; set; } = string.Empty;
     public string NormalizedInstitutionalEmailDomain { get; set; } = string.Empty;
-    
-    public bool IsDeleted { get; set; }
+
+    public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }
 
     public void Normalize()
