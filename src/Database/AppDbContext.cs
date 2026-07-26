@@ -8,48 +8,38 @@ namespace ReforaTec.Api.Database;
 
 public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
-    /// <summary>
-    /// Multi-tenant educational institutions / schools.
-    /// </summary>
+    #region Multi-Tenant & Identity
     public DbSet<Tenant> Tenants { get; set; }
-
-    /// <summary>
-    /// Platform users (students, inspectors, coordinators, admins) and OTP auth codes.
-    /// </summary>
     public DbSet<User> Users { get; set; }
     public DbSet<AuthOtpCode> AuthOtpCodes { get; set; }
+    #endregion
 
-    /// <summary>
-    /// System master catalogs (tree species, system values/virtues, service types).
-    /// </summary>
+    #region Master Catalogs
     public DbSet<Species> Species { get; set; }
     public DbSet<Value> Values { get; set; }
     public DbSet<ServiceType> ServiceTypes { get; set; }
+    #endregion
 
-    /// <summary>
-    /// Core domain entities (environmental campaigns and individual trees).
-    /// </summary>
+    #region Core Domain Entities
     public DbSet<Campaign> Campaigns { get; set; }
     public DbSet<Tree> Trees { get; set; }
+    #endregion
 
-    /// <summary>
-    /// Domain junction entities (inspector assignments, campaign tree folios, student care relationships).
-    /// </summary>
+    #region Domain Junction Entities
     public DbSet<UserInspectsCampaign> UserInspectsCampaigns { get; set; }
     public DbSet<CampaignManagesTree> CampaignManagesTrees { get; set; }
     public DbSet<UserCaresForTree> UserCaresForTrees { get; set; }
+    #endregion
 
-    /// <summary>
-    /// Field activity logs (tree care services and botanical inspections).
-    /// </summary>
+    #region Field Activity Logs
     public DbSet<Service> Services { get; set; }
     public DbSet<Measurement> Measurements { get; set; }
+    #endregion
 
-    /// <summary>
-    /// Push notification templates and user FCM mobile devices.
-    /// </summary>
+    #region Push Notifications & Devices
     public DbSet<NotificationTemplate> NotificationTemplates { get; set; }
     public DbSet<UserDevice> UserDevices { get; set; }
+    #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
