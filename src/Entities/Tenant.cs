@@ -9,8 +9,15 @@ public class Tenant : AuditableEntity, INormalizable
     public string InstitutionName { get; set; } = string.Empty;
     public string NormalizedInstitutionName { get; set; } = string.Empty;
     
+    /// <summary>
+    /// Institutional acronym used for campaign inscription code generation (e.g. "ITCM", "ITT", "UNAM").
+    /// </summary>
+    public string Acronym { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Institutional email domain used for automatic student tenant assignment (e.g. "cdmadero.tecnm.mx").
+    /// </summary>
     public string InstitutionalEmailDomain { get; set; } = string.Empty;
-    public string NormalizedInstitutionalEmailDomain { get; set; } = string.Empty;
 
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }
@@ -20,7 +27,7 @@ public class Tenant : AuditableEntity, INormalizable
         InstitutionName = InstitutionName.ToSanitized();
         NormalizedInstitutionName = InstitutionName.ToNormalized();
         
-        InstitutionalEmailDomain = InstitutionalEmailDomain.ToSanitized();
-        NormalizedInstitutionalEmailDomain = InstitutionalEmailDomain.ToNormalized();
+        Acronym = Acronym.Trim().ToUpperInvariant();
+        InstitutionalEmailDomain = InstitutionalEmailDomain.ToNormalized();
     }
 }
