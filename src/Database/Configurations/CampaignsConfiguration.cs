@@ -11,9 +11,6 @@ public class CampaignsConfiguration : IEntityTypeConfiguration<Campaign>
         builder.OwnsOne(c => c.Period);
         builder.OwnsOne(c => c.Location);
 
-        builder.Property(c => c.SchoolName)
-            .IsRequired()
-            .HasMaxLength(50);
 
         builder.Property(c => c.CampaignName)
             .IsRequired()
