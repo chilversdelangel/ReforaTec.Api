@@ -4,7 +4,7 @@ using ReforaTec.Api.Entities;
 
 namespace ReforaTec.Api.Database.Configurations;
 
-public class TreesConfiguration : IEntityTypeConfiguration<Tree>
+public class TreeConfiguration : IEntityTypeConfiguration<Tree>
 {
     public void Configure(EntityTypeBuilder<Tree> builder)
     {

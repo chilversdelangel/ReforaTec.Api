@@ -4,7 +4,7 @@ using ReforaTec.Api.Entities;
 
 namespace ReforaTec.Api.Database.Configurations;
 
-public class CampaignsConfiguration : IEntityTypeConfiguration<Campaign>
+public class CampaignConfiguration : IEntityTypeConfiguration<Campaign>
 {
     public void Configure(EntityTypeBuilder<Campaign> builder)
     {
