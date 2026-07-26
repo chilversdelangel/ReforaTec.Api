@@ -12,8 +12,8 @@ public class User : AuditableEntity, INormalizable
     
     public UserRole CurrentRole { get; set; } = UserRole.Student;
     
-    public string InstitutionalEmail { get; set; } = string.Empty;
-    public string NormalizedInstitutionalEmail { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? ControlNumber { get; set; }
     
     public string FirstName { get; set; } = string.Empty;
     public string? MiddleName { get; set; }
@@ -22,18 +22,18 @@ public class User : AuditableEntity, INormalizable
     
     public string? PhoneNumber { get; set; }
     
-    public bool IsDeleted { get; set; }
+    public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }
 
     public void Normalize()
     {
-        InstitutionalEmail = InstitutionalEmail.ToSanitized();
-        NormalizedInstitutionalEmail = InstitutionalEmail.ToNormalized();
-        
+        Email = Email.ToNormalized();
+
+        ControlNumber = ControlNumber?.ToSanitized().ToUpperInvariant();
+
         FirstName = FirstName.ToSanitized();
+        MiddleName = MiddleName?.ToSanitized();
         LastName = LastName.ToSanitized();
-        
-        if (MiddleName is not null) MiddleName = MiddleName.ToSanitized();
-        if (SecondLastName is not null) SecondLastName = SecondLastName.ToSanitized();
+        SecondLastName = SecondLastName?.ToSanitized();
     }
 }
