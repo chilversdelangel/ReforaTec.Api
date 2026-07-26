@@ -2,8 +2,14 @@ using ReforaTec.Api.Entities.Common;
 
 namespace ReforaTec.Api.Entities;
 
+/// <summary>
+/// Represents the temporal assignment of a user/student responsible for caring for a tree.
+/// </summary>
 public class UserCaresForTree : AuditableEntity
 {
+    public int TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
+    
     public int UserId { get; set; }
     public User? User { get; set; }
     
@@ -18,5 +24,9 @@ public class UserCaresForTree : AuditableEntity
     public Campaign? Campaign { get; set; }
     
     public DateOnly StartDate { get; set; }
+    
+    /// <summary>
+    /// End date of the care assignment. Null indicates the care relationship is currently active.
+    /// </summary>
     public DateOnly? EndDate { get; set; }
 }
