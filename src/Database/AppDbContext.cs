@@ -20,7 +20,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<AuthOtpCode> AuthOtpCodes { get; set; }
 
     /// <summary>
-    /// System master catalogs (botanical species, ecosystem values, service types).
+    /// System master catalogs (tree species, moral values/virtues, service types).
     /// </summary>
     public DbSet<Species> Species { get; set; }
     public DbSet<Value> Values { get; set; }
