@@ -25,8 +25,15 @@ public class Measurement : AuditableEntity
    
     public TreeHealthState DetectedHealthState { get; set; } = TreeHealthState.Healthy;
     
-    public decimal HeightCentimeters { get; set; }
-    public decimal DiameterCentimeters { get; set; }
+    /// <summary>
+    /// Height of the tree in centimeters. Null during routine health checks if physical measurement was not taken.
+    /// </summary>
+    public decimal? HeightCentimeters { get; set; }
+
+    /// <summary>
+    /// Trunk diameter of the tree in centimeters. Null during routine health checks if physical measurement was not taken.
+    /// </summary>
+    public decimal? DiameterCentimeters { get; set; }
     
     /// <summary>
     /// Optional photo URL of the tree inspection evidence (typically captured 
