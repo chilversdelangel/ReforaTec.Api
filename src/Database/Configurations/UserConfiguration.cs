@@ -48,6 +48,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasForeignKey(u => u.TenantId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasQueryFilter(u => !u.IsDeleted);
+        // Note: Soft delete (IsDeleted) is handled explicitly in application feature handlers
+        // rather than via global HasQueryFilter to allow historical audit logs to include user navigation properties.
     }
 }

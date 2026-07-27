@@ -30,6 +30,7 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
         builder.HasIndex(t => t.InstitutionalEmailDomain)
             .IsUnique();
 
-        builder.HasQueryFilter(t => !t.IsDeleted);
+        // Note: Soft delete (IsDeleted) is handled explicitly in application feature handlers
+        // rather than via global HasQueryFilter to allow historical audit logs to include tenant navigation properties.
     }
 }
