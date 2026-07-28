@@ -9,11 +9,9 @@ public class ValueConfiguration : IEntityTypeConfiguration<Value>
     public void Configure(EntityTypeBuilder<Value> builder)
     {
         builder.Property(v => v.ValueName)
-            .IsRequired()
             .HasMaxLength(25);
 
         builder.Property(v => v.NormalizedValueName)
-            .IsRequired()
             .HasMaxLength(25);
 
         builder.HasIndex(v => v.NormalizedValueName)
