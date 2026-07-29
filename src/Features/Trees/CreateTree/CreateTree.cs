@@ -87,7 +87,7 @@ public static class CreateTree
     )
     {
         var newTree = request.Adapt<Tree>();
-        newTree.Status = TreeStatus.Planted;
+        newTree.HealthState = TreeHealthState.Healthy;
 
         context.Trees.Add(newTree);
         await context.SaveChangesAsync();

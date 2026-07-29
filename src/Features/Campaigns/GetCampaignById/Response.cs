@@ -7,6 +7,5 @@ public record Response(
     string CampaignName,
     string NormalizedCampaignName,
     PeriodDto Period,
-    string SchoolName,
     LocationDto Location
 );

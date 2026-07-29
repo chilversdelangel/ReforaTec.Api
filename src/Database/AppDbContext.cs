@@ -8,10 +8,38 @@ namespace ReforaTec.Api.Database;
 
 public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
-    public DbSet<Tree> Trees { get; set; }
-    public DbSet<Value> Values { get; set; }
+    #region Multi-Tenant & Identity
+    public DbSet<Tenant> Tenants { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<AuthOtpCode> AuthOtpCodes { get; set; }
+    #endregion
+
+    #region Master Catalogs
     public DbSet<Species> Species { get; set; }
+    public DbSet<Value> Values { get; set; }
+    public DbSet<ServiceType> ServiceTypes { get; set; }
+    #endregion
+
+    #region Core Domain Entities
     public DbSet<Campaign> Campaigns { get; set; }
+    public DbSet<Tree> Trees { get; set; }
+    #endregion
+
+    #region Domain Junction Entities
+    public DbSet<UserInspectsCampaign> UserInspectsCampaigns { get; set; }
+    public DbSet<CampaignManagesTree> CampaignManagesTrees { get; set; }
+    public DbSet<UserCaresForTree> UserCaresForTrees { get; set; }
+    #endregion
+
+    #region Field Activity Logs
+    public DbSet<Service> Services { get; set; }
+    public DbSet<Measurement> Measurements { get; set; }
+    #endregion
+
+    #region Push Notifications & Devices
+    public DbSet<NotificationTemplate> NotificationTemplates { get; set; }
+    public DbSet<UserDevice> UserDevices { get; set; }
+    #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

@@ -11,10 +11,6 @@ public class Validator : AbstractValidator<Request>
             .NotEmpty()
             .MaximumLength(50);
 
-        RuleFor(request => request.SchoolName)
-            .NotNull()
-            .NotEmpty()
-            .MaximumLength(50);
 
         RuleFor(request => request.Location)
             .NotNull()
