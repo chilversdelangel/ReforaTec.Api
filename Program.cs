@@ -10,6 +10,7 @@ using ReforaTec.Api.Features.Trees.GetTreeById;
 using ReforaTec.Api.Features.Trees.GetTrees;
 using ReforaTec.Api.Features.Values.CreateValue;
 using ReforaTec.Api.Features.Values.GetValueById;
+using ReforaTec.Api.Infrastructure.Middleware;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,7 +25,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSnakeCaseNamingConvention();
 });
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Middleware
 if (app.Environment.IsDevelopment())
