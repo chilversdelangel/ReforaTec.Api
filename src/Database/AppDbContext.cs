@@ -12,6 +12,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<AuthOtpCode> AuthOtpCodes { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
     #endregion
 
     #region Master Catalogs
@@ -46,10 +47,9 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var entries = ChangeTracker.Entries<AuditableEntity>();
         var now = DateTime.UtcNow;
 
-        foreach (var entry in entries)
+        foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {
             switch (entry)
             {
@@ -59,6 +59,16 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
                     break;
                 case { State: EntityState.Modified }:
                     entry.Entity.ModifiedAt = now;
+                    break;
+            }
+        }
+
+        foreach (var entry in ChangeTracker.Entries<CreatableEntity>())
+        {
+            switch (entry)
+            {
+                case { State: EntityState.Added }:
+                    entry.Entity.CreatedAt = now;
                     break;
             }
         }
