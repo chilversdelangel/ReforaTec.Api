@@ -12,6 +12,7 @@ public static class DbSeeder
     public static async Task SeedAsync(AppDbContext context)
     {
         await SeedTenantsAsync(context);
+        await SeedUsersAsync(context);
         await SeedSpeciesAsync(context);
         await SeedValuesAsync(context);
         await SeedServiceTypesAsync(context);
@@ -180,6 +181,27 @@ public static class DbSeeder
         };
 
         context.NotificationTemplates.AddRange(notificationTemplates);
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedUsersAsync(AppDbContext context)
+    {
+        if (await context.Users.AnyAsync()) return;
+
+        var tenant = await context.Tenants.FirstAsync();
+
+        var testUser = new User
+        {
+            TenantId = tenant.Id,
+            CurrentRole = UserRole.Student,
+            Email = "student@cdmadero.tecnm.mx",
+            ControlNumber = "21070001",
+            FirstName = "Juan",
+            LastName = "Pérez"
+        };
+        testUser.Normalize();
+
+        context.Users.Add(testUser);
         await context.SaveChangesAsync();
     }
 }

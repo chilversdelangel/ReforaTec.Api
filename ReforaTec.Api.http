@@ -178,3 +178,27 @@ Content-Type: application/json
     "streetNumber": "456"
   }
 }
+
+### Auth - Request OTP (Success)
+POST {{host}}/api/v1/otp-codes
+Content-Type: application/json
+
+{
+  "email": "student@cdmadero.tecnm.mx"
+}
+
+### Auth - Request OTP (Validation Error - Invalid Email)
+POST {{host}}/api/v1/otp-codes
+Content-Type: application/json
+
+{
+  "email": "not-an-email"
+}
+
+### Auth - Request OTP (OWASP - Unregistered Email)
+POST {{host}}/api/v1/otp-codes
+Content-Type: application/json
+
+{
+  "email": "nonexistent@reforatec.edu.mx"
+}
