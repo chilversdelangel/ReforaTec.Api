@@ -56,20 +56,21 @@ public static class Handler
     {
         if (otpCode.ExpiresAt < DateTime.UtcNow)
             return Error.Unauthorized(
-                ErrorCodes.OtpExpired,
+                ErrorCodes.OtpExpired, 
                 "OTP code has expired. Please request a new one.");
 
-        if (otpCode.FailedAttempts >= 3)
+        if (otpCode.FailedAttempts >= AuthOtpCode.MaxFailedAttempts)
             return Error.Unauthorized(
-                ErrorCodes.TooManyAttempts,
+                ErrorCodes.TooManyAttempts, 
                 "Too many failed attempts. Please request a new OTP code.");
 
-        if (otpCode.VerificationCode != inputOtpCode)
-            return Error.Unauthorized(
-                ErrorCodes.InvalidCredentials,
-                "Invalid email or OTP code.");
+        if (otpCode.VerificationCode == inputOtpCode) return Result.Success;
+        otpCode.FailedAttempts++;
 
-        return Result.Success;
+        return otpCode.FailedAttempts >= AuthOtpCode.MaxFailedAttempts
+            ? Error.Unauthorized(ErrorCodes.TooManyAttempts, "Too many failed attempts. OTP code destroyed.")
+            : Error.Unauthorized(ErrorCodes.InvalidCredentials, "Invalid email or OTP code.");
+
     }
 
     private static async Task UpdateOtpStateAsync(
@@ -78,15 +79,8 @@ public static class Handler
         Error error,
         CancellationToken cancellationToken)
     {
-        switch (error.Code)
-        {
-            case ErrorCodes.OtpExpired or ErrorCodes.TooManyAttempts:
-                context.AuthOtpCodes.Remove(otpRecord);
-                break;
-            case ErrorCodes.InvalidCredentials:
-                otpRecord.FailedAttempts++;
-                break;
-        }
+        if (error.Code is ErrorCodes.OtpExpired or ErrorCodes.TooManyAttempts) 
+            context.AuthOtpCodes.Remove(otpRecord);
 
         await context.SaveChangesAsync(cancellationToken);
     }
