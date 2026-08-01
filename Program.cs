@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Features.Auth.RequestOtp;
+using ReforaTec.Api.Features.Auth.VerifyOtp;
 using ReforaTec.Api.Features.Campaigns.CreateCampaign;
 using ReforaTec.Api.Features.Campaigns.GetCampaignById;
 using ReforaTec.Api.Features.Species.CreateSpecies;
@@ -12,6 +13,7 @@ using ReforaTec.Api.Features.Trees.GetTrees;
 using ReforaTec.Api.Features.Values.CreateValue;
 using ReforaTec.Api.Features.Values.GetValueById;
 using ReforaTec.Api.Infrastructure.Middleware;
+using ReforaTec.Api.Infrastructure.Security.Jwt;
 using ReforaTec.Api.Infrastructure.Security.Otp;
 using Scalar.AspNetCore;
 
@@ -27,6 +29,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSnakeCaseNamingConvention();
 });
 
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
+builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -80,5 +84,6 @@ CreateCampaign.MapEndpoint(apiV1);
 
 // Auth
 RequestOtp.MapEndpoint(apiV1);
+VerifyOtp.MapEndpoint(apiV1);
 
 app.Run();

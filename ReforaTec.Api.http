@@ -202,3 +202,43 @@ Content-Type: application/json
 {
   "email": "nonexistent@reforatec.edu.mx"
 }
+
+### Auth - Create Session / Verify OTP (Success)
+POST {{host}}/api/v1/sessions
+Content-Type: application/json
+
+{
+  "email": "student@cdmadero.tecnm.mx",
+  "otpCode": "992440",
+  "audience": "ReforaTec.MobileApp"
+}
+
+### Auth - Create Session (Invalid OTP Code)
+POST {{host}}/api/v1/sessions
+Content-Type: application/json
+
+{
+  "email": "student@cdmadero.tecnm.mx",
+  "otpCode": "000000",
+  "audience": "ReforaTec.MobileApp"
+}
+
+### Auth - Create Session (Validation Error - Short OTP Code)
+POST {{host}}/api/v1/sessions
+Content-Type: application/json
+
+{
+  "email": "student@cdmadero.tecnm.mx",
+  "otpCode": "123",
+  "audience": "ReforaTec.MobileApp"
+}
+
+### Auth - Create Session (Validation Error - Unauthorized Audience)
+POST {{host}}/api/v1/sessions
+Content-Type: application/json
+
+{
+  "email": "student@cdmadero.tecnm.mx",
+  "otpCode": "123456",
+  "audience": "HackerApp"
+}
