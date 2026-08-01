@@ -40,6 +40,8 @@
 - EF Core: Convention-over-configuration. Only configure exceptions (MaxLength, IsFixedLength, etc.).
 - Base entities: `AuditableEntity` (Id, CreatedAt, ModifiedAt) or `CreatableEntity` (Id, CreatedAt).
 - Default parameter values belong ONLY to the interface, not the implementation.
+- Control flow: Prefer single-line guard clauses for simple early exits (`if (condition) return ...;`).
+- Pattern matching: Prefer modern C# pattern matching (`is null`, `is not null`) over `== null` / `!= null`.
 
 ## 6. Workflow
 - Git: Atomic commits (one logical change per commit).
