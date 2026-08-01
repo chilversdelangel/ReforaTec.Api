@@ -21,9 +21,12 @@
 - No Controllers.
 - Feature folder structure:
   src/Features/{Domain}/{UseCase}/
-    ├── {UseCase}Endpoint.cs   (MapPost/MapGet + validation wiring)
-    ├── {UseCase}Request.cs    (Input DTO / record)
-    └── {UseCase}Handler.cs    (Business logic, returns ErrorOr<T>)
+    ├── {UseCase}.cs       (MapEndpoint + HandleRequest wiring)
+    ├── Request.cs         (Input DTO / record)
+    ├── Response.cs        (Output DTO / record, if applicable)
+    ├── Handler.cs         (Business logic, returns ErrorOr<T>)
+    ├── Validator.cs       (FluentValidation AbstractValidator<Request>)
+    └── ErrorCodes.cs      (Domain error constants: Entity.Reason)
 
 ## 4. Mandatory Rules
 - ALL errors use `ErrorOr<T>`. No exceptions for business flow.
