@@ -203,6 +203,14 @@ Content-Type: application/json
   "email": "nonexistent@reforatec.edu.mx"
 }
 
+### Auth - Request OTP (OWASP - Soft-deleted User)
+POST {{host}}/api/v1/otp-codes
+Content-Type: application/json
+
+{
+  "email": "deleted_student@cdmadero.tecnm.mx"
+}
+
 ### Auth - Create Session / Verify OTP (Success)
 POST {{host}}/api/v1/sessions
 Content-Type: application/json

@@ -201,7 +201,20 @@ public static class DbSeeder
         };
         testUser.Normalize();
 
-        context.Users.Add(testUser);
+        var deletedUser = new User
+        {
+            TenantId = tenant.Id,
+            CurrentRole = UserRole.Student,
+            Email = "deleted_student@cdmadero.tecnm.mx",
+            ControlNumber = "21070002",
+            FirstName = "Carlos",
+            LastName = "Gómez",
+            IsDeleted = true,
+            DeletedAt = DateTime.UtcNow
+        };
+        deletedUser.Normalize();
+
+        context.Users.AddRange(testUser, deletedUser);
         await context.SaveChangesAsync();
     }
 }
