@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
@@ -21,9 +22,10 @@ public static class VerifyOtp
         Request request,
         AppDbContext context,
         IJwtTokenService jwtTokenService,
+        IOptionsSnapshot<JwtOptions> jwtOptions,
         CancellationToken cancellationToken)
     {
-        var result = await Handler.Handle(request, context, jwtTokenService, cancellationToken);
+        var result = await Handler.Handle(request, context, jwtTokenService, jwtOptions, cancellationToken);
 
         return result.Match(
             response => Results.Ok(response),
