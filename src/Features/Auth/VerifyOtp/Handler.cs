@@ -48,13 +48,14 @@ public static class Handler
         var accessToken = jwtTokenService.GenerateAccessToken(
             new TokenGenerationRequest(user.Id, user.CurrentRole, request.Audience));
 
-        var refreshTokenResult = jwtTokenService.GenerateRefreshToken();
+        var rawRefreshToken = jwtTokenService.GenerateRawRefreshToken();
+        var hashedRefreshToken = jwtTokenService.HashRefreshToken(rawRefreshToken);
         context.RefreshTokens.Add(
-            CreateRefreshTokenEntity(user.Id, refreshTokenResult.HashedToken, request.Audience));
+            CreateRefreshTokenEntity(user.Id, hashedRefreshToken, request.Audience));
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new Response(accessToken, refreshTokenResult.RawToken);
+        return new Response(accessToken, rawRefreshToken);
     }
 
     private static ErrorOr<Success> ValidateOtp(AuthOtpCode otpCode, string inputOtpCode)

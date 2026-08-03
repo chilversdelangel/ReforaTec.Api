@@ -2,8 +2,6 @@ using ReforaTec.Api.Entities.Enums;
 
 namespace ReforaTec.Api.Infrastructure.Security.Jwt;
 
-public record RefreshTokenResult(string RawToken, string HashedToken);
-
 public record TokenGenerationRequest(int UserId, UserRole Role, string Audience);
 
 public interface IJwtTokenService
@@ -14,7 +12,12 @@ public interface IJwtTokenService
     string GenerateAccessToken(TokenGenerationRequest request);
 
     /// <summary>
-    /// Generates a cryptographically secure raw Refresh Token alongside its SHA-256 hash.
+    /// Generates a cryptographically secure raw Refresh Token string (64 random bytes in Base64).
     /// </summary>
-    RefreshTokenResult GenerateRefreshToken();
+    string GenerateRawRefreshToken();
+
+    /// <summary>
+    /// Hashes a raw Refresh Token string using SHA-256 (HEX output).
+    /// </summary>
+    string HashRefreshToken(string rawRefreshToken);
 }

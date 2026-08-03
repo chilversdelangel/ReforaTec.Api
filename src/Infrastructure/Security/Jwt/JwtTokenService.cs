@@ -34,13 +34,18 @@ public class JwtTokenService(IOptions<JwtOptions> jwtOptions) : IJwtTokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public RefreshTokenResult GenerateRefreshToken()
+    public string GenerateRawRefreshToken()
     {
         var randomBytes = RandomNumberGenerator.GetBytes(64);
-        var rawToken = Convert.ToBase64String(randomBytes);
-        var hashedToken = HashToken(rawToken);
+        return Convert.ToBase64String(randomBytes);
+    }
 
-        return new RefreshTokenResult(rawToken, hashedToken);
+    public string HashRefreshToken(string rawRefreshToken)
+    {
+        var tokenBytes = Encoding.UTF8.GetBytes(rawRefreshToken);
+        var hashBytes = SHA256.HashData(tokenBytes);
+
+        return Convert.ToHexString(hashBytes);
     }
 
     private static SigningCredentials CreateSigningCredentials(string secretKey)
@@ -49,13 +54,5 @@ public class JwtTokenService(IOptions<JwtOptions> jwtOptions) : IJwtTokenService
         var securityKey = new SymmetricSecurityKey(keyBytes);
 
         return new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-    }
-
-    private static string HashToken(string rawToken)
-    {
-        var tokenBytes = Encoding.UTF8.GetBytes(rawToken);
-        var hashBytes = SHA256.HashData(tokenBytes);
-
-        return Convert.ToHexString(hashBytes);
     }
 }
