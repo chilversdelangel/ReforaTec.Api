@@ -1,4 +1,4 @@
-namespace ReforaTec.Api.Features.Auth.RotateToken;
+namespace ReforaTec.Api.Features.Auth.RefreshSession;
 
 public static class ErrorCodes
 {

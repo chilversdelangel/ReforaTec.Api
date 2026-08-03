@@ -252,7 +252,7 @@ Content-Type: application/json
 }
 
 ### Auth - Rotate Token (Success - Replace with raw refreshToken from login response)
-POST {{host}}/api/v1/tokens
+POST {{host}}/api/v1/sessions/refresh
 Content-Type: application/json
 
 {
@@ -261,7 +261,7 @@ Content-Type: application/json
 }
 
 ### Auth - Rotate Token (Invalid / Already Consumed Token Error)
-POST {{host}}/api/v1/tokens
+POST {{host}}/api/v1/sessions/refresh
 Content-Type: application/json
 
 {

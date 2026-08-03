@@ -1,7 +1,7 @@
 using FluentValidation;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
 
-namespace ReforaTec.Api.Features.Auth.RotateToken;
+namespace ReforaTec.Api.Features.Auth.RefreshSession;
 
 public class Validator : AbstractValidator<Request>
 {

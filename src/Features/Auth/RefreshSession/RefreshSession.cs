@@ -3,13 +3,13 @@ using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
 
-namespace ReforaTec.Api.Features.Auth.RotateToken;
+namespace ReforaTec.Api.Features.Auth.RefreshSession;
 
-public static class RotateToken
+public static class RefreshSession
 {
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/tokens", HandleRequest)
+        app.MapPost("/sessions/refresh", HandleRequest)
             .AddEndpointFilter<ValidationFilter<Request>>()
             .ProducesValidationProblem()
             .Produces<Response>(StatusCodes.Status200OK)
