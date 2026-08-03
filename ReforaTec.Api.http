@@ -250,3 +250,21 @@ Content-Type: application/json
   "otpCode": "123456",
   "audience": "HackerApp"
 }
+
+### Auth - Rotate Token (Success - Replace with raw refreshToken from login response)
+POST {{host}}/api/v1/tokens
+Content-Type: application/json
+
+{
+  "refreshToken": "TmAX58rstuVuHhVPbU0tVp4pTdN+7ve8S/gHppC+d74folC5g2nWMU81/PsjNRWGs76E0MD0Xo1TRq1cH2lUjQ==",
+  "audience": "ReforaTec.MobileApp"
+}
+
+### Auth - Rotate Token (Invalid / Already Consumed Token Error)
+POST {{host}}/api/v1/tokens
+Content-Type: application/json
+
+{
+  "refreshToken": "invalid-or-already-used-refresh-token",
+  "audience": "ReforaTec.MobileApp"
+}
