@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Features.Auth.RequestOtp;
+using ReforaTec.Api.Features.Auth.RevokeToken;
 using ReforaTec.Api.Features.Auth.RotateToken;
 using ReforaTec.Api.Features.Auth.VerifyOtp;
 using ReforaTec.Api.Features.Campaigns.CreateCampaign;
@@ -87,5 +88,6 @@ CreateCampaign.MapEndpoint(apiV1);
 RequestOtp.MapEndpoint(apiV1);
 VerifyOtp.MapEndpoint(apiV1);
 RotateToken.MapEndpoint(apiV1);
+RevokeToken.MapEndpoint(apiV1);
 
 app.Run();

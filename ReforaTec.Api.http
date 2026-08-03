@@ -268,3 +268,11 @@ Content-Type: application/json
   "refreshToken": "invalid-or-already-used-refresh-token",
   "audience": "ReforaTec.MobileApp"
 }
+
+### Auth - Revoke Token / Logout (RFC 7009 - POST /api/v1/sessions/revoke)
+POST {{host}}/api/v1/sessions/revoke
+Content-Type: application/json
+
+{
+  "refreshToken": "RKhDyeFkyi17GF1We3lQ9e3d+hOB46CtlA3SEYg5x2RttD+5x8/tuo+EaDbYq0Mhbm1HbE+l1tvwJjuZOlJsZA=="
+}
