@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
 
-namespace ReforaTec.Api.Features.Auth.RevokeToken;
+namespace ReforaTec.Api.Features.Auth.RevokeSession;
 
 public static class Handler
 {

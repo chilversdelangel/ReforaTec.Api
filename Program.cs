@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Features.Auth.RefreshSession;
 using ReforaTec.Api.Features.Auth.RequestOtp;
-using ReforaTec.Api.Features.Auth.RevokeToken;
+using ReforaTec.Api.Features.Auth.RevokeSession;
 using ReforaTec.Api.Features.Auth.VerifyOtp;
 using ReforaTec.Api.Features.Campaigns.CreateCampaign;
 using ReforaTec.Api.Features.Campaigns.GetCampaignById;
@@ -93,6 +93,6 @@ CreateCampaign.MapEndpoint(apiV1);
 RequestOtp.MapEndpoint(apiV1);
 VerifyOtp.MapEndpoint(apiV1);
 RefreshSession.MapEndpoint(apiV1);
-RevokeToken.MapEndpoint(apiV1);
+RevokeSession.MapEndpoint(apiV1);
 
 app.Run();

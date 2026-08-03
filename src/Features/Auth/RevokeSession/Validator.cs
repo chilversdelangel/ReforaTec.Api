@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace ReforaTec.Api.Features.Auth.RevokeToken;
+namespace ReforaTec.Api.Features.Auth.RevokeSession;
 
 public class Validator : AbstractValidator<Request>
 {
