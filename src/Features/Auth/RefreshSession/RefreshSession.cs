@@ -10,6 +10,7 @@ public static class RefreshSession
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/sessions/refresh", HandleRequest)
+            .AllowAnonymous()
             .AddEndpointFilter<ValidationFilter<Request>>()
             .ProducesValidationProblem()
             .Produces<Response>(StatusCodes.Status200OK)

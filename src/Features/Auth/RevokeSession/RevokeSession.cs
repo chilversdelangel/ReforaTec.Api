@@ -10,6 +10,7 @@ public static class RevokeSession
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/sessions/revoke", HandleRequest)
+            .AllowAnonymous()
             .AddEndpointFilter<ValidationFilter<Request>>()
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status204NoContent)

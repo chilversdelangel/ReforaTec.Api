@@ -10,6 +10,7 @@ public static class RequestOtp
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/otp-codes", HandleRequest)
+            .AllowAnonymous()
             .AddEndpointFilter<ValidationFilter<Request>>()
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status200OK)

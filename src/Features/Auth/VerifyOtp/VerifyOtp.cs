@@ -11,6 +11,7 @@ public static class VerifyOtp
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/sessions", HandleRequest)
+            .AllowAnonymous()
             .AddEndpointFilter<ValidationFilter<Request>>()
             .ProducesValidationProblem()
             .Produces<Response>(StatusCodes.Status200OK)
