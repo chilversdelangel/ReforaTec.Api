@@ -36,8 +36,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSnakeCaseNamingConvention();
 });
 
-builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
-builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+builder.Services.AddJwtAuthentication<JwtTokenService>(builder.Configuration);
 builder.Services.AddScoped<IOtpService, OtpService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -67,6 +66,9 @@ app.UseRequestLocalization(options =>
     options.AddSupportedCultures(supportedCultures);
     options.AddSupportedUICultures(supportedCultures);
 });
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Endpoints
 var apiV1 = app.MapGroup("/api/v1")
