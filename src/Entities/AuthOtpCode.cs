@@ -7,6 +7,8 @@ namespace ReforaTec.Api.Entities;
 /// </summary>
 public class AuthOtpCode
 {
+    public const int MaxFailedAttempts = 3;
+
     public int UserId { get; set; }
     public User? User { get; set; }
     

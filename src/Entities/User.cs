@@ -13,6 +13,7 @@ public class User : AuditableEntity, INormalizable
     public UserRole CurrentRole { get; set; } = UserRole.Student;
     
     public string Email { get; set; } = string.Empty;
+    public bool IsEmailVerified { get; set; } = false;
     public string? ControlNumber { get; set; }
     
     public string FirstName { get; set; } = string.Empty;

@@ -178,3 +178,135 @@ Content-Type: application/json
     "streetNumber": "456"
   }
 }
+
+### Auth - Request OTP (Success)
+POST {{host}}/api/v1/otp-codes
+Content-Type: application/json
+
+{
+  "email": "student@cdmadero.tecnm.mx"
+}
+
+### Auth - Request OTP (Validation Error - Invalid Email)
+POST {{host}}/api/v1/otp-codes
+Content-Type: application/json
+
+{
+  "email": "not-an-email"
+}
+
+### Auth - Request OTP (OWASP - Unregistered Email)
+POST {{host}}/api/v1/otp-codes
+Content-Type: application/json
+
+{
+  "email": "nonexistent@reforatec.edu.mx"
+}
+
+### Auth - Request OTP (OWASP - Soft-deleted User)
+POST {{host}}/api/v1/otp-codes
+Content-Type: application/json
+
+{
+  "email": "deleted_student@cdmadero.tecnm.mx"
+}
+
+### Auth - Create Session / Verify OTP (Success)
+POST {{host}}/api/v1/sessions
+Content-Type: application/json
+
+{
+  "email": "student@cdmadero.tecnm.mx",
+  "otpCode": "992440",
+  "audience": "ReforaTec.MobileApp"
+}
+
+### Auth - Create Session (Invalid OTP Code)
+POST {{host}}/api/v1/sessions
+Content-Type: application/json
+
+{
+  "email": "student@cdmadero.tecnm.mx",
+  "otpCode": "000000",
+  "audience": "ReforaTec.MobileApp"
+}
+
+### Auth - Create Session (Validation Error - Short OTP Code)
+POST {{host}}/api/v1/sessions
+Content-Type: application/json
+
+{
+  "email": "student@cdmadero.tecnm.mx",
+  "otpCode": "123",
+  "audience": "ReforaTec.MobileApp"
+}
+
+### Auth - Create Session (Validation Error - Unauthorized Audience)
+POST {{host}}/api/v1/sessions
+Content-Type: application/json
+
+{
+  "email": "student@cdmadero.tecnm.mx",
+  "otpCode": "123456",
+  "audience": "HackerApp"
+}
+
+### Auth - Rotate Token (Success - Replace with raw refreshToken from login response)
+POST {{host}}/api/v1/sessions/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "TmAX58rstuVuHhVPbU0tVp4pTdN+7ve8S/gHppC+d74folC5g2nWMU81/PsjNRWGs76E0MD0Xo1TRq1cH2lUjQ==",
+  "audience": "ReforaTec.MobileApp"
+}
+
+### Auth - Rotate Token (Invalid / Already Consumed Token Error)
+POST {{host}}/api/v1/sessions/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "invalid-or-already-used-refresh-token",
+  "audience": "ReforaTec.MobileApp"
+}
+
+### Auth - Revoke Token / Logout (RFC 7009 - POST /api/v1/sessions/revoke)
+POST {{host}}/api/v1/sessions/revoke
+Content-Type: application/json
+
+{
+  "refreshToken": "RKhDyeFkyi17GF1We3lQ9e3d+hOB46CtlA3SEYg5x2RttD+5x8/tuo+EaDbYq0Mhbm1HbE+l1tvwJjuZOlJsZA=="
+}
+
+### Auth - Register User (Success / Overwrite Unverified)
+POST {{host}}/api/v1/users
+Content-Type: application/json
+
+{
+  "firstName": "Juan",
+  "lastName": "Pérez",
+  "email": "juan.perez@cdmadero.tecnm.mx",
+  "controlNumber": "21070001",
+  "phoneNumber": "8331234567"
+}
+
+### Auth - Register User (Domain Not Found 404)
+POST {{host}}/api/v1/users
+Content-Type: application/json
+
+{
+  "firstName": "Hacker",
+  "lastName": "Anon",
+  "email": "hacker@gmail.com",
+  "controlNumber": "99999999"
+}
+
+### Auth - Register User (Validation Error - Missing Control Number)
+POST {{host}}/api/v1/users
+Content-Type: application/json
+
+{
+  "firstName": "Ana",
+  "lastName": "García",
+  "email": "ana.garcia@cdmadero.tecnm.mx",
+  "controlNumber": ""
+}

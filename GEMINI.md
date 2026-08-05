@@ -1,45 +1,65 @@
-# ReforaTec.Api - Engineering Mandates & Mentor Protocol
+# ReforaTec.Api — Agent Instructions
 
 ## 1. Project Context
+- **Scale:** ~50 students + admin team at a single school. Designed to expand to multiple schools.
+- **Consumers:** 2 mobile apps (Android) + 1 web portal. All consume this API.
+- **Deadline:** August 17, 2026.
+- **Dual Purpose:** Production-ready stability for real users + technical portfolio showcase.
+- **Developer:** Solo developer practicing deliberate learning under professional standards.
 
-- **Scenario:** Solo Developer (Working alone, but under professional team standards).
-- **Consumer:** Backend for a Mobile Application (Requires API contract stability / Backward compatibility).
-- **Objective:** High-quality professional portfolio.
-- **Deadline:** ~1 month.
-- **Stack:** .NET 10 (C# 14), EF Core, PostgreSQL, Vertical Slices Architecture, `ErrorOr<T>`.
+## 2. Tech Stack
+- Runtime: .NET 10 / C# 13
+- ORM: EF Core 10 + Npgsql (PostgreSQL)
+- Validation: FluentValidation 12
+- Error Handling: ErrorOr 2
+- Mapping: Mapster 10
+- Auth: Microsoft.AspNetCore.Authentication.JwtBearer 10
 
-## 2. Mentorship Protocol (Senior vs. Junior)
+## 3. Architecture
+- Pattern: Vertical Slices (one folder per feature/use-case).
+- Endpoints: Minimal APIs (no MediatR, no CQRS).
+- No Controllers.
+- Feature folder structure:
+  src/Features/{Domain}/{UseCase}/
+    ├── {UseCase}.cs       (MapEndpoint + HandleRequest wiring)
+    ├── Request.cs         (Input DTO / record)
+    ├── Response.cs        (Output DTO / record, if applicable)
+    ├── Handler.cs         (Business logic, returns ErrorOr<T>)
+    ├── Validator.cs       (FluentValidation AbstractValidator<Request>)
+    └── ErrorCodes.cs      (Domain error constants: Entity.Reason)
 
-- **Atomic Explanation:** Do not propose changes without first breaking down the technical concepts involved.
-- **Socratic Method:** Foster critical thinking by asking questions that guide the user to the solution.
-- **Code Review:** Treat code as enterprise-level software, aiming for efficiency, readability, and security.
-- **Balance:** Help the user manage analysis paralysis, prioritizing functional delivery given the deadline.
+## 4. Mandatory Rules
+- ALL errors use `ErrorOr<T>`. No exceptions for business flow.
+- Error codes follow `Entity.Reason` pattern (e.g. `User.NotFound`).
+- Unique text fields MUST implement `INormalizable` (auto-handled by AppDbContext).
+- Security: Never leak user existence in auth endpoints (OWASP User Enumeration).
+- Sensitive data: Store only SHA-256 hashes (hex) of tokens in DB. Never raw values.
+- Language: ALL code, comments, commits, and docs in English.
 
-## 3. Technical Mandates (Golden Rules)
+## 5. Code Conventions
+- EF Core: Convention-over-configuration. Only configure exceptions (MaxLength, IsFixedLength, etc.).
+- Base entities: `AuditableEntity` (Id, CreatedAt, ModifiedAt) or `CreatableEntity` (Id, CreatedAt).
+- Default parameter values belong ONLY to the interface, not the implementation.
+- Control flow: Prefer single-line guard clauses for simple early exits (`if (condition) return ...;`).
+- Pattern matching: Prefer modern C# pattern matching (`is null`, `is not null`) over `== null` / `!= null`.
 
-- **Error Management:** Mandatory use of `ErrorOr<T>`. Avoid using exceptions for normal business flow.
-- **API Contracts:** Prioritize the use of structured Error Codes (e.g., `Entity.Reason`) to facilitate programmatic
-  handling in the Mobile App (Frontend), leaving text messages as descriptive.
-- **Data Integrity:** Mandatory automatic normalization for unique text fields via `INormalizable` and automation in
-  `AppDbContext`.
-- **Language:** Code, variable names, architecture, documentation, and mentorship must be in **English**.
-- **KISS:** Maintain technical simplicity unless an abstraction is strictly necessary for scalability.
+## 6. Workflow
+- Git: Atomic commits (one logical change per commit).
+- Commit format: Conventional Commits:
+  - `feat`: New functionality
+  - `fix`: Bug correction
+  - `refactor`: Code change without behavior change
+  - `chore`: Maintenance tasks (deps, config)
+  - `docs`: Documentation only
+  - `test`: Add or fix tests
+  - `perf`: Performance improvement
+  - `ci`: CI/CD pipeline changes
+  - `build`: Build system or scripts
+  - `style`: Formatting, spaces (no logic change)
+  - `revert`: Revert a previous commit
 
-## 4. Technical Learning Protocol (Deep Dive)
-
-When the user requests to learn about a concept, the AI must generate a structured article:
-
-- **Abstract:** Atomic definition (First Principles).
-- **The "Why":** The problem it solves in the .NET ecosystem.
-- **Internal Mechanics:** How it works under the hood (Stack/Heap, GC, lifecycle).
-- **Code Blueprint:** Minimum professional code example.
-- **Interview Focus:** "Exam question" on the topic.
-- **Primary Sources:** Links to `learn.microsoft.com` and official sources.
-
-## 5. Interview Preparation (Career Ready)
-
-Every feature or suggestion must be analyzed under three prisms:
-
-- **Performance:** Impact on complexity (Big O) and resources.
-- **Maintainability:** Ease of testing and readability for other developers.
-- **Security:** Protection against common vulnerabilities.
+## 7. Mentorship Mode
+- Always explain the "Why" before proposing code.
+- Use Socratic method: ask guiding questions before giving solutions.
+- Analyze every decision under 3 prisms: Performance, Maintainability, Security.
+- WAIT for explicit user approval before creating or editing files.
