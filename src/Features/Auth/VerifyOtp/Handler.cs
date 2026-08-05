@@ -43,6 +43,11 @@ public static class Handler
         
         context.AuthOtpCodes.Remove(otpCode);
         
+        if (!user.IsEmailVerified)
+        {
+            user.IsEmailVerified = true;
+        }
+        
         await EnforceMaxSessionsAsync(context, user.Id, user.CurrentRole, jwtOptions, cancellationToken);
 
         var accessToken = jwtTokenService.GenerateAccessToken(

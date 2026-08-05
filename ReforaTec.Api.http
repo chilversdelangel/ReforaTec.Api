@@ -276,3 +276,37 @@ Content-Type: application/json
 {
   "refreshToken": "RKhDyeFkyi17GF1We3lQ9e3d+hOB46CtlA3SEYg5x2RttD+5x8/tuo+EaDbYq0Mhbm1HbE+l1tvwJjuZOlJsZA=="
 }
+
+### Auth - Register User (Success / Overwrite Unverified)
+POST {{host}}/api/v1/users
+Content-Type: application/json
+
+{
+  "firstName": "Juan",
+  "lastName": "Pérez",
+  "email": "juan.perez@cdmadero.tecnm.mx",
+  "controlNumber": "21070001",
+  "phoneNumber": "8331234567"
+}
+
+### Auth - Register User (Domain Not Found 404)
+POST {{host}}/api/v1/users
+Content-Type: application/json
+
+{
+  "firstName": "Hacker",
+  "lastName": "Anon",
+  "email": "hacker@gmail.com",
+  "controlNumber": "99999999"
+}
+
+### Auth - Register User (Validation Error - Missing Control Number)
+POST {{host}}/api/v1/users
+Content-Type: application/json
+
+{
+  "firstName": "Ana",
+  "lastName": "García",
+  "email": "ana.garcia@cdmadero.tecnm.mx",
+  "controlNumber": ""
+}

@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Features.Auth.RefreshSession;
+using ReforaTec.Api.Features.Auth.RegisterUser;
 using ReforaTec.Api.Features.Auth.RequestOtp;
 using ReforaTec.Api.Features.Auth.RevokeSession;
 using ReforaTec.Api.Features.Auth.VerifyOtp;
@@ -49,8 +50,8 @@ app.UseExceptionHandler();
 // Middleware
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapOpenApi().AllowAnonymous();
+    app.MapScalarApiReference().AllowAnonymous();
 
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -92,6 +93,7 @@ GetCampaignById.MapEndpoint(apiV1);
 CreateCampaign.MapEndpoint(apiV1);
 
 // Auth
+RegisterUser.MapEndpoint(apiV1);
 RequestOtp.MapEndpoint(apiV1);
 VerifyOtp.MapEndpoint(apiV1);
 RefreshSession.MapEndpoint(apiV1);
