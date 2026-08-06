@@ -13,9 +13,10 @@ using ReforaTec.Api.Features.Trees.GetTreeById;
 using ReforaTec.Api.Features.Trees.GetTrees;
 using ReforaTec.Api.Features.Values.CreateValue;
 using ReforaTec.Api.Features.Values.GetValueById;
-using ReforaTec.Api.Infrastructure;
 using ReforaTec.Api.Infrastructure.Endpoints;
+using ReforaTec.Api.Infrastructure.Localization;
 using ReforaTec.Api.Infrastructure.Middleware;
+using ReforaTec.Api.Infrastructure.OpenApi;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
 using ReforaTec.Api.Infrastructure.Security.Otp;
 using Scalar.AspNetCore;
@@ -35,27 +36,16 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 
-// Middleware
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi().AllowAnonymous();
     app.MapScalarApiReference().AllowAnonymous();
 
-    using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await DbSeeder.SeedAsync(dbContext);
+    await app.SeedDatabaseAsync();
 }
 
 app.UseHttpsRedirection();
-
-var supportedCultures = new[] { "en" };
-app.UseRequestLocalization(options =>
-{
-    options.SetDefaultCulture("en");
-    options.AddSupportedCultures(supportedCultures);
-    options.AddSupportedUICultures(supportedCultures);
-});
-
+app.UseDefaultRequestLocalization();
 app.UseAuthentication();
 app.UseAuthorization();
 

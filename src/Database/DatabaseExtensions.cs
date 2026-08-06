@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using ReforaTec.Api.Database;
 
-namespace ReforaTec.Api.Infrastructure;
+namespace ReforaTec.Api.Database;
 
-internal static class DependencyInjection
+internal static class DatabaseExtensions
 {
     extension(IServiceCollection services)
     {
@@ -19,17 +18,15 @@ internal static class DependencyInjection
 
             return services;
         }
+    }
 
-        internal IServiceCollection AddCustomOpenApi()
+    extension(WebApplication app)
+    {
+        internal async Task SeedDatabaseAsync()
         {
-            services.AddOpenApi(options =>
-            {
-                options.CreateSchemaReferenceId = typeInfo => typeInfo.Type.FullName?
-                    .Replace("ReforaTec.Api.Features.", "")
-                    .Replace("+", ".");
-            });
-
-            return services;
+            using var scope = app.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await DbSeeder.SeedAsync(dbContext);
         }
     }
 }
