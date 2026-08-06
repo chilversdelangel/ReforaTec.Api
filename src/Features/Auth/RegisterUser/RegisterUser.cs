@@ -1,12 +1,13 @@
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
 
 namespace ReforaTec.Api.Features.Auth.RegisterUser;
 
-public static class RegisterUser
+internal sealed class RegisterUser : IEndpoint
 {
-    public static void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/users", HandleRequest)
             .AllowAnonymous()

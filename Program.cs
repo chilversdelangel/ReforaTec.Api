@@ -13,6 +13,8 @@ using ReforaTec.Api.Features.Trees.GetTreeById;
 using ReforaTec.Api.Features.Trees.GetTrees;
 using ReforaTec.Api.Features.Values.CreateValue;
 using ReforaTec.Api.Features.Values.GetValueById;
+using ReforaTec.Api.Infrastructure;
+using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Middleware;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
 using ReforaTec.Api.Infrastructure.Security.Otp;
@@ -61,6 +63,8 @@ app.UseAuthorization();
 var apiV1 = app.MapGroup("/api/v1")
     .WithTags("V1 Endpoints");
 
+apiV1.MapEndpoints();
+
 // Trees
 GetTrees.MapEndpoint(apiV1);
 GetTreeById.MapEndpoint(apiV1);
@@ -79,7 +83,7 @@ GetCampaignById.MapEndpoint(apiV1);
 CreateCampaign.MapEndpoint(apiV1);
 
 // Auth
-RegisterUser.MapEndpoint(apiV1);
+// RegisterUser.MapEndpoint(apiV1); // Auto-mapped by reflection
 RequestOtp.MapEndpoint(apiV1);
 VerifyOtp.MapEndpoint(apiV1);
 RefreshSession.MapEndpoint(apiV1);
