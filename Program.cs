@@ -1,8 +1,6 @@
 using FluentValidation;
-using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Features.Auth.RefreshSession;
-using ReforaTec.Api.Features.Auth.RegisterUser;
 using ReforaTec.Api.Features.Auth.RequestOtp;
 using ReforaTec.Api.Features.Auth.RevokeSession;
 using ReforaTec.Api.Features.Auth.VerifyOtp;
@@ -21,25 +19,13 @@ using ReforaTec.Api.Infrastructure.Security.Otp;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Services
-builder.Services.AddOpenApi(options =>
-{
-    options.CreateSchemaReferenceId = typeInfo => typeInfo.Type.FullName?
-        .Replace("ReforaTec.Api.Features.", "")
-        .Replace("+", ".");
-});
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseNpgsql(connectionString);
-    options.UseSnakeCaseNamingConvention();
-});
-
+// Explicit Services Inventory
+builder.Services.AddPostgresDbContext(builder.Configuration);
 builder.Services.AddJwtAuthentication<JwtTokenService>(builder.Configuration);
 builder.Services.AddScoped<IOtpService, OtpService>();
-
+builder.Services.AddCustomOpenApi();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
