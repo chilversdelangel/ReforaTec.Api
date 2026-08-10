@@ -4,9 +4,6 @@ using ReforaTec.Api.Features.Campaigns.CreateCampaign;
 using ReforaTec.Api.Features.Campaigns.GetCampaignById;
 using ReforaTec.Api.Features.Species.CreateSpecies;
 using ReforaTec.Api.Features.Species.GetSpeciesById;
-using ReforaTec.Api.Features.Trees.CreateTree;
-using ReforaTec.Api.Features.Trees.GetTreeById;
-using ReforaTec.Api.Features.Trees.GetTrees;
 using ReforaTec.Api.Features.Values.CreateValue;
 using ReforaTec.Api.Features.Values.GetValueById;
 using ReforaTec.Api.Infrastructure.Endpoints;
@@ -50,11 +47,6 @@ var apiV1 = app.MapGroup("/api/v1")
     .WithTags("V1 Endpoints");
 
 apiV1.MapEndpoints();
-
-// Trees
-GetTrees.MapEndpoint(apiV1);
-GetTreeById.MapEndpoint(apiV1);
-CreateTree.MapEndpoint(apiV1);
 
 // Values
 GetValueById.MapEndpoint(apiV1);

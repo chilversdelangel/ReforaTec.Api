@@ -1,7 +1,20 @@
+using ReforaTec.Api.Infrastructure.Endpoints;
+
 namespace ReforaTec.Api.Features.Trees.GetTrees;
 
-public static class GetTrees
+internal sealed class GetTrees : IEndpoint
 {
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapGet("/trees", Handle);
+    }
+
+    public static Task<List<Response>> Handle()
+    {
+        var treeList = new List<Response>();
+        return Task.FromResult(treeList);
+    }
+
     public record LocationResponse(
         double? Latitude,
         double? Longitude,
@@ -22,15 +35,4 @@ public static class GetTrees
         LocationResponse Location,
         string? Notes
     );
-
-    public static Task<List<Response>> Handle()
-    {
-        var treeList = new List<Response> { };
-        return Task.FromResult(treeList);
-    }
-
-    public static void MapEndpoint(IEndpointRouteBuilder app)
-    {
-        app.MapGet("/trees", Handle);
-    }
 }

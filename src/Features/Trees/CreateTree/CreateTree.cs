@@ -3,12 +3,37 @@ using Mapster;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Entities;
 using ReforaTec.Api.Entities.Enums;
+using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 
 namespace ReforaTec.Api.Features.Trees.CreateTree;
 
-public static class CreateTree
+internal sealed class CreateTree : IEndpoint
 {
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapPost("/trees", Handle)
+            .AddEndpointFilter<ValidationFilter<Request>>()
+            .Produces<Response>(StatusCodes.Status201Created)
+            .ProducesValidationProblem();
+    }
+
+    public static async Task<IResult> Handle(
+        Request request,
+        AppDbContext context
+    )
+    {
+        var newTree = request.Adapt<Tree>();
+        newTree.HealthState = TreeHealthState.Healthy;
+
+        context.Trees.Add(newTree);
+        await context.SaveChangesAsync();
+
+        var treeResponse = newTree.Adapt<Response>();
+
+        return Results.CreatedAtRoute("GetTreeById", new { id = treeResponse.Id }, treeResponse);
+    }
+
     public record LocationDto(
         double? Latitude,
         double? Longitude,
@@ -79,29 +104,5 @@ public static class CreateTree
                         .NotEmpty().WithMessage("Street is required");
                 });
         }
-    }
-
-    public static async Task<IResult> Handle(
-        Request request,
-        AppDbContext context
-    )
-    {
-        var newTree = request.Adapt<Tree>();
-        newTree.HealthState = TreeHealthState.Healthy;
-
-        context.Trees.Add(newTree);
-        await context.SaveChangesAsync();
-
-        var treeResponse = newTree.Adapt<Response>();
-
-        return Results.CreatedAtRoute("GetTreeById", new { id = treeResponse.Id }, treeResponse);
-    }
-
-    public static void MapEndpoint(IEndpointRouteBuilder app)
-    {
-        app.MapPost("/trees", Handle)
-            .AddEndpointFilter<ValidationFilter<Request>>()
-            .Produces<Response>(StatusCodes.Status201Created)
-            .ProducesValidationProblem();
     }
 }
