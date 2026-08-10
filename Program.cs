@@ -1,7 +1,5 @@
 using FluentValidation;
 using ReforaTec.Api.Database;
-using ReforaTec.Api.Features.Species.CreateSpecies;
-using ReforaTec.Api.Features.Species.GetSpeciesById;
 using ReforaTec.Api.Features.Values.CreateValue;
 using ReforaTec.Api.Features.Values.GetValueById;
 using ReforaTec.Api.Infrastructure.Endpoints;
@@ -49,9 +47,5 @@ apiV1.MapEndpoints();
 // Values
 GetValueById.MapEndpoint(apiV1);
 CreateValue.MapEndpoint(apiV1);
-
-// Species
-CreateSpecies.MapEndpoint(apiV1);
-GetSpeciesById.MapEndpoint(apiV1);
 
 app.Run();

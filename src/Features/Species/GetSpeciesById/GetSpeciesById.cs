@@ -2,10 +2,11 @@ using ErrorOr;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Infrastructure.Endpoints;
 
 namespace ReforaTec.Api.Features.Species.GetSpeciesById;
 
-public static class GetSpeciesById
+internal sealed class GetSpeciesById : IEndpoint
 {
     public record Response(
         int Id,
@@ -37,7 +38,7 @@ public static class GetSpeciesById
         return species.Adapt<Response>();
     }
 
-    public static void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("/species/{id:int}", async (int id, AppDbContext context) =>
             {

@@ -4,11 +4,12 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Common.Helpers;
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 
 namespace ReforaTec.Api.Features.Species.CreateSpecies;
 
-public static class CreateSpecies
+internal sealed class CreateSpecies : IEndpoint
 {
     public record Request(
         string ScientificName,
@@ -77,7 +78,7 @@ public static class CreateSpecies
         return speciesResponse;
     }
 
-    public static void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/species", async (Request request, AppDbContext context) =>
             {
