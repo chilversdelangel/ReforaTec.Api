@@ -4,11 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Common.Helpers;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Entities;
+using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 
 namespace ReforaTec.Api.Features.Values.CreateValue;
 
-public static class CreateValue
+internal sealed class CreateValue : IEndpoint
 {
     public record Request(string ValueName);
 
@@ -59,7 +60,7 @@ public static class CreateValue
         return Results.CreatedAtRoute("GetValueById", new { id = valueResponse.Id }, valueResponse);
     }
 
-    public static void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/values", Handle)
             .AddEndpointFilter<ValidationFilter<Request>>()

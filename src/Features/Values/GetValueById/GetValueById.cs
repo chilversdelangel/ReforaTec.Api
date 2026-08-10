@@ -1,10 +1,11 @@
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Infrastructure.Endpoints;
 
 namespace ReforaTec.Api.Features.Values.GetValueById;
 
-public static class GetValueById
+internal sealed class GetValueById : IEndpoint
 {
     public record Response(
         int Id,
@@ -31,7 +32,7 @@ public static class GetValueById
         return Results.Ok(value.Adapt<Response>());
     }
 
-    public static void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("/values/{id:int}", Handle)
             .WithName("GetValueById");

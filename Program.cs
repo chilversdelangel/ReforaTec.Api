@@ -1,7 +1,5 @@
 using FluentValidation;
 using ReforaTec.Api.Database;
-using ReforaTec.Api.Features.Values.CreateValue;
-using ReforaTec.Api.Features.Values.GetValueById;
 using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Localization;
 using ReforaTec.Api.Infrastructure.Middleware;
@@ -43,9 +41,5 @@ var apiV1 = app.MapGroup("/api/v1")
     .WithTags("V1 Endpoints");
 
 apiV1.MapEndpoints();
-
-// Values
-GetValueById.MapEndpoint(apiV1);
-CreateValue.MapEndpoint(apiV1);
 
 app.Run();
