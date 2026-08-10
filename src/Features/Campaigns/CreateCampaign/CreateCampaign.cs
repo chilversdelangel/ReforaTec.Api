@@ -1,12 +1,13 @@
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
 
 namespace ReforaTec.Api.Features.Campaigns.CreateCampaign;
 
-public static class CreateCampaign
+internal sealed class CreateCampaign : IEndpoint
 {
-    public static void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/campaigns", HandleRequest)
             .AddEndpointFilter<ValidationFilter<Request>>()

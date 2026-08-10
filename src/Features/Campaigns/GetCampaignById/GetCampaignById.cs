@@ -1,11 +1,12 @@
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Mapping;
 
 namespace ReforaTec.Api.Features.Campaigns.GetCampaignById;
 
-public static class GetCampaignById
+internal sealed class GetCampaignById : IEndpoint
 {
-    public static void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("/campaigns/{id:int}", HandleRequest)
             .WithName("GetCampaignById")
