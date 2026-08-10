@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="GEMINI.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/ReforaTec.Api/ReforaTec.Api.csproj" />
+  </Folder>
+</Solution>

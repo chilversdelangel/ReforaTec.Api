@@ -1,0 +1,11 @@
+root = true
+
+[*.cs]
+# Require explicit access modifiers (internal, public, private)
+dotnet_style_require_accessibility_modifiers = always:warning
+
+# CA1852: Seal internal types that are not inherited (Performance & Design intent)
+dotnet_diagnostic.CA1852.severity = warning
+
+# CA1822: Mark members as static if they don't access instance data (Performance & Purity)
+dotnet_diagnostic.CA1822.severity = warning
