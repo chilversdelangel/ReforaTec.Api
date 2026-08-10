@@ -1,13 +1,14 @@
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
 using ReforaTec.Api.Infrastructure.Security.Otp;
 
 namespace ReforaTec.Api.Features.Auth.RequestOtp;
 
-public static class RequestOtp
+internal sealed class RequestOtp : IEndpoint
 {
-    public static void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/otp-codes", HandleRequest)
             .AllowAnonymous()
@@ -18,8 +19,8 @@ public static class RequestOtp
     }
 
     private static async Task<IResult> HandleRequest(
-        Request request, 
-        AppDbContext context, 
+        Request request,
+        AppDbContext context,
         IOtpService otpService,
         CancellationToken cancellationToken)
     {

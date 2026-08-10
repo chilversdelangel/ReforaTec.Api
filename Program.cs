@@ -1,9 +1,5 @@
 using FluentValidation;
 using ReforaTec.Api.Database;
-using ReforaTec.Api.Features.Auth.RefreshSession;
-using ReforaTec.Api.Features.Auth.RequestOtp;
-using ReforaTec.Api.Features.Auth.RevokeSession;
-using ReforaTec.Api.Features.Auth.VerifyOtp;
 using ReforaTec.Api.Features.Campaigns.CreateCampaign;
 using ReforaTec.Api.Features.Campaigns.GetCampaignById;
 using ReforaTec.Api.Features.Species.CreateSpecies;
@@ -71,12 +67,5 @@ GetSpeciesById.MapEndpoint(apiV1);
 // Campaign
 GetCampaignById.MapEndpoint(apiV1);
 CreateCampaign.MapEndpoint(apiV1);
-
-// Auth
-// RegisterUser.MapEndpoint(apiV1); // Auto-mapped by reflection
-RequestOtp.MapEndpoint(apiV1);
-VerifyOtp.MapEndpoint(apiV1);
-RefreshSession.MapEndpoint(apiV1);
-RevokeSession.MapEndpoint(apiV1);
 
 app.Run();

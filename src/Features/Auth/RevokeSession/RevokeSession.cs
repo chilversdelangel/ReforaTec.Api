@@ -1,13 +1,14 @@
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
 
 namespace ReforaTec.Api.Features.Auth.RevokeSession;
 
-public static class RevokeSession
+internal sealed class RevokeSession : IEndpoint
 {
-    public static void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/sessions/revoke", HandleRequest)
             .AllowAnonymous()
