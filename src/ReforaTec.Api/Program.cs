@@ -6,6 +6,7 @@ using ReforaTec.Api.Infrastructure.Middleware;
 using ReforaTec.Api.Infrastructure.OpenApi;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
 using ReforaTec.Api.Infrastructure.Security.Otp;
+using ReforaTec.Api.Infrastructure.Storage;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddPostgresDbContext(builder.Configuration);
 builder.Services.AddJwtAuthentication<JwtTokenService>(builder.Configuration);
 builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddFileStorage();
 builder.Services.AddCustomOpenApi();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -22,6 +24,7 @@ builder.Services.AddProblemDetails();
 var app = builder.Build();
 
 app.UseExceptionHandler();
+app.UseStaticFiles();
 
 if (app.Environment.IsDevelopment())
 {
