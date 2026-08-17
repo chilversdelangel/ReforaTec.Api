@@ -2,7 +2,7 @@ namespace ReforaTec.Api.Infrastructure.Storage;
 
 internal sealed class LocalStorageService(IWebHostEnvironment environment) : IFileStorageService
 {
-    public async Task<string> UploadAsync(IFormFile file, string folder, CancellationToken cancellationToken)
+    public async Task<FileStorageResult> UploadAsync(IFormFile file, string folder, CancellationToken cancellationToken)
     {
         var fileName = file.FileName;
         var extension = Path.GetExtension(fileName).ToLowerInvariant();
@@ -19,6 +19,9 @@ internal sealed class LocalStorageService(IWebHostEnvironment environment) : IFi
         await file.CopyToAsync(outputStream, cancellationToken);
 
         var urlFolder = normalizedFolder.Replace('\\', '/');
-        return $"/media/{urlFolder}/{uniqueFileName}";
+        var fileKey = $"{urlFolder}/{uniqueFileName}";
+        var url = $"/media/{fileKey}";
+
+        return new FileStorageResult(url, fileKey);
     }
 }
