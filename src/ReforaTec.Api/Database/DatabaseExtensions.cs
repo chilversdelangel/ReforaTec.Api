@@ -26,6 +26,7 @@ internal static class DatabaseExtensions
         {
             using var scope = app.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await dbContext.Database.MigrateAsync();
             await DbSeeder.SeedAsync(dbContext);
         }
     }
