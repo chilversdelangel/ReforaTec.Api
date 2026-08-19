@@ -11,8 +11,8 @@ COPY . .
 WORKDIR "/src/src/ReforaTec.Api"
 RUN dotnet publish "ReforaTec.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# Stage 2: Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview AS final
+# Stage 2: Runtime — use same SDK image to guarantee ASP.NET Core assembly version match
+FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
