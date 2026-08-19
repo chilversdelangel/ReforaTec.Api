@@ -16,6 +16,11 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
+# Install Kerberos GSSAPI library required by Npgsql for remote PostgreSQL connections
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgssapi-krb5-2 \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV ASPNETCORE_HTTP_PORTS=8080
 ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 EXPOSE 8080
