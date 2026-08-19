@@ -14,12 +14,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Explicit Services Inventory
 builder.Services.AddPostgresDbContext(builder.Configuration);
 builder.Services.AddJwtAuthentication<JwtTokenService>(builder.Configuration);
-builder.Services.AddScoped<IOtpService, OtpService>();
-builder.Services.AddFileStorage();
-builder.Services.AddCustomOpenApi();
+builder.Services.AddOtpService<OtpService>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.AddCustomOpenApi();
 
 var app = builder.Build();
 
