@@ -186,35 +186,60 @@ public static class DbSeeder
 
     private static async Task SeedUsersAsync(AppDbContext context)
     {
-        if (await context.Users.AnyAsync()) return;
-
         var tenant = await context.Tenants.FirstAsync();
 
-        var testUser = new User
+        var usersToSeed = new List<User>
         {
-            TenantId = tenant.Id,
-            CurrentRole = UserRole.Student,
-            Email = "student@cdmadero.tecnm.mx",
-            ControlNumber = "21070001",
-            FirstName = "Juan",
-            LastName = "Pérez"
+            new()
+            {
+                TenantId = tenant.Id,
+                CurrentRole = UserRole.SystemAdmin,
+                Email = "admin@cdmadero.tecnm.mx",
+                ControlNumber = "ADM0001",
+                FirstName = "Admin",
+                LastName = "General"
+            },
+            new()
+            {
+                TenantId = tenant.Id,
+                CurrentRole = UserRole.Coordinator,
+                Email = "coordinador@cdmadero.tecnm.mx",
+                ControlNumber = "CRD0001",
+                FirstName = "Danna",
+                LastName = "Coordinadora"
+            },
+            new()
+            {
+                TenantId = tenant.Id,
+                CurrentRole = UserRole.Student,
+                Email = "student@cdmadero.tecnm.mx",
+                ControlNumber = "21070001",
+                FirstName = "Juan",
+                LastName = "Pérez"
+            },
+            new()
+            {
+                TenantId = tenant.Id,
+                CurrentRole = UserRole.Student,
+                Email = "deleted_student@cdmadero.tecnm.mx",
+                ControlNumber = "21070002",
+                FirstName = "Carlos",
+                LastName = "Gómez",
+                IsDeleted = true,
+                DeletedAt = DateTime.UtcNow
+            }
         };
-        testUser.Normalize();
 
-        var deletedUser = new User
+        foreach (var user in usersToSeed)
         {
-            TenantId = tenant.Id,
-            CurrentRole = UserRole.Student,
-            Email = "deleted_student@cdmadero.tecnm.mx",
-            ControlNumber = "21070002",
-            FirstName = "Carlos",
-            LastName = "Gómez",
-            IsDeleted = true,
-            DeletedAt = DateTime.UtcNow
-        };
-        deletedUser.Normalize();
+            user.Normalize();
+            var exists = await context.Users.AnyAsync(u => u.Email == user.Email);
+            if (!exists)
+            {
+                context.Users.Add(user);
+            }
+        }
 
-        context.Users.AddRange(testUser, deletedUser);
         await context.SaveChangesAsync();
     }
 }
