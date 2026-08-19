@@ -16,7 +16,7 @@ builder.Services.AddPostgresDbContext(builder.Configuration);
 builder.Services.AddLocalStorage(builder.Configuration);
 builder.Services.AddJwtAuthentication<JwtTokenService>(builder.Configuration);
 builder.Services.AddOtpService<OtpService>();
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>(includeInternalTypes: true);
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddCustomOpenApi();
