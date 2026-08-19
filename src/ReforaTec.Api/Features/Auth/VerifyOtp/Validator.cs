@@ -3,7 +3,7 @@ using ReforaTec.Api.Infrastructure.Security.Jwt;
 
 namespace ReforaTec.Api.Features.Auth.VerifyOtp;
 
-public class Validator : AbstractValidator<Request>
+internal sealed class Validator : AbstractValidator<Request>
 {
     public Validator()
     {

@@ -14,10 +14,11 @@ internal sealed class VerifyOtp : IEndpoint
         app.MapPost("/sessions", HandleRequest)
             .AllowAnonymous()
             .AddEndpointFilter<ValidationFilter<Request>>()
+            .Produces<Response>(StatusCodes.Status200OK)
             .ProducesValidationProblem()
-            .Produces<Response>()
-            .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized);
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .WithSummary("Create session / Verify OTP")
+            .WithDescription("Verifies an OTP verification code and generates a JWT access token and refresh token.");
     }
 
     private static async Task<IResult> HandleRequest(
