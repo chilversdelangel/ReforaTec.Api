@@ -1,27 +1,37 @@
+using Microsoft.Extensions.Options;
+using ReforaTec.Api.Common.Helpers;
+
 namespace ReforaTec.Api.Infrastructure.Storage;
 
-internal sealed class LocalStorageService(IWebHostEnvironment environment) : IFileStorageService
+internal sealed class LocalStorageService(
+    IWebHostEnvironment environment,
+    IOptions<LocalStorageOptions> options) : IFileStorageService
 {
-    public async Task<FileStorageResult> UploadAsync(IFormFile file, string folder, CancellationToken cancellationToken)
+    private readonly LocalStorageOptions _options = options.Value;
+    private readonly string _storageRoot = Path.GetFullPath(options.Value.StoragePath, environment.ContentRootPath);
+
+    public async Task<FileStorageResult> UploadAsync(
+        IFormFile file,
+        string targetPath,
+        CancellationToken cancellationToken)
     {
         var fileName = file.FileName;
         var extension = Path.GetExtension(fileName).ToLowerInvariant();
         var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
 
-        var webRoot = environment.WebRootPath;
-        var normalizedFolder = folder.Trim('/', '\\');
-        var targetDirectory = Path.Combine(webRoot, "media", normalizedFolder);
+        targetPath = targetPath.ToNormalizedPath();
 
-        Directory.CreateDirectory(targetDirectory);
+        var directory = Path.Combine(_storageRoot, targetPath);
+        Directory.CreateDirectory(directory);
 
-        var physicalFilePath = Path.Combine(targetDirectory, uniqueFileName);
-        await using var outputStream = new FileStream(physicalFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
-        await file.CopyToAsync(outputStream, cancellationToken);
+        var filePath = Path.Combine(directory, uniqueFileName);
+        await using var fileStream = File.Create(filePath);
+        await file.CopyToAsync(fileStream, cancellationToken);
 
-        var urlFolder = normalizedFolder.Replace('\\', '/');
-        var fileKey = $"{urlFolder}/{uniqueFileName}";
-        var url = $"/media/{fileKey}";
+        var fileIdentifier = $"{targetPath}/{uniqueFileName}";
+        var baseUrl = _options.BaseUrl.TrimEnd('/');
+        var fileUrl = $"{baseUrl}/media/{fileIdentifier}";
 
-        return new FileStorageResult(url, fileKey);
+        return new FileStorageResult(fileUrl, fileIdentifier);
     }
 }

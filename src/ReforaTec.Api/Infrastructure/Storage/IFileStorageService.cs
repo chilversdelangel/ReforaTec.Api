@@ -1,8 +1,8 @@
 namespace ReforaTec.Api.Infrastructure.Storage;
 
-internal record FileStorageResult(string Url, string FileKey);
+internal record FileStorageResult(string FileUrl, string FileIdentifier);
 
 internal interface IFileStorageService
 {
-    public Task<FileStorageResult> UploadAsync(IFormFile file, string folder, CancellationToken cancellationToken = default);
+    public Task<FileStorageResult> UploadAsync(IFormFile file, string targetPath, CancellationToken cancellationToken = default);
 }
