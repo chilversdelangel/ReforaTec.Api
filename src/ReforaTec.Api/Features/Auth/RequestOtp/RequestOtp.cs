@@ -13,10 +13,10 @@ internal sealed class RequestOtp : IEndpoint
         app.MapPost("/otp-codes", HandleRequest)
             .AllowAnonymous()
             .AddEndpointFilter<ValidationFilter<Request>>()
-            .Produces(StatusCodes.Status204NoContent)
+            .Produces<Response>(StatusCodes.Status200OK)
             .ProducesValidationProblem()
             .WithSummary("Request login OTP code")
-            .WithDescription("Sends a one-time password code to the registered email address if it exists.");
+            .WithDescription("Sends an OTP code (and returns it in development) for user login.");
     }
 
     private static async Task<IResult> HandleRequest(
@@ -28,7 +28,7 @@ internal sealed class RequestOtp : IEndpoint
         var result = await Handler.Handle(request, context, otpService, cancellationToken);
 
         return result.Match(
-            _ => Results.NoContent(),
+            response => Results.Ok(response),
             errors => errors.ToProblem());
     }
 }

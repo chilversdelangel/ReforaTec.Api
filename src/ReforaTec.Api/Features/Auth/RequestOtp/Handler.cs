@@ -9,7 +9,7 @@ namespace ReforaTec.Api.Features.Auth.RequestOtp;
 
 public static class Handler
 {
-    public static async Task<ErrorOr<Success>> Handle(
+    public static async Task<ErrorOr<Response>> Handle(
         Request request,
         AppDbContext context,
         IOtpService otpService,
@@ -20,8 +20,8 @@ public static class Handler
         var user = await context.Users
             .FirstOrDefaultAsync(u => u.Email == normalizedEmail && !u.IsDeleted, cancellationToken);
 
-        // OWASP User Enumeration Prevention: Do not leak user existence
-        if (user is null) return Result.Success;
+        // OWASP User Enumeration Prevention: Do not leak user existence (return empty response)
+        if (user is null) return new Response(null);
 
         var otpCode = otpService.GenerateOtp();
         var expiresAt = DateTime.UtcNow.AddMinutes(5);
@@ -51,6 +51,6 @@ public static class Handler
         // Development simulation: Print OTP to console until Email service is integrated
         Console.WriteLine($"[DEV ONLY] OTP Code for {user.Email}: {otpCode}");
 
-        return Result.Success;
+        return new Response(otpCode);
     }
 }
