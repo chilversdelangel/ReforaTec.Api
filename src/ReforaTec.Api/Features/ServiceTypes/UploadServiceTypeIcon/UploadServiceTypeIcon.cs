@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
+using ReforaTec.Api.Infrastructure.Security.Authorization;
 using ReforaTec.Api.Infrastructure.Storage;
 
 namespace ReforaTec.Api.Features.ServiceTypes.UploadServiceTypeIcon;
@@ -18,7 +19,7 @@ internal sealed class UploadServiceTypeIcon : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Upload service type icon")
             .WithDescription("Uploads an icon image (PNG/WebP/JPEG, max 1MB) for a service type catalog entry.")
-            .RequireAuthorization();
+            .RequireAuthorization(Policy.CanManageCatalogs);
     }
 
     private static async Task<IResult> HandleRequest(
