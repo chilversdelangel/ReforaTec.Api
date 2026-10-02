@@ -13,6 +13,11 @@ internal static class AuthorizationExtensions
             auth.AddPolicy(Policy.CanManageCatalogs, policy => policy.RequireRole(
                 nameof(UserRole.SystemAdmin)));
 
+            auth.AddPolicy(Policy.CanRecordMeasurements, policy => policy.RequireRole(
+                nameof(UserRole.Inspector),
+                nameof(UserRole.Coordinator),
+                nameof(UserRole.SystemAdmin)));
+
             return services;
         }
     }
