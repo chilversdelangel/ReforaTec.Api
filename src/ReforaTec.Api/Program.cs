@@ -28,6 +28,8 @@ var app = builder.Build();
 app.UseExceptionHandler();
 app.UseLocalStorage();
 
+await app.MigrateDatabaseAsync();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi().AllowAnonymous();
