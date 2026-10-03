@@ -60,7 +60,9 @@ public static class Handler
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new Response(accessToken, rawRefreshToken);
+        var expiresInSeconds = jwtOptions.Value.AccessTokenExpirationHours * 3600;
+
+        return new Response(accessToken, rawRefreshToken, "Bearer", expiresInSeconds);
     }
 
     private static ErrorOr<Success> ValidateOtp(AuthOtpCode otpCode, string inputOtpCode)

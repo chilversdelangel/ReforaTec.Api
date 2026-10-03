@@ -4,24 +4,29 @@ using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Localization;
 using ReforaTec.Api.Infrastructure.Middleware;
 using ReforaTec.Api.Infrastructure.OpenApi;
+using ReforaTec.Api.Infrastructure.Security.Authorization;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
 using ReforaTec.Api.Infrastructure.Security.Otp;
+using ReforaTec.Api.Infrastructure.Storage;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Explicit Services Inventory
 builder.Services.AddPostgresDbContext(builder.Configuration);
+builder.Services.AddLocalStorage(builder.Configuration);
 builder.Services.AddJwtAuthentication<JwtTokenService>(builder.Configuration);
-builder.Services.AddScoped<IOtpService, OtpService>();
-builder.Services.AddCustomOpenApi();
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddAuthorizationPolicies();
+builder.Services.AddOtpService<OtpService>();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>(includeInternalTypes: true);
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.AddCustomOpenApi();
 
 var app = builder.Build();
 
 app.UseExceptionHandler();
+app.UseLocalStorage();
 
 if (app.Environment.IsDevelopment())
 {

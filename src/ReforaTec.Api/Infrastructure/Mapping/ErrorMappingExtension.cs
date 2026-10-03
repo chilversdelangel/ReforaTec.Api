@@ -2,30 +2,38 @@ using ErrorOr;
 
 namespace ReforaTec.Api.Infrastructure.Mapping;
 
-public static class ErrorMappingExtensions
+internal static class ErrorMappingExtensions
 {
     public static IResult ToProblem(this List<Error> errors)
     {
-        if (errors.Count == 0) return Results.Problem();
+        if (errors.Count == 0)
+        {
+            return Results.Problem();
+        }
 
         var firstError = errors[0];
-        var errorResponse = new { code = firstError.Code, detail = firstError.Description };
+        
+        var description = firstError.Description;
+        var customCode = firstError.Code;
 
-        return firstError.Type switch
+        var httpStatusCode = firstError.Type switch
         {
-            ErrorType.NotFound => Results.NotFound(errorResponse),
-
-            ErrorType.Validation => Results.BadRequest(errorResponse),
-
-            ErrorType.Conflict => Results.Conflict(errorResponse),
-
-            // Uses Results.Json with 401 instead of Results.Unauthorized()
-            // to preserve the custom JSON payload { code, detail } for client UIs.
-            ErrorType.Unauthorized => Results.Json(
-                errorResponse, 
-                statusCode: StatusCodes.Status401Unauthorized),
-
-            _ => Results.Problem(statusCode: 500, title: "An unexpected error occurred.")
+            ErrorType.NotFound => StatusCodes.Status404NotFound,
+            ErrorType.Validation => StatusCodes.Status400BadRequest,
+            ErrorType.Conflict => StatusCodes.Status409Conflict,
+            ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
+            _ => StatusCodes.Status500InternalServerError
         };
+
+        var extensions = new Dictionary<string, object?> 
+        { 
+            ["code"] = customCode 
+        };
+
+        return Results.Problem(
+            statusCode: httpStatusCode,
+            detail: description,
+            extensions: extensions
+        );
     }
 }
