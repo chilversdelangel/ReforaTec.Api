@@ -13,9 +13,8 @@ internal sealed class GetCampaignById : IEndpoint
             .WithTags(OpenApiTags.Campaigns)
             .WithName("GetCampaignById")
             .Produces<Response>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status500InternalServerError)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Get campaign by ID")
             .WithDescription("Retrieves the details of an environmental campaign by its unique identifier.");
     }

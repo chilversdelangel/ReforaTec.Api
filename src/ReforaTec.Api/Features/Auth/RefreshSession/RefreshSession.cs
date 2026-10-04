@@ -17,8 +17,7 @@ internal sealed class RefreshSession : IEndpoint
             .AddEndpointFilter<ValidationFilter<Request>>()
             .ProducesValidationProblem()
             .Produces<Response>()
-            .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
             .WithSummary("Refresh user session")
             .WithDescription("Exchanges a valid refresh token for a new access token and rotated refresh token.");
     }

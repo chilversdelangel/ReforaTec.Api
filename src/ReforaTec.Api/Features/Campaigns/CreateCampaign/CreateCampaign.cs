@@ -15,7 +15,7 @@ internal sealed class CreateCampaign : IEndpoint
             .AddEndpointFilter<ValidationFilter<Request>>()
             .ProducesValidationProblem()
             .Produces<Response>(StatusCodes.Status201Created)
-            .Produces(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status409Conflict)
             .WithSummary("Create campaign")
             .WithDescription("Creates a new institutional campaign with start/end dates and inscription code.");
     }

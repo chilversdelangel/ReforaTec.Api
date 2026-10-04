@@ -17,7 +17,6 @@ internal sealed class RevokeSession : IEndpoint
             .AddEndpointFilter<ValidationFilter<Request>>()
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status400BadRequest)
             .WithSummary("Revoke user session")
             .WithDescription("Revokes an active refresh token, ending the associated device session.");
     }

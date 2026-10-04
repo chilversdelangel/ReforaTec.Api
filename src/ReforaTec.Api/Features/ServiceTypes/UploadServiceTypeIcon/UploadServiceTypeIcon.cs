@@ -18,7 +18,6 @@ internal sealed class UploadServiceTypeIcon : IEndpoint
             .AddEndpointFilter<ValidationFilter<Request>>()
             .Produces<Response>(StatusCodes.Status201Created)
             .ProducesValidationProblem()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Upload service type icon")
             .WithDescription("Uploads an icon image (PNG/WebP/JPEG, max 1MB) for a service type catalog entry.")
             .RequireAuthorization(Policy.CanManageCatalogs);

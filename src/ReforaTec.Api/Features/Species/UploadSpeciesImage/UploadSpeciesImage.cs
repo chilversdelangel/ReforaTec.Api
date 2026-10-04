@@ -18,7 +18,6 @@ internal sealed class UploadSpeciesImage : IEndpoint
             .AddEndpointFilter<ValidationFilter<Request>>()
             .Produces<Response>(StatusCodes.Status201Created)
             .ProducesValidationProblem()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Upload species image")
             .WithDescription("Uploads a representative photo (PNG/WebP/JPEG, max 5MB) for a botanical species.")
             .RequireAuthorization(Policy.CanManageCatalogs);
