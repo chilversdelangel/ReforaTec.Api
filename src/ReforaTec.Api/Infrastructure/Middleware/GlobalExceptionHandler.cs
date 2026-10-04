@@ -22,14 +22,14 @@ internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log
                 Status = badRequest.StatusCode,
                 Title = "Bad Request",
                 Detail = "The request payload is invalid, malformed, or could not be deserialized.",
-                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1"
+                Type = Mapping.ErrorTypes.BadRequest
             },
             _ => new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,
                 Title = "An unexpected error occurred",
                 Detail = "An internal server error occurred while processing your request. Please try again later.",
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
+                Type = Mapping.ErrorTypes.InternalServer
             }
         };
 
