@@ -5,27 +5,25 @@ using ReforaTec.Api.Database;
 
 namespace ReforaTec.Api.Features.Campaigns.GetCampaignById;
 
-public static class Handler
+internal static class Handler
 {
-    public static async Task<ErrorOr<Response>> Handle(int id, AppDbContext context)
+    public static async Task<ErrorOr<Response>> Handle(
+        int id, 
+        AppDbContext context,
+        CancellationToken cancellationToken)
     {
-        if (id <= 0)
-            return Error.Validation(
-                code: ErrorCodes.InvalidId,
-                description: $"Id {id} is invalid."
-            );
-
         var campaign = await context.Campaigns
             .AsNoTracking()
             .Where(c => c.Id == id)
             .ProjectToType<Response>()
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
-        if (campaign == null)
+        if (campaign is null)
+        {
             return Error.NotFound(
                 code: ErrorCodes.NotFound,
-                description: $"Campaign with id {id} not found."
-            );
+                description: $"Campaign with ID {id} was not found.");
+        }
 
         return campaign;
     }

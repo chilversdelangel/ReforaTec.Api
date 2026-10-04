@@ -96,6 +96,7 @@ internal sealed class CreateSpecies : IEndpoint
             })
             .AddEndpointFilter<ValidationFilter<Request>>()
             .Produces<Response>(StatusCodes.Status201Created)
-            .ProducesValidationProblem();
+            .ProducesValidationProblem()
+            .ExcludeFromDescription();
     }
 }

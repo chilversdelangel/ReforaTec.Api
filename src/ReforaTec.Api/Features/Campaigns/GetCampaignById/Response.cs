@@ -2,7 +2,7 @@ using ReforaTec.Api.Features.Common.Dtos;
 
 namespace ReforaTec.Api.Features.Campaigns.GetCampaignById;
 
-public record Response(
+internal sealed record Response(
     int Id,
     string CampaignName,
     string NormalizedCampaignName,

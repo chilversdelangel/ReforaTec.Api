@@ -2,6 +2,7 @@ using ReforaTec.Api.Database;
 using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
+using ReforaTec.Api.Infrastructure.OpenApi;
 using ReforaTec.Api.Infrastructure.Security.Otp;
 
 namespace ReforaTec.Api.Features.Auth.RequestOtp;
@@ -11,6 +12,7 @@ internal sealed class RequestOtp : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/otp-codes", HandleRequest)
+            .WithTags(OpenApiTags.Auth)
             .AllowAnonymous()
             .AddEndpointFilter<ValidationFilter<Request>>()
             .Produces(StatusCodes.Status204NoContent)

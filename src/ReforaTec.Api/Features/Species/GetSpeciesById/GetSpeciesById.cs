@@ -56,6 +56,7 @@ internal sealed class GetSpeciesById : IEndpoint
             })
             .WithName("GetSpeciesById")
             .Produces<Response>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .ExcludeFromDescription();
     }
 }

@@ -65,6 +65,7 @@ internal sealed class CreateValue : IEndpoint
         app.MapPost("/values", Handle)
             .AddEndpointFilter<ValidationFilter<Request>>()
             .Produces<Response>(StatusCodes.Status201Created)
-            .ProducesValidationProblem();
+            .ProducesValidationProblem()
+            .ExcludeFromDescription();
     }
 }
