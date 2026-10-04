@@ -13,19 +13,20 @@ internal sealed class GetCampaignById : IEndpoint
             .WithTags(OpenApiTags.Campaigns)
             .WithName("GetCampaignById")
             .Produces<Response>(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Get campaign by ID")
             .WithDescription("Retrieves the details of an environmental campaign by its unique identifier.");
     }
 
-    private static async Task<IResult> HandleRequest(int id, AppDbContext context)
+    private static async Task<IResult> HandleRequest(
+        int id, 
+        AppDbContext context, 
+        CancellationToken cancellationToken)
     {
-        var result = await Handler.Handle(id, context);
+        var result = await Handler.Handle(id, context, cancellationToken);
 
         return result.Match(
-            value => Results.Ok(value),
-            errors => errors.ToProblem()
-        );
+            Results.Ok,
+            errors => errors.ToProblem());
     }
 }
