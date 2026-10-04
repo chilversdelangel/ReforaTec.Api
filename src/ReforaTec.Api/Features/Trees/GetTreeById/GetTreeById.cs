@@ -10,7 +10,8 @@ internal sealed class GetTreeById : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("/trees/{id:int}", Handle)
-            .WithName("GetTreeById");
+            .WithName("GetTreeById")
+            .ExcludeFromDescription();
     }
 
     public static async Task<IResult> Handle(int id, AppDbContext context)

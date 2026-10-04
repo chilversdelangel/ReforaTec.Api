@@ -15,7 +15,8 @@ internal sealed class CreateTree : IEndpoint
         app.MapPost("/trees", Handle)
             .AddEndpointFilter<ValidationFilter<Request>>()
             .Produces<Response>(StatusCodes.Status201Created)
-            .ProducesValidationProblem();
+            .ProducesValidationProblem()
+            .ExcludeFromDescription();
     }
 
     public static async Task<IResult> Handle(

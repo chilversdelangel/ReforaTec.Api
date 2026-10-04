@@ -44,8 +44,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Endpoints
-var apiV1 = app.MapGroup("/api/v1")
-    .WithTags("V1 Endpoints");
+var apiV1 = app.MapGroup("/api/v1");
 
 apiV1.MapEndpoints();
 

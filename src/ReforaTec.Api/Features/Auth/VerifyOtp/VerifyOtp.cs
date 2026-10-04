@@ -3,6 +3,7 @@ using ReforaTec.Api.Database;
 using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
+using ReforaTec.Api.Infrastructure.OpenApi;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
 
 namespace ReforaTec.Api.Features.Auth.VerifyOtp;
@@ -12,6 +13,7 @@ internal sealed class VerifyOtp : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/sessions", HandleRequest)
+            .WithTags(OpenApiTags.Auth)
             .AllowAnonymous()
             .AddEndpointFilter<ValidationFilter<Request>>()
             .Produces<Response>(StatusCodes.Status200OK)

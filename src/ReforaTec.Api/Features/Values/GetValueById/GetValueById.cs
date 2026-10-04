@@ -35,6 +35,7 @@ internal sealed class GetValueById : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("/values/{id:int}", Handle)
-            .WithName("GetValueById");
+            .WithName("GetValueById")
+            .ExcludeFromDescription();
     }
 }

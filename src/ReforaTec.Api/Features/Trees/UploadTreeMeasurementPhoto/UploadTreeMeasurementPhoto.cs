@@ -3,6 +3,7 @@ using ReforaTec.Api.Database;
 using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
+using ReforaTec.Api.Infrastructure.OpenApi;
 using ReforaTec.Api.Infrastructure.Security.Authorization;
 using ReforaTec.Api.Infrastructure.Storage;
 
@@ -13,6 +14,7 @@ internal sealed class UploadTreeMeasurementPhoto : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/trees/{treeId:int}/measurements/photo", HandleRequest)
+            .WithTags(OpenApiTags.Trees)
             .DisableAntiforgery()
             .AddEndpointFilter<ValidationFilter<Request>>()
             .Produces<Response>(StatusCodes.Status201Created)

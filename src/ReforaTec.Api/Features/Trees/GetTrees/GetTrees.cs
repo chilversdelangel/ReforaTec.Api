@@ -6,7 +6,8 @@ internal sealed class GetTrees : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/trees", Handle);
+        app.MapGet("/trees", Handle)
+            .ExcludeFromDescription();
     }
 
     public static Task<List<Response>> Handle()

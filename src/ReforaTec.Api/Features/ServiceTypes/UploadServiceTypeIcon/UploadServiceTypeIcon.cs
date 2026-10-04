@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
+using ReforaTec.Api.Infrastructure.OpenApi;
 using ReforaTec.Api.Infrastructure.Security.Authorization;
 using ReforaTec.Api.Infrastructure.Storage;
 
@@ -12,6 +13,7 @@ internal sealed class UploadServiceTypeIcon : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/service-types/icons", HandleRequest)
+            .WithTags(OpenApiTags.Catalogs)
             .DisableAntiforgery()
             .AddEndpointFilter<ValidationFilter<Request>>()
             .Produces<Response>(StatusCodes.Status201Created)

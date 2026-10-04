@@ -2,6 +2,7 @@ using ReforaTec.Api.Database;
 using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
+using ReforaTec.Api.Infrastructure.OpenApi;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
 
 namespace ReforaTec.Api.Features.Auth.RefreshSession;
@@ -11,12 +12,15 @@ internal sealed class RefreshSession : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/sessions/refresh", HandleRequest)
+            .WithTags(OpenApiTags.Auth)
             .AllowAnonymous()
             .AddEndpointFilter<ValidationFilter<Request>>()
             .ProducesValidationProblem()
             .Produces<Response>()
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized);
+            .Produces(StatusCodes.Status401Unauthorized)
+            .WithSummary("Refresh user session")
+            .WithDescription("Exchanges a valid refresh token for a new access token and rotated refresh token.");
     }
 
     private static async Task<IResult> HandleRequest(
