@@ -6,6 +6,7 @@ namespace ReforaTec.Api.Infrastructure.Security.Jwt;
 /// </summary>
 public static class Audience
 {
-    public const string MobileApp = "ReforaTec.MobileApp";
-    public const string AdminDashboard = "ReforaTec.AdminDashboard";
+    public const string StudentMobileApp = "student-mobile-app";
+    public const string InspectorMobileApp = "inspector-mobile-app";
+    public const string WebDashboard = "web-dashboard";
 }

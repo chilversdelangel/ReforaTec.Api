@@ -18,7 +18,7 @@ internal sealed class Validator : AbstractValidator<Request>
 
         RuleFor(x => x.Audience)
             .NotEmpty()
-            .Must(a => a is Audience.MobileApp or Audience.AdminDashboard)
+            .Must(a => a is Audience.StudentMobileApp or Audience.InspectorMobileApp or Audience.WebDashboard)
             .WithMessage("The requested audience is not authorized.");
     }
 }

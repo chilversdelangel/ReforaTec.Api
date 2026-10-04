@@ -30,9 +30,9 @@ internal sealed class CreateSpecies : IEndpoint
 
     private static class ErrorCodes
     {
-        public const string NameRequired = "Species.ScientificName.Required";
-        public const string DescriptionRequired = "Species.Description.Required";
-        public const string Duplicate = "Species.Duplicate";
+        public const string NameRequired = "species/scientific-name-required";
+        public const string DescriptionRequired = "species/description-required";
+        public const string Duplicate = "species/duplicate";
     }
 
     public class Validator : AbstractValidator<Request>

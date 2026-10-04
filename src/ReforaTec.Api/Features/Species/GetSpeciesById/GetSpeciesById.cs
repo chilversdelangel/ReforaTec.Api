@@ -20,7 +20,7 @@ internal sealed class GetSpeciesById : IEndpoint
 
     private static class ErrorCodes
     {
-        public const string NotFound = "Species.NotFound";
+        public const string NotFound = "species/not-found";
     }
 
     public static async Task<ErrorOr<Response>> Handle(int id, AppDbContext context)

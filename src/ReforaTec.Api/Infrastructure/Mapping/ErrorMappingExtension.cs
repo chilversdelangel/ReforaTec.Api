@@ -12,7 +12,7 @@ internal static class ErrorMappingExtensions
         }
 
         var firstError = errors[0];
-        
+
         var description = firstError.Description;
         var customCode = firstError.Code;
 
@@ -25,15 +25,12 @@ internal static class ErrorMappingExtensions
             _ => StatusCodes.Status500InternalServerError
         };
 
-        var extensions = new Dictionary<string, object?> 
-        { 
-            ["code"] = customCode 
-        };
+        var type = $"{ErrorTypes.Prefix}{customCode}";
 
         return Results.Problem(
             statusCode: httpStatusCode,
             detail: description,
-            extensions: extensions
+            type: type
         );
     }
 }
