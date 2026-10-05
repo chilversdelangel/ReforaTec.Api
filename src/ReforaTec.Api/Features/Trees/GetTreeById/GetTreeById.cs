@@ -1,7 +1,7 @@
-using Mapster;
-using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Infrastructure.Endpoints;
+using ReforaTec.Api.Infrastructure.Mapping;
+using ReforaTec.Api.Infrastructure.OpenApi;
 
 namespace ReforaTec.Api.Features.Trees.GetTreeById;
 
@@ -9,45 +9,26 @@ internal sealed class GetTreeById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/trees/{id:int}", Handle)
+        app.MapGet("/trees/{id:int}", HandleRequest)
             .WithName("GetTreeById")
-            .ExcludeFromDescription();
+            .WithTags(OpenApiTags.Trees)
+            .Produces<Response>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithSummary("Get tree technical profile")
+            .WithDescription("Retrieves the complete technical sheet, botanical details, current measurements, and active assigned students for a specific tree.")
+            .RequireAuthorization();
     }
 
-    public static async Task<IResult> Handle(int id, AppDbContext context)
+    private static async Task<IResult> HandleRequest(
+        int id,
+        AppDbContext context,
+        CancellationToken cancellationToken)
     {
-        var tree = await context.Trees
-            .AsNoTracking()
-            .SingleOrDefaultAsync(t => t.Id == id);
+        var result = await Handler.Handle(id, context, cancellationToken);
 
-        if (tree is null)
-            return Results.Problem(
-                statusCode: 404,
-                title: "Tree not found",
-                detail: $"The tree with ID {id} does not exist."
-            );
-
-        return Results.Ok(tree.Adapt<Response>());
+        return result.Match(
+            Results.Ok,
+            errors => errors.ToProblem());
     }
-
-    public record LocationDto(
-        double? Latitude,
-        double? Longitude,
-        string Street,
-        string Neighborhood,
-        string StreetNumber
-    );
-
-    public record Response(
-        int Id,
-        DateTime CreatedAt,
-        DateTime ModifiedAt,
-        DateOnly PlantingDate,
-        int ValueId,
-        int SpeciesId,
-        decimal? Height,
-        decimal? Diameter,
-        LocationDto Location,
-        string? Notes
-    );
 }
