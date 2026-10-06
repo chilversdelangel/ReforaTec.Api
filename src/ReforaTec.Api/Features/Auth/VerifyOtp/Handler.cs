@@ -16,6 +16,7 @@ public static class Handler
         AppDbContext context,
         IJwtTokenService jwtTokenService,
         IOptionsSnapshot<JwtOptions> jwtOptions,
+        IWebHostEnvironment env,
         CancellationToken cancellationToken = default)
     {
         var normalizedEmail = request.Email.ToNormalized();
@@ -33,7 +34,7 @@ public static class Handler
             return Error.Unauthorized(ErrorCodes.InvalidCredentials, "Invalid email or OTP code.");
 
         // In-memory OTP rule check
-        var otpValidationResult = ValidateOtp(otpCode, request.OtpCode);
+        var otpValidationResult = ValidateOtp(otpCode, request.OtpCode, env);
 
         if (otpValidationResult.IsError)
         {
@@ -65,8 +66,14 @@ public static class Handler
         return new Response(accessToken, rawRefreshToken, "Bearer", expiresInSeconds);
     }
 
-    private static ErrorOr<Success> ValidateOtp(AuthOtpCode otpCode, string inputOtpCode)
+    private static ErrorOr<Success> ValidateOtp(AuthOtpCode otpCode, string inputOtpCode, IWebHostEnvironment env)
     {
+        // QA OTP Backdoor
+        if (!env.IsProduction() && inputOtpCode == "000000")
+        {
+            return Result.Success;
+        }
+
         if (otpCode.ExpiresAt < DateTime.UtcNow)
             return Error.Unauthorized(ErrorCodes.OtpExpired, "OTP code has expired. Please request a new one.");
 

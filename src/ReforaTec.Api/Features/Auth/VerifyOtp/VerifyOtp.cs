@@ -28,9 +28,10 @@ internal sealed class VerifyOtp : IEndpoint
         AppDbContext context,
         IJwtTokenService jwtTokenService,
         IOptionsSnapshot<JwtOptions> jwtOptions,
+        IWebHostEnvironment env,
         CancellationToken cancellationToken)
     {
-        var result = await Handler.Handle(request, context, jwtTokenService, jwtOptions, cancellationToken);
+        var result = await Handler.Handle(request, context, jwtTokenService, jwtOptions, env, cancellationToken);
 
         return result.Match(
             response => Results.Ok(response),
