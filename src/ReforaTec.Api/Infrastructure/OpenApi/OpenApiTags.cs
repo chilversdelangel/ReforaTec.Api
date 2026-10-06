@@ -6,4 +6,5 @@ internal static class OpenApiTags
     public const string Campaigns = "Campaigns";
     public const string Trees = "Trees";
     public const string Catalogs = "Catalogs";
+    public const string Users = "Users";
 }
