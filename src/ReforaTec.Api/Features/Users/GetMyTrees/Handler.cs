@@ -22,9 +22,9 @@ internal static class Handler
                 description: "User identity could not be determined from the authentication token.");
         }
 
-        var userExists = await UserExistsAsync(context, userId.Value, cancellationToken);
+        var tenantId = await GetUserTenantIdAsync(context, userId.Value, cancellationToken);
 
-        if (!userExists)
+        if (tenantId is null)
         {
             return Error.NotFound(
                 code: ErrorCodes.UserNotFound,
@@ -32,7 +32,7 @@ internal static class Handler
         }
 
         var assignedCareRecords =
-            await GetActiveAssignmentsAsync(context, userId.Value, cancellationToken);
+            await GetActiveAssignmentsAsync(context, tenantId.Value, userId.Value, cancellationToken);
 
         if (assignedCareRecords.Count == 0)
         {
@@ -42,10 +42,10 @@ internal static class Handler
         var treeIds = assignedCareRecords.Select(assignment => assignment.TreeId).ToList();
 
         var activeCampaignByTreeId =
-            await GetActiveCampaignsAsync(context, treeIds, cancellationToken);
+            await GetActiveCampaignsAsync(context, tenantId.Value, treeIds, cancellationToken);
 
         var latestPhotoByTreeId =
-            await GetLatestPhotosAsync(context, treeIds, cancellationToken);
+            await GetLatestPhotosAsync(context, tenantId.Value, treeIds, cancellationToken);
 
         var response = assignedCareRecords.Select(assignment =>
         {
@@ -81,11 +81,13 @@ internal static class Handler
 
     private static async Task<List<Entities.UserCaresForTree>> GetActiveAssignmentsAsync(
         AppDbContext context,
+        int tenantId,
         int userId,
         CancellationToken cancellationToken)
     {
         return await context.UserCaresForTrees
             .AsNoTracking()
+            .Where(assignment => assignment.TenantId == tenantId)
             .Where(assignment => assignment.UserId == userId)
             .Where(assignment => assignment.EndDate == null)
             .Where(assignment => assignment.Tree != null)
@@ -97,21 +99,24 @@ internal static class Handler
             .ToListAsync(cancellationToken);
     }
 
-    private static Task<bool> UserExistsAsync(AppDbContext context, int userId, CancellationToken cancellationToken)
+    private static Task<int?> GetUserTenantIdAsync(AppDbContext context, int userId, CancellationToken cancellationToken)
     {
         return context.Users
             .Where(user => user.Id == userId)
             .Where(user => !user.IsDeleted)
-            .AnyAsync(cancellationToken);
+            .Select(user => (int?)user.TenantId)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     private static Task<Dictionary<int, Entities.CampaignManagesTree>> GetActiveCampaignsAsync(
         AppDbContext context,
+        int tenantId,
         List<int> treeIds,
         CancellationToken cancellationToken)
     {
         return context.CampaignManagesTrees
             .AsNoTracking()
+            .Where(campaignRecord => campaignRecord.TenantId == tenantId)
             .Where(campaignRecord => treeIds.Contains(campaignRecord.TreeId))
             .Where(campaignRecord => campaignRecord.EndDate == null)
             .Include(campaignRecord => campaignRecord.Campaign)
@@ -120,11 +125,13 @@ internal static class Handler
 
     private static Task<Dictionary<int, string?>> GetLatestPhotosAsync(
         AppDbContext context,
+        int tenantId,
         List<int> treeIds,
         CancellationToken cancellationToken)
     {
         return context.Measurements
             .AsNoTracking()
+            .Where(measurement => measurement.TenantId == tenantId)
             .Where(measurement => treeIds.Contains(measurement.TreeId))
             .Where(measurement => measurement.EvidencePhotoUrl != null)
             .GroupBy(measurement => measurement.TreeId)
