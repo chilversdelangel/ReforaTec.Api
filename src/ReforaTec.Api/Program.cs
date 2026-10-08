@@ -5,6 +5,7 @@ using ReforaTec.Api.Infrastructure.Localization;
 using ReforaTec.Api.Infrastructure.Middleware;
 using ReforaTec.Api.Infrastructure.OpenApi;
 using ReforaTec.Api.Infrastructure.Security.Authorization;
+using ReforaTec.Api.Infrastructure.Security.Cors;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
 using ReforaTec.Api.Infrastructure.Security.Otp;
 using ReforaTec.Api.Infrastructure.Storage;
@@ -15,12 +16,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Explicit Services Inventory
 builder.Services.AddPostgresDbContext(builder.Configuration);
 builder.Services.AddLocalStorage(builder.Configuration);
+builder.Services.AddCorsPolicy(builder.Configuration);
 builder.Services.AddJwtAuthentication<JwtTokenService>(builder.Configuration);
-builder.Services.AddAuthorizationPolicies();
-builder.Services.AddOtpService<OtpService>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>(includeInternalTypes: true);
+builder.Services.AddOtpService<OtpService>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.AddAuthorizationPolicies();
 builder.Services.AddCustomOpenApi();
 
 var app = builder.Build();
@@ -39,6 +41,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseDefaultRequestLocalization();
 app.UseAuthentication();
 app.UseAuthorization();
