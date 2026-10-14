@@ -9,7 +9,7 @@ using ReforaTec.Api.Infrastructure.Security.Jwt;
 
 namespace ReforaTec.Api.Features.Auth.VerifyOtp;
 
-public static class Handler
+internal static class Handler
 {
     public static async Task<ErrorOr<Response>> Handle(
         Request request,
@@ -52,7 +52,7 @@ public static class Handler
         await EnforceMaxSessionsAsync(context, user.Id, user.CurrentRole, jwtOptions, cancellationToken);
 
         var accessToken = jwtTokenService.GenerateAccessToken(
-            new TokenGenerationRequest(user.Id, user.CurrentRole, request.Audience));
+            new TokenGenerationRequest(user.Id, user.TenantId, user.CurrentRole, request.Audience));
 
         var rawRefreshToken = jwtTokenService.GenerateRawRefreshToken();
         var hashedRefreshToken = jwtTokenService.HashRefreshToken(rawRefreshToken);

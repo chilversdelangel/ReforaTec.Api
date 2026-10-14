@@ -6,7 +6,7 @@ using ReforaTec.Api.Infrastructure.Security.Jwt;
 
 namespace ReforaTec.Api.Features.Auth.RefreshSession;
 
-public static class Handler
+internal static class Handler
 {
     public static async Task<ErrorOr<Response>> Handle(
         Request request,
@@ -35,6 +35,7 @@ public static class Handler
 
         var tokenRequest = new TokenGenerationRequest(
             existingToken.UserId,
+            existingToken.User.TenantId,
             existingToken.User.CurrentRole,
             request.Audience);
         var newAccessToken = jwtTokenService.GenerateAccessToken(tokenRequest);

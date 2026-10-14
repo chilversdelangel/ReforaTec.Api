@@ -5,7 +5,7 @@ using ReforaTec.Api.Infrastructure.Security.Jwt;
 
 namespace ReforaTec.Api.Features.Auth.RevokeSession;
 
-public static class Handler
+internal static class Handler
 {
     public static async Task<ErrorOr<Success>> Handle(
         Request request,

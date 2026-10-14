@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ReforaTec.Api.Infrastructure.Security.Jwt;
 
-public static class JwtAuthenticationExtensions
+internal static class JwtAuthenticationExtensions
 {
     public static IServiceCollection AddJwtAuthentication<TTokenService>(
         this IServiceCollection services,
