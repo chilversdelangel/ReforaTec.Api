@@ -2,9 +2,9 @@ using ReforaTec.Api.Entities.Enums;
 
 namespace ReforaTec.Api.Infrastructure.Security.Jwt;
 
-public record TokenGenerationRequest(int UserId, UserRole Role, string Audience);
+internal sealed record TokenGenerationRequest(int UserId, int TenantId, UserRole Role, string Audience);
 
-public interface IJwtTokenService
+internal interface IJwtTokenService
 {
     /// <summary>
     /// Generates a signed JWT Access Token for the specified user.

@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ReforaTec.Api.Infrastructure.Security.Jwt;
 
-public class JwtTokenService(IOptions<JwtOptions> jwtOptions) : IJwtTokenService
+internal sealed class JwtTokenService(IOptions<JwtOptions> jwtOptions) : IJwtTokenService
 {
     private readonly JwtOptions _options = jwtOptions.Value;
     private readonly SigningCredentials _signingCredentials = CreateSigningCredentials(jwtOptions.Value.SecretKey);
@@ -20,6 +20,7 @@ public class JwtTokenService(IOptions<JwtOptions> jwtOptions) : IJwtTokenService
         {
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Sub, request.UserId.ToString()),
+            new Claim(CustomClaims.TenantId, request.TenantId.ToString()),
             new Claim(ClaimTypes.Role, request.Role.ToString())
         };
 
