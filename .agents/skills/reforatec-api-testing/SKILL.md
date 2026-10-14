@@ -75,7 +75,7 @@ echo "$ACCESS_TOKEN" | cut -d. -f2 | base64 -d 2>/dev/null | jq
 ```
 Verify the payload contains:
 - `sub`: User ID (e.g., `"1"`)
-- `tid`: Tenant ID (e.g., `"1"`)
+- `tenant_id`: Tenant ID (e.g., `"1"`)
 - `role`: User role (e.g., `"Student"`)
 - `aud`: `"student-mobile-app"`
 
