@@ -1,0 +1,41 @@
+using ErrorOr;
+using Microsoft.EntityFrameworkCore;
+using ReforaTec.Api.Database;
+using ReforaTec.Api.Infrastructure.Security.CurrentUser;
+
+namespace ReforaTec.Api.Features.{Domain}.{UseCase};
+
+internal static class Handler
+{
+    public static async Task<ErrorOr<Response>> Handle(
+        UserIdentity user,
+        Request request,
+        AppDbContext context,
+        CancellationToken cancellationToken)
+    {
+        // Enforce tenant isolation
+        var entityExists = await context.{Entities}
+            .AnyAsync(e => e.Name == request.Name && e.TenantId == user.TenantId, cancellationToken);
+
+        if (entityExists)
+        {
+            return Error.Conflict(ErrorCodes.Duplicate, "An entity with this name already exists in this tenant.");
+        }
+
+        var entity = new {Entity}
+        {
+            TenantId = user.TenantId,
+            Name = request.Name,
+            CapturedAt = request.CapturedAt.UtcDateTime
+        };
+
+        context.{Entities}.Add(entity);
+        await context.SaveChangesAsync(cancellationToken);
+
+        return new Response(
+            Id: entity.Id,
+            Name: entity.Name,
+            CreatedAt: entity.CreatedAt
+        );
+    }
+}

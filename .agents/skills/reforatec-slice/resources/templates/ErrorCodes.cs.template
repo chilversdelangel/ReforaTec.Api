@@ -1,0 +1,8 @@
+namespace ReforaTec.Api.Features.{Domain}.{UseCase};
+
+internal static class ErrorCodes
+{
+    public const string NotFound = "{entity}/not-found";
+    public const string Duplicate = "{entity}/duplicate";
+    public const string Forbidden = "{entity}/forbidden";
+}

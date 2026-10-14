@@ -1,0 +1,45 @@
+using ReforaTec.Api.Database;
+using ReforaTec.Api.Infrastructure.Endpoints;
+using ReforaTec.Api.Infrastructure.Filters;
+using ReforaTec.Api.Infrastructure.Mapping;
+using ReforaTec.Api.Infrastructure.OpenApi;
+using ReforaTec.Api.Infrastructure.Security.CurrentUser;
+
+namespace ReforaTec.Api.Features.{Domain}.{UseCase};
+
+internal sealed class {UseCase} : IEndpoint
+{
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapPost("/{entities}", HandleRequest)
+            .WithName("{UseCase}")
+            .WithTags(OpenApiTags.{Domain})
+            .RequireAuthorization()
+            .AddEndpointFilter<ValidationFilter<Request>>()
+            .Produces<Response>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .ProducesValidationProblem()
+            .WithSummary("{Summary description}")
+            .WithDescription("{Detailed description of the use case.}");
+    }
+
+    private static async Task<IResult> HandleRequest(
+        Request request,
+        ICurrentUserService currentUser,
+        AppDbContext context,
+        CancellationToken cancellationToken)
+    {
+        var identity = currentUser.GetIdentity();
+        if (identity.IsError)
+        {
+            return identity.Errors.ToProblem();
+        }
+
+        var result = await Handler.Handle(identity.Value, request, context, cancellationToken);
+
+        return result.Match(
+            response => Results.CreatedAtRoute("{GetUseCase}", new { id = response.Id }, response),
+            errors => errors.ToProblem());
+    }
+}

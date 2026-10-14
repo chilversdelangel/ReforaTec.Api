@@ -1,0 +1,6 @@
+namespace ReforaTec.Api.Features.{Domain}.{UseCase};
+
+internal sealed record Request(
+    string Name,
+    DateTimeOffset CapturedAt
+);
