@@ -24,14 +24,17 @@
     ├── Response.cs        (Output DTO record, if applicable)
     ├── Handler.cs         (Pure business logic, returns ErrorOr<T>)
     ├── Validator.cs       (FluentValidation AbstractValidator<Request>)
-    └── ErrorCodes.cs      (Domain error constants in kebab-case)
+    └── Errors.cs          (Pre-constructed Error objects: NotFound, Forbidden, Conflict)
   ```
+- **Domain Aggregate Cohesion:** Operations on child entities or subresources strictly scoped to an Aggregate Root (e.g., tree maintenance services, measurement photos) belong inside the Aggregate's feature folder (`Features/Trees/`), preserving domain cohesion and avoiding premature top-level folder fragmentation.
 
 ## 4. Mandatory Invariants
 - **Error Flow:** ALL business errors MUST return `ErrorOr<T>`. Never throw exceptions for expected business flow.
 - **Error Codes:** Standard string pattern `"entity/kebab-case"` (e.g., `"tree/not-found"`, `"auth/unauthorized"`).
+- **Resource Authorization Violations:** Accessing or operating on resources not actively assigned or owned within the tenant MUST return `Error.Forbidden` (`StatusCodes.Status403Forbidden`).
 - **Tenant Isolation:** Every query and mutation on tenant-scoped entities MUST enforce `TenantId == user.TenantId`. Never trust client-provided tenant identifiers.
 - **Identity Extraction:** Use `ICurrentUserService` and `UserIdentity` (resolved from JWT claims). Never perform ad-hoc database queries to `Users` just to discover `TenantId`.
+- **JWT Claim Conventions:** Custom JWT claims MUST use standard snake_case names (e.g., `"tenant_id"`). Avoid short abbreviations reserved by Microsoft (such as `"tid"`, `"oid"`) to prevent unintended transformations by ASP.NET Core `DefaultInboundClaimTypeMap`.
 - **DTO Boundary:** Endpoints MUST NEVER return EF Core database entities. Always map to immutable `Response` DTO records.
 - **Unique Text Fields:** Unique text properties MUST implement `INormalizable` (handled by `AppDbContext`).
 - **Soft Delete:** Entities implementing soft delete must always filter out deleted records (`!x.IsDeleted`).
@@ -49,6 +52,8 @@
   - Favor early exits and guard clauses to minimize nesting and maintain flat indentation.
   - Leverage modern pattern matching (`is null`, `is not null`, type patterns) and switch expressions (`=>`) over multi-branch `if-else` ladders.
   - Use expression-bodied members (`=>`) for concise single-statement methods and read-only properties.
+  - Always use descriptive lambda parameter names in LINQ queries and FluentValidation rules (`tree => tree.Id`, `assignment => assignment.UserId`, `request => request.ServiceTypeId`), strictly avoiding single-letter abbreviations (`x =>`, `t =>`).
+  - Identity resolution result variable MUST be named `identityResult` (`var identityResult = currentUser.GetIdentity(); if (identityResult.IsError)`).
 - **OpenAPI Documentation:** Every endpoint MUST declare `.WithName()`, `.WithTags()`, `.WithSummary()`, `.WithDescription()`, and explicit `.Produces<T>()` status codes.
 - **Build Health:** Must verify zero compiler warnings and zero errors via `dotnet build` at the completion of each task.
 

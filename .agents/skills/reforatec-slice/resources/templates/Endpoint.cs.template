@@ -30,10 +30,10 @@ internal sealed class {UseCase} : IEndpoint
         AppDbContext context,
         CancellationToken cancellationToken)
     {
-        var identity = currentUser.GetIdentity();
-        if (identity.IsError)
+        var identityResult = currentUser.GetIdentity();
+        if (identityResult.IsError)
         {
-            return identity.Errors.ToProblem();
+            return identityResult.Errors.ToProblem();
         }
 
         var result = await Handler.Handle(identity.Value, request, context, cancellationToken);

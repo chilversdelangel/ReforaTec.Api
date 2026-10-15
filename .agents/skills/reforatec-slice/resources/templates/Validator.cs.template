@@ -6,11 +6,11 @@ internal sealed class Validator : AbstractValidator<Request>
 {
     public Validator()
     {
-        RuleFor(x => x.Name)
+        RuleFor(request => request.Name)
             .NotEmpty()
             .MaximumLength(100);
 
-        RuleFor(x => x.CapturedAt)
+        RuleFor(request => request.CapturedAt)
             .NotEmpty()
             .LessThanOrEqualTo(DateTimeOffset.UtcNow);
     }
