@@ -1,5 +1,4 @@
 using ErrorOr;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Common.Helpers;
 using ReforaTec.Api.Database;
@@ -8,7 +7,7 @@ using ReforaTec.Api.Entities.Enums;
 
 namespace ReforaTec.Api.Features.Auth.RegisterUser;
 
-public static class Handler
+internal static class Handler
 {
     public static async Task<ErrorOr<Response>> Handle(
         Request request,
@@ -18,7 +17,7 @@ public static class Handler
         var normalizedEmail = request.Email.ToNormalized();
 
         var user = await context.Users
-            .FirstOrDefaultAsync(u => u.Email == normalizedEmail, cancellationToken);
+            .FirstOrDefaultAsync(user => user.Email == normalizedEmail, cancellationToken);
 
         if (user is not null && user.IsEmailVerified)
         {
@@ -43,9 +42,10 @@ public static class Handler
         var existingUserId = user?.Id;
 
         var controlNumberOwner = await context.Users.FirstOrDefaultAsync(
-            u => u.TenantId == tenant.Id &&
-                 u.ControlNumber == controlNumber &&
-                 u.Id != existingUserId,
+            candidate => 
+                candidate.TenantId == tenant.Id && 
+                candidate.ControlNumber == controlNumber &&
+                candidate.Id != existingUserId,
             cancellationToken);
 
         if (controlNumberOwner?.IsEmailVerified == true)
@@ -70,7 +70,19 @@ public static class Handler
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return userEntity.Adapt<Response>();
+        return new Response(
+            userEntity.Id,
+            userEntity.TenantId,
+            userEntity.Email,
+            userEntity.FirstName,
+            userEntity.MiddleName,
+            userEntity.LastName,
+            userEntity.SecondLastName,
+            userEntity.ControlNumber,
+            userEntity.PhoneNumber,
+            userEntity.Gender,
+            userEntity.CurrentRole,
+            userEntity.CreatedAt);
     }
 
     private static Task<Tenant?> FindTenantByDomainAsync(
@@ -80,7 +92,7 @@ public static class Handler
     {
         return context.Tenants
             .FirstOrDefaultAsync(
-                t => t.InstitutionalEmailDomain == emailDomain && !t.IsDeleted,
+                tenant => tenant.InstitutionalEmailDomain == emailDomain && !tenant.IsDeleted,
                 cancellationToken);
     }
 
@@ -99,6 +111,7 @@ public static class Handler
         userToSave.SecondLastName = request.SecondLastName;
         userToSave.ControlNumber = request.ControlNumber;
         userToSave.PhoneNumber = request.PhoneNumber;
+        userToSave.Gender = request.Gender;
         userToSave.CurrentRole = UserRole.Student; // Default role for open registrations
     }
 }

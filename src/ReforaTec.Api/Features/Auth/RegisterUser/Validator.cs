@@ -2,37 +2,39 @@ using FluentValidation;
 
 namespace ReforaTec.Api.Features.Auth.RegisterUser;
 
-public class Validator : AbstractValidator<Request>
+internal sealed class Validator : AbstractValidator<Request>
 {
     public Validator()
     {
-        RuleFor(x => x.Email)
+        RuleFor(request => request.Email)
             .NotEmpty()
             .EmailAddress()
             .MaximumLength(150);
 
-        RuleFor(x => x.FirstName)
+        RuleFor(request => request.FirstName)
             .NotEmpty()
             .MaximumLength(50);
 
-        RuleFor(x => x.LastName)
+        RuleFor(request => request.LastName)
             .NotEmpty()
             .MaximumLength(50);
 
-        RuleFor(x => x.MiddleName)
-            .MaximumLength(50)
-            .When(x => !string.IsNullOrWhiteSpace(x.MiddleName));
+        RuleFor(request => request.MiddleName)
+            .MaximumLength(50);
 
-        RuleFor(x => x.SecondLastName)
-            .MaximumLength(50)
-            .When(x => !string.IsNullOrWhiteSpace(x.SecondLastName));
+        RuleFor(request => request.SecondLastName)
+            .MaximumLength(50);
 
-        RuleFor(x => x.ControlNumber)
+        RuleFor(request => request.ControlNumber)
             .NotEmpty()
             .MaximumLength(30);
 
-        RuleFor(x => x.PhoneNumber)
-            .MaximumLength(20)
-            .When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber));
+        RuleFor(request => request.PhoneNumber)
+            .MaximumLength(20);
+
+        RuleFor(request => request.Gender)
+            .NotNull()
+            .IsInEnum()
+            .WithMessage("Gender must be a valid value: 0 (Male), 1 (Female), or 2 (Other).");
     }
 }
