@@ -713,6 +713,10 @@ namespace ReforaTec.Api.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("first_name");
 
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer")
+                        .HasColumnName("gender");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");

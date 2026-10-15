@@ -203,7 +203,8 @@ internal static class DbSeeder
             Email = "student@cdmadero.tecnm.mx",
             ControlNumber = "21070001",
             FirstName = "Juan",
-            LastName = "Pérez"
+            LastName = "Pérez",
+            Gender = Gender.Male
         };
         testUser.Normalize();
 
