@@ -96,6 +96,12 @@ gh pr create --base main --head <branch-name> \
 - [x] Database schema and queries verified via Podman / psql."
 ```
 
+### PR Conciseness & Formatting Rules:
+- **Checkbox Syntax:** Always use `- [x]` in markdown source for changes and validation items.
+- **Flat Single-Level Bullets:** Strictly avoid deep nested bullet points, multi-tiered indentations, or walls of text. Keep each item to one crisp, self-contained sentence.
+- **Punchy Summary:** 1-2 sentences explaining what was implemented and its direct business value.
+- **Three Prisms Rationale:** Deliver clear, high-signal rationale under Performance, Maintainability, and Security without verbose padding.
+
 ### Step 3: Monitor CI Pipeline
 ```bash
 gh pr checks <pr-number> --watch

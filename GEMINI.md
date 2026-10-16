@@ -38,6 +38,7 @@
 - **DTO Boundary:** Endpoints MUST NEVER return EF Core database entities. Always map to immutable `Response` DTO records.
 - **Unique Text Fields:** Unique text properties MUST implement `INormalizable` (handled by `AppDbContext`).
 - **Soft Delete:** Entities implementing soft delete must always filter out deleted records (`!x.IsDeleted`).
+- **User-Scoped Routing Hierarchy:** All endpoints operating on or projecting data for the currently authenticated user MUST use the canonical `/users/me/...` route hierarchy (e.g., `GET /users/me/profile`, `GET /users/me/trees`, `PATCH /users/me`). Never expose UI-centric endpoints at the root level (e.g., `/users/profile`), and avoid redundant secondary alias routes or `.ExcludeFromDescription()`.
 - **Security:** Never leak user existence in authentication flows (OWASP User Enumeration Prevention). Store only SHA-256 hex hashes of refresh tokens.
 - **Language:** ALL code, identifiers, XML docs, comments, git commits, and documentation in English.
 
@@ -46,6 +47,8 @@
 - **Timezones:** DTOs accepting timestamps MUST use `DateTimeOffset` to preserve client timezones. Database entities store `.UtcDateTime` (`timestamp with time zone`).
 - **Validation:** Use FluentValidation built-in validators; avoid redundant custom `.WithMessage()` overrides.
 - **Read Performance:** All read-only database queries MUST use `.AsNoTracking()`.
+- **LINQ Style & Syntax:** Always use **Fluent Method Syntax** (`context.Entity.AsNoTracking().Where(...).Select(...)`) with chained methods. Never use SQL-like Query Syntax (`from ... join ... select`). When relating entities without direct EF Core navigation properties, prefer subquery expressions using `IQueryable.Contains(...)` (e.g., `activeTreeIds.Contains(record.TreeId)`), which PostgreSQL compiles to high-performance semi-joins (`Nested Loop Semi Join`) with early exit.
+- **Handler Query Decomposition:** Handlers executing multiple queries, aggregations, or complex lookups MUST decompose each independent operation into private static helper methods, keeping the top-level `Handle` orchestrator clean, flat, and immediately readable.
 - **EF Core Configuration:** Convention-over-configuration. Configure only exceptions (`MaxLength`, `IsFixedLength`). Base entities inherit `AuditableEntity` or `CreatableEntity`.
 - **Control Flow:** Follow official .NET conventions:
   - Always use braces `{}` on separate lines (Allman style) for control blocks (`if`, `foreach`, `while`), avoiding single-line brace-less statements.

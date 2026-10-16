@@ -68,6 +68,10 @@ ACCESS_TOKEN=$(echo "$RESPONSE" | jq -r .accessToken)
 echo "Access Token: $ACCESS_TOKEN"
 ```
 
+> [!IMPORTANT]
+> The session verification payload strictly accepts only three fields: `email`, `otpCode`, and `audience`. Never include deprecated or extraneous properties like `deviceInfo`.
+
+
 ### Step C: Inspect JWT Payload & Claims
 Decode the Base64Url payload to verify that identity claims are present:
 ```bash
