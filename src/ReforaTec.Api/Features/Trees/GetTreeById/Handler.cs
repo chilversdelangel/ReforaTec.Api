@@ -1,6 +1,7 @@
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
+using ReforaTec.Api.Entities;
 
 namespace ReforaTec.Api.Features.Trees.GetTreeById;
 
@@ -11,37 +12,66 @@ internal static class Handler
         AppDbContext context,
         CancellationToken cancellationToken)
     {
-        var tree = await context.Trees
+        var tree = await FindTreeWithDetailsAsync(context, id, cancellationToken);
+        if (tree is null)
+        {
+            return Errors.TreeNotFound;
+        }
+
+        var currentFolio = await GetActiveCampaignFolioAsync(context, id, cancellationToken);
+        var latestPhotoUrl = await GetLatestEvidencePhotoUrlAsync(context, id, cancellationToken);
+        var assignedStudents = await GetAssignedStudentsAsync(context, id, cancellationToken);
+
+        return MapToResponse(tree, currentFolio, latestPhotoUrl, assignedStudents);
+    }
+
+    private static Task<Tree?> FindTreeWithDetailsAsync(
+        AppDbContext context,
+        int treeId,
+        CancellationToken cancellationToken)
+    {
+        return context.Trees
             .AsNoTracking()
             .Include(tree => tree.Species)
             .Include(tree => tree.Value)
-            .FirstOrDefaultAsync(tree => tree.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(tree => tree.Id == treeId, cancellationToken);
+    }
 
-        if (tree is null)
-        {
-            return Error.NotFound(
-                code: ErrorCodes.NotFound,
-                description: $"Tree with ID {id} was not found.");
-        }
-
-        var currentFolio = await context.CampaignManagesTrees
+    private static Task<string?> GetActiveCampaignFolioAsync(
+        AppDbContext context,
+        int treeId,
+        CancellationToken cancellationToken)
+    {
+        return context.CampaignManagesTrees
             .AsNoTracking()
-            .Where(campaign => campaign.TreeId == id)
+            .Where(campaign => campaign.TreeId == treeId)
             .Where(campaign => campaign.EndDate == null)
             .Select(campaign => campaign.CampaignFolio)
             .FirstOrDefaultAsync(cancellationToken);
+    }
 
-        var latestPhoto = await context.Measurements
+    private static Task<string?> GetLatestEvidencePhotoUrlAsync(
+        AppDbContext context,
+        int treeId,
+        CancellationToken cancellationToken)
+    {
+        return context.Measurements
             .AsNoTracking()
-            .Where(measurement => measurement.TreeId == id)
+            .Where(measurement => measurement.TreeId == treeId)
             .Where(measurement => measurement.EvidencePhotoUrl != null)
             .OrderByDescending(measurement => measurement.DeviceCapturedAt)
             .Select(measurement => measurement.EvidencePhotoUrl)
             .FirstOrDefaultAsync(cancellationToken);
+    }
 
-        var assignedStudents = await context.UserCaresForTrees
+    private static Task<List<AssignedStudentDto>> GetAssignedStudentsAsync(
+        AppDbContext context,
+        int treeId,
+        CancellationToken cancellationToken)
+    {
+        return context.UserCaresForTrees
             .AsNoTracking()
-            .Where(assignment => assignment.TreeId == id)
+            .Where(assignment => assignment.TreeId == treeId)
             .Where(assignment => assignment.EndDate == null)
             .Where(assignment => assignment.User != null && !assignment.User.IsDeleted)
             .Select(assignment => new AssignedStudentDto(
@@ -52,7 +82,14 @@ internal static class Handler
                 assignment.User.SecondLastName,
                 assignment.User.DisplayName))
             .ToListAsync(cancellationToken);
+    }
 
+    private static Response MapToResponse(
+        Tree tree,
+        string? currentFolio,
+        string? latestPhotoUrl,
+        List<AssignedStudentDto> assignedStudents)
+    {
         var locationDto = tree.Location is not null
             ? new LocationDto(
                 tree.Location.Latitude,
@@ -62,7 +99,7 @@ internal static class Handler
                 tree.Location.StreetNumber)
             : null;
 
-        var response = new Response(
+        return new Response(
             Id: tree.Id,
             CurrentCampaignFolio: currentFolio,
             HealthState: tree.HealthState.ToString(),
@@ -70,14 +107,13 @@ internal static class Handler
             Observations: tree.Notes,
             Value: tree.Value!.ValueName,
             Species: tree.Species!.CommonName,
-            SpeciesScientificName: tree.Species!.ScientificName,
-            SpeciesImageUrl: tree.Species?.ImageUrl,
+            SpeciesScientificName: tree.Species.ScientificName,
+            SpeciesImageUrl: tree.Species.ImageUrl,
             CurrentHeightCentimeters: tree.HeightCentimeters,
             CurrentDiameterCentimeters: tree.DiameterCentimeters,
-            LatestPhotoUrl: latestPhoto,
+            LatestPhotoUrl: latestPhotoUrl,
             Location: locationDto,
             CurrentAssignedStudents: assignedStudents);
-
-        return response;
     }
 }
+
