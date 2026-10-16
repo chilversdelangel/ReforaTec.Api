@@ -16,67 +16,68 @@ internal static class Handler
     {
         var normalizedEmail = request.Email.ToNormalized();
 
-        var user = await context.Users
-            .FirstOrDefaultAsync(user => user.Email == normalizedEmail, cancellationToken);
-
-        if (user is not null && user.IsEmailVerified)
+        // 1. Hostage / abandoned account check:
+        // Reject if the email is already registered AND verified.
+        // If an account exists but was NEVER verified (e.g., abandoned signup or typo by another person),
+        // we allow overwriting its details with this new attempt instead of permanently locking the student out.
+        var existingUser = await FindUserByEmailAsync(context, normalizedEmail, cancellationToken);
+        if (existingUser is { IsEmailVerified: true })
         {
             return Errors.EmailAlreadyExists;
         }
 
-        // If the user exists but is NOT verified, we allow overwriting their data (Hostage mitigation)
-        var emailDomain = normalizedEmail.Split('@').Last();
-
+        // 2. Resolve educational institution (tenant) from email domain (e.g., "@cdmadero.tecnm.mx")
+        var emailDomain = ExtractEmailDomain(normalizedEmail);
         var tenant = await FindTenantByDomainAsync(context, emailDomain, cancellationToken);
-
         if (tenant is null)
         {
             return Errors.InstitutionalDomainNotFound;
         }
 
-        var controlNumber = NormalizeControlNumber(request.ControlNumber);
-        var existingUserId = user?.Id;
-
-        var controlNumberOwner = await context.Users.FirstOrDefaultAsync(
-            candidate => 
-                candidate.TenantId == tenant.Id && 
-                candidate.ControlNumber == controlNumber &&
-                candidate.Id != existingUserId,
+        // 3. Claim control number within the tenant:
+        // Ensures the requested control number is not already held by a verified student.
+        // If held by an unverified account, it is reclaimed and cleared to prevent duplicate key collisions.
+        var claimResult = await ClaimControlNumberAsync(
+            context,
+            requestedTenantId: tenant.Id,
+            requestedControlNumber: request.ControlNumber,
+            existingUserId: existingUser?.Id,
             cancellationToken);
 
-        if (controlNumberOwner?.IsEmailVerified is true)
+        if (claimResult.IsError)
         {
-            return Errors.ControlNumberAlreadyExists;
+            return claimResult.Errors;
         }
-            
-        // Release the hijacked control number from the unverified
-        controlNumberOwner?.ControlNumber = null;
 
-        var userEntity = user ?? new User();
-        ApplyRegistration(userEntity, request, tenant);
-        
-        var isNewUser = user is null;
+        // 4. Upsert user: reuse the unverified entity if one existed, or instantiate a new one
+        var isNewUser = existingUser is null;
+        var user = existingUser ?? new User();
+
+        ApplyRegistration(user, request, tenant);
 
         if (isNewUser)
         {
-            context.Users.Add(userEntity);
+            context.Users.Add(user);
         }
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new Response(
-            userEntity.Id,
-            userEntity.TenantId,
-            userEntity.Email,
-            userEntity.FirstName,
-            userEntity.LastName,
-            userEntity.SecondLastName,
-            userEntity.DisplayName,
-            userEntity.ControlNumber,
-            userEntity.PhoneNumber,
-            userEntity.Gender,
-            userEntity.CurrentRole,
-            userEntity.CreatedAt);
+        // 5. Project to immutable response DTO
+        return MapToResponse(user);
+    }
+
+    private static Task<User?> FindUserByEmailAsync(
+        AppDbContext context,
+        string normalizedEmail,
+        CancellationToken cancellationToken)
+    {
+        return context.Users
+            .FirstOrDefaultAsync(user => user.Email == normalizedEmail, cancellationToken);
+    }
+
+    private static string ExtractEmailDomain(string email)
+    {
+        return email.Split('@').Last();
     }
 
     private static Task<Tenant?> FindTenantByDomainAsync(
@@ -90,21 +91,75 @@ internal static class Handler
                 cancellationToken);
     }
 
+    /// <summary>
+    /// Checks control number uniqueness per tenant and prevents account hostage situations.
+    /// If another verified student owns this number, registration is rejected with conflict.
+    /// If an unverified account holds it, we set its ControlNumber to null, freeing it up in PostgreSQL
+    /// so the current student can claim it without violating the UNIQUE(tenant_id, control_number) constraint.
+    /// </summary>
+    private static async Task<ErrorOr<Success>> ClaimControlNumberAsync(
+        AppDbContext context,
+        int requestedTenantId,
+        string requestedControlNumber,
+        int? existingUserId,
+        CancellationToken cancellationToken)
+    {
+        var normalizedControlNumber = NormalizeControlNumber(requestedControlNumber);
+
+        var conflictingUser = await context.Users
+            .Where(user => user.TenantId == requestedTenantId)
+            .Where(user => user.ControlNumber == normalizedControlNumber)
+            .Where(user => user.Id != existingUserId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (conflictingUser is null)
+        {
+            return Result.Success;
+        }
+
+        if (conflictingUser.IsEmailVerified)
+        {
+            return Errors.ControlNumberAlreadyExists;
+        }
+
+        // Release the control number from the unverified account so PostgreSQL unique constraint won't fail
+        conflictingUser.ControlNumber = null;
+        return Result.Success;
+    }
+
     private static string NormalizeControlNumber(string controlNumber)
     {
         return controlNumber.ToSanitized().ToUpperInvariant();
     }
 
-    private static void ApplyRegistration(User userToSave, Request request, Tenant tenant)
+    private static void ApplyRegistration(User user, Request request, Tenant tenant)
     {
-        userToSave.TenantId = tenant.Id;
-        userToSave.Email = request.Email;
-        userToSave.FirstName = request.FirstName;
-        userToSave.LastName = request.LastName;
-        userToSave.SecondLastName = request.SecondLastName;
-        userToSave.ControlNumber = request.ControlNumber;
-        userToSave.PhoneNumber = request.PhoneNumber;
-        userToSave.Gender = request.Gender;
-        userToSave.CurrentRole = UserRole.Student; // Default role for open registrations
+        user.TenantId = tenant.Id;
+        user.Email = request.Email;
+        user.FirstName = request.FirstName;
+        user.LastName = request.LastName;
+        user.SecondLastName = request.SecondLastName;
+        user.ControlNumber = request.ControlNumber;
+        user.PhoneNumber = request.PhoneNumber;
+        user.Gender = request.Gender;
+        user.CurrentRole = UserRole.Student;
+    }
+
+    private static Response MapToResponse(User user)
+    {
+        return new Response(
+            user.Id,
+            user.TenantId,
+            user.Email,
+            user.FirstName,
+            user.LastName,
+            user.SecondLastName,
+            user.DisplayName,
+            user.ControlNumber,
+            user.PhoneNumber,
+            user.Gender,
+            user.CurrentRole,
+            user.CreatedAt);
     }
 }
+
