@@ -192,18 +192,26 @@ internal static class DbSeeder
 
     private static async Task SeedUsersAsync(AppDbContext context)
     {
-        if (await context.Users.AnyAsync()) return;
+        if (await context.Users.AnyAsync())
+        {
+            return;
+        }
 
-        var tenant = await context.Tenants.FirstAsync(t => t.Acronym == "ITCM");
+        var tenant = await context.Tenants.FirstAsync(tenant => tenant.Acronym == "ITCM");
 
         var testUser = new User
         {
             TenantId = tenant.Id,
             CurrentRole = UserRole.Student,
             Email = "student@cdmadero.tecnm.mx",
+            IsEmailVerified = true,
             ControlNumber = "21070001",
             FirstName = "Juan",
-            LastName = "Pérez"
+            LastName = "Pérez",
+            SecondLastName = "Hernández",
+            DisplayName = "Juancho",
+            PhoneNumber = "8331234567",
+            Gender = Gender.Male
         };
         testUser.Normalize();
 
@@ -212,9 +220,11 @@ internal static class DbSeeder
             TenantId = tenant.Id,
             CurrentRole = UserRole.Student,
             Email = "deleted_student@cdmadero.tecnm.mx",
+            IsEmailVerified = false,
             ControlNumber = "21070002",
             FirstName = "Carlos",
             LastName = "Gómez",
+            Gender = Gender.Male,
             IsDeleted = true,
             DeletedAt = DateTime.UtcNow
         };

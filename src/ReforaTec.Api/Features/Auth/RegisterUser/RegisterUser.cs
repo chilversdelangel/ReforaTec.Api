@@ -11,6 +11,7 @@ internal sealed class RegisterUser : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/users", HandleRequest)
+            .WithName("RegisterUser")
             .WithTags(OpenApiTags.Auth)
             .AllowAnonymous()
             .AddEndpointFilter<ValidationFilter<Request>>()
@@ -30,7 +31,7 @@ internal sealed class RegisterUser : IEndpoint
         var result = await Handler.Handle(request, context, cancellationToken);
 
         return result.Match(
-            response => Results.Created($"/users/{response.Id}", response),
+            response => Results.Json(response, statusCode: StatusCodes.Status201Created),
             errors => errors.ToProblem());
     }
 }

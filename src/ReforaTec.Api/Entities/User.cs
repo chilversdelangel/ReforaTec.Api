@@ -17,11 +17,12 @@ public class User : AuditableEntity, INormalizable
     public string? ControlNumber { get; set; }
     
     public string FirstName { get; set; } = string.Empty;
-    public string? MiddleName { get; set; }
     public string LastName { get; set; } = string.Empty;
     public string? SecondLastName { get; set; }
+    public string? DisplayName { get; set; }
     
     public string? PhoneNumber { get; set; }
+    public Gender Gender { get; set; }
     
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }
@@ -33,8 +34,8 @@ public class User : AuditableEntity, INormalizable
         ControlNumber = ControlNumber?.ToSanitized().ToUpperInvariant();
 
         FirstName = FirstName.ToSanitized();
-        MiddleName = MiddleName?.ToSanitized();
         LastName = LastName.ToSanitized();
         SecondLastName = SecondLastName?.ToSanitized();
+        DisplayName = DisplayName?.ToSanitized();
     }
 }

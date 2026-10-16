@@ -27,6 +27,6 @@ internal sealed record AssignedStudentDto(
     int Id,
     string? ControlNumber,
     string FirstName,
-    string? MiddleName,
     string LastName,
-    string? SecondLastName);
+    string? SecondLastName,
+    string? DisplayName);
