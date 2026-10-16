@@ -21,9 +21,7 @@ internal static class Handler
 
         if (user is not null && user.IsEmailVerified)
         {
-            return Error.Conflict(
-                code: ErrorCodes.EmailAlreadyExists,
-                description: "A user with this email already exists.");
+            return Errors.EmailAlreadyExists;
         }
 
         // If the user exists but is NOT verified, we allow overwriting their data (Hostage mitigation)
@@ -33,9 +31,7 @@ internal static class Handler
 
         if (tenant is null)
         {
-            return Error.NotFound(
-                code: ErrorCodes.InstitutionalDomainNotFound,
-                description: "The provided email domain does not belong to any registered institution.");
+            return Errors.InstitutionalDomainNotFound;
         }
 
         var controlNumber = NormalizeControlNumber(request.ControlNumber);
@@ -48,11 +44,9 @@ internal static class Handler
                 candidate.Id != existingUserId,
             cancellationToken);
 
-        if (controlNumberOwner?.IsEmailVerified == true)
+        if (controlNumberOwner?.IsEmailVerified is true)
         {
-            return Error.Conflict(
-                code: ErrorCodes.ControlNumberAlreadyExists,
-                description: "A user with this control number already exists in the institution.");
+            return Errors.ControlNumberAlreadyExists;
         }
             
         // Release the hijacked control number from the unverified
