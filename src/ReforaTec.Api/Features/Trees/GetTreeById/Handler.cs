@@ -13,9 +13,9 @@ internal static class Handler
     {
         var tree = await context.Trees
             .AsNoTracking()
-            .Include(t => t.Species)
-            .Include(t => t.Value)
-            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+            .Include(tree => tree.Species)
+            .Include(tree => tree.Value)
+            .FirstOrDefaultAsync(tree => tree.Id == id, cancellationToken);
 
         if (tree is null)
         {
@@ -26,29 +26,31 @@ internal static class Handler
 
         var currentFolio = await context.CampaignManagesTrees
             .AsNoTracking()
-            .Where(c => c.TreeId == id && c.EndDate == null)
-            .Select(c => c.CampaignFolio)
+            .Where(campaign => campaign.TreeId == id)
+            .Where(campaign => campaign.EndDate == null)
+            .Select(campaign => campaign.CampaignFolio)
             .FirstOrDefaultAsync(cancellationToken);
 
         var latestPhoto = await context.Measurements
             .AsNoTracking()
-            .Where(m => m.TreeId == id && m.EvidencePhotoUrl != null)
-            .OrderByDescending(m => m.DeviceCapturedAt)
-            .Select(m => m.EvidencePhotoUrl)
+            .Where(measurement => measurement.TreeId == id)
+            .Where(measurement => measurement.EvidencePhotoUrl != null)
+            .OrderByDescending(measurement => measurement.DeviceCapturedAt)
+            .Select(measurement => measurement.EvidencePhotoUrl)
             .FirstOrDefaultAsync(cancellationToken);
 
         var assignedStudents = await context.UserCaresForTrees
             .AsNoTracking()
-            .Where(u => u.TreeId == id)
-            .Where(u => u.EndDate == null)
-            .Where(u => u.User != null && !u.User.IsDeleted)
-            .Select(u => new AssignedStudentDto(
-                u.User!.Id,
-                u.User.ControlNumber,
-                u.User.FirstName,
-                u.User.MiddleName,
-                u.User.LastName,
-                u.User.SecondLastName))
+            .Where(assignment => assignment.TreeId == id)
+            .Where(assignment => assignment.EndDate == null)
+            .Where(assignment => assignment.User != null && !assignment.User.IsDeleted)
+            .Select(assignment => new AssignedStudentDto(
+                assignment.User!.Id,
+                assignment.User.ControlNumber,
+                assignment.User.FirstName,
+                assignment.User.LastName,
+                assignment.User.SecondLastName,
+                assignment.User.DisplayName))
             .ToListAsync(cancellationToken);
 
         var locationDto = tree.Location is not null

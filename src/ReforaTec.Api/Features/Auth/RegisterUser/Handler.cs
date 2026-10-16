@@ -69,9 +69,9 @@ internal static class Handler
             userEntity.TenantId,
             userEntity.Email,
             userEntity.FirstName,
-            userEntity.MiddleName,
             userEntity.LastName,
             userEntity.SecondLastName,
+            userEntity.DisplayName,
             userEntity.ControlNumber,
             userEntity.PhoneNumber,
             userEntity.Gender,
@@ -100,7 +100,6 @@ internal static class Handler
         userToSave.TenantId = tenant.Id;
         userToSave.Email = request.Email;
         userToSave.FirstName = request.FirstName;
-        userToSave.MiddleName = request.MiddleName;
         userToSave.LastName = request.LastName;
         userToSave.SecondLastName = request.SecondLastName;
         userToSave.ControlNumber = request.ControlNumber;

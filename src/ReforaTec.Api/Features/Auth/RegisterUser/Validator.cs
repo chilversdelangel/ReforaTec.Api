@@ -13,13 +13,10 @@ internal sealed class Validator : AbstractValidator<Request>
 
         RuleFor(request => request.FirstName)
             .NotEmpty()
-            .MaximumLength(50);
+            .MaximumLength(100);
 
         RuleFor(request => request.LastName)
             .NotEmpty()
-            .MaximumLength(50);
-
-        RuleFor(request => request.MiddleName)
             .MaximumLength(50);
 
         RuleFor(request => request.SecondLastName)

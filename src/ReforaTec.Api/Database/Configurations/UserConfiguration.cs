@@ -8,44 +8,44 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.Property(u => u.Email)
+        builder.Property(user => user.Email)
             .IsRequired()
             .HasMaxLength(150);
 
-        builder.Property(u => u.FirstName)
+        builder.Property(user => user.FirstName)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(user => user.DisplayName)
+            .HasMaxLength(50);
+
+        builder.Property(user => user.LastName)
             .IsRequired()
             .HasMaxLength(50);
 
-        builder.Property(u => u.MiddleName)
+        builder.Property(user => user.SecondLastName)
             .HasMaxLength(50);
 
-        builder.Property(u => u.LastName)
-            .IsRequired()
-            .HasMaxLength(50);
-
-        builder.Property(u => u.SecondLastName)
-            .HasMaxLength(50);
-
-        builder.Property(u => u.ControlNumber)
+        builder.Property(user => user.ControlNumber)
             .HasMaxLength(30);
 
-        builder.Property(u => u.PhoneNumber)
+        builder.Property(user => user.PhoneNumber)
             .HasMaxLength(20);
 
-        builder.Property(u => u.CurrentRole)
+        builder.Property(user => user.CurrentRole)
             .IsRequired();
 
-        builder.HasIndex(u => u.Email)
+        builder.HasIndex(user => user.Email)
             .IsUnique();
 
         // Multi-Tenant Composite Unique Index: Enforces control number uniqueness per institution,
         // while allowing different institutions to have independent control numbers. NULL values are ignored.
-        builder.HasIndex(u => new { u.TenantId, u.ControlNumber })
+        builder.HasIndex(user => new { user.TenantId, user.ControlNumber })
             .IsUnique();
 
-        builder.HasOne(u => u.Tenant)
+        builder.HasOne(user => user.Tenant)
             .WithMany()
-            .HasForeignKey(u => u.TenantId)
+            .HasForeignKey(user => user.TenantId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Note: Soft delete (IsDeleted) is handled explicitly in application feature handlers
