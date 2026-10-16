@@ -12,6 +12,6 @@ internal sealed record Response(
     string? SecondLastName,
     string? ControlNumber,
     string? PhoneNumber,
-    Gender? Gender,
+    Gender Gender,
     UserRole CurrentRole,
     DateTime CreatedAt);

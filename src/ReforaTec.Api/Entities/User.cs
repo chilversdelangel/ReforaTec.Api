@@ -22,7 +22,7 @@ public class User : AuditableEntity, INormalizable
     public string? SecondLastName { get; set; }
     
     public string? PhoneNumber { get; set; }
-    public Gender? Gender { get; set; }
+    public Gender Gender { get; set; }
     
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }

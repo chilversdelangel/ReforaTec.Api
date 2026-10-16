@@ -33,7 +33,6 @@ internal sealed class Validator : AbstractValidator<Request>
             .MaximumLength(20);
 
         RuleFor(request => request.Gender)
-            .NotNull()
             .IsInEnum()
             .WithMessage("Gender must be a valid value: 0 (Male), 1 (Female), or 2 (Other).");
     }

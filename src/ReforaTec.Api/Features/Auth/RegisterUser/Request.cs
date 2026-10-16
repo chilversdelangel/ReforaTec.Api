@@ -10,4 +10,4 @@ internal sealed record Request(
     string? SecondLastName,
     string ControlNumber,
     string? PhoneNumber,
-    Gender? Gender);
+    Gender Gender);

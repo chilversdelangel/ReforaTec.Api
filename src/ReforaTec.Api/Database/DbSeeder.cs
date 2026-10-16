@@ -216,6 +216,7 @@ internal static class DbSeeder
             ControlNumber = "21070002",
             FirstName = "Carlos",
             LastName = "Gómez",
+            Gender = Gender.Male,
             IsDeleted = true,
             DeletedAt = DateTime.UtcNow
         };
