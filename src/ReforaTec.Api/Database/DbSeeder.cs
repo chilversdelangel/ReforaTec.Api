@@ -206,9 +206,9 @@ internal static class DbSeeder
             Email = "student@cdmadero.tecnm.mx",
             IsEmailVerified = true,
             ControlNumber = "21070001",
-            FirstName = "Juan",
-            LastName = "Pérez",
-            SecondLastName = "Hernández",
+            GivenName = "Juan",
+            FamilyName = "Pérez",
+            SecondFamilyName = "Hernández",
             DisplayName = "Juancho",
             PhoneNumber = "+528331234567",
             Gender = Gender.Male
@@ -222,8 +222,8 @@ internal static class DbSeeder
             Email = "deleted_student@cdmadero.tecnm.mx",
             IsEmailVerified = false,
             ControlNumber = "21070002",
-            FirstName = "Carlos",
-            LastName = "Gómez",
+            GivenName = "Carlos",
+            FamilyName = "Gómez",
             Gender = Gender.Male,
             IsDeleted = true,
             DeletedAt = DateTime.UtcNow

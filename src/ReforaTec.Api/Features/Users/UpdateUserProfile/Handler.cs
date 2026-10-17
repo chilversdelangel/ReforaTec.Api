@@ -29,9 +29,9 @@ internal static class Handler
 
         return new Response(
             Id: userEntity.Id,
-            FirstName: userEntity.FirstName,
-            LastName: userEntity.LastName,
-            SecondLastName: userEntity.SecondLastName,
+            GivenName: userEntity.GivenName,
+            FamilyName: userEntity.FamilyName,
+            SecondFamilyName: userEntity.SecondFamilyName,
             DisplayName: userEntity.DisplayName,
             ControlNumber: userEntity.ControlNumber,
             PhoneNumber: userEntity.PhoneNumber,
@@ -42,19 +42,19 @@ internal static class Handler
 
     private static void ApplyUpdates(User userEntity, Request request)
     {
-        if (request.FirstName is not null)
+        if (request.GivenName is not null)
         {
-            userEntity.FirstName = request.FirstName;
+            userEntity.GivenName = request.GivenName;
         }
 
-        if (request.LastName is not null)
+        if (request.FamilyName is not null)
         {
-            userEntity.LastName = request.LastName;
+            userEntity.FamilyName = request.FamilyName;
         }
 
-        if (request.SecondLastName is not null)
+        if (request.SecondFamilyName is not null)
         {
-            userEntity.SecondLastName = request.SecondLastName.ToSanitizedOrNull();
+            userEntity.SecondFamilyName = request.SecondFamilyName.ToSanitizedOrNull();
         }
 
         if (request.DisplayName is not null)

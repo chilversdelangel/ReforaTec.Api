@@ -4,9 +4,9 @@ namespace ReforaTec.Api.Features.Users.UpdateUserProfile;
 
 internal sealed record Response(
     int Id,
-    string FirstName,
-    string LastName,
-    string? SecondLastName,
+    string GivenName,
+    string FamilyName,
+    string? SecondFamilyName,
     string? DisplayName,
     string? ControlNumber,
     string? PhoneNumber,

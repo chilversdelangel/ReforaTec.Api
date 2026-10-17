@@ -21,7 +21,7 @@ internal sealed class UpdateUserProfile : IEndpoint
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Partially update authenticated user profile")
-            .WithDescription("Partially updates personal information for the currently authenticated user. Only provided fields are updated; omitted fields retain their existing values. To clear an optional field (secondLastName, displayName, phoneNumber), pass an empty string \"\".");
+            .WithDescription("Partially updates personal information for the currently authenticated user. Only provided fields are updated; omitted fields retain their existing values. To clear an optional field (secondFamilyName, displayName, phoneNumber), pass an empty string \"\".");
     }
 
     private static async Task<IResult> HandleRequest(

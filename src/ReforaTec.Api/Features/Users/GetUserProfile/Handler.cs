@@ -24,9 +24,9 @@ internal static class Handler
         var currentCampaign = await GetCurrentCampaignNameAsync(context, loggedUser, cancellationToken);
 
         return new Response(
-            FirstName: userEntity.FirstName,
-            LastName: userEntity.LastName,
-            SecondLastName: userEntity.SecondLastName,
+            GivenName: userEntity.GivenName,
+            FamilyName: userEntity.FamilyName,
+            SecondFamilyName: userEntity.SecondFamilyName,
             DisplayName: userEntity.DisplayName,
             ControlNumber: userEntity.ControlNumber,
             PhoneNumber: userEntity.PhoneNumber,

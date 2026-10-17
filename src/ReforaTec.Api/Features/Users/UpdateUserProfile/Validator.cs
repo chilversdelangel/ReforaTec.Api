@@ -10,19 +10,19 @@ internal sealed class Validator : AbstractValidator<Request>
             .Must(HaveAtLeastOneField)
             .WithMessage("At least one field must be provided for update.");
 
-        RuleFor(request => request.FirstName)
+        RuleFor(request => request.GivenName)
             .NotEmpty()
             .MaximumLength(100)
-            .When(request => request.FirstName is not null);
+            .When(request => request.GivenName is not null);
 
-        RuleFor(request => request.LastName)
+        RuleFor(request => request.FamilyName)
             .NotEmpty()
             .MaximumLength(50)
-            .When(request => request.LastName is not null);
+            .When(request => request.FamilyName is not null);
 
-        RuleFor(request => request.SecondLastName)
+        RuleFor(request => request.SecondFamilyName)
             .MaximumLength(50)
-            .When(request => !string.IsNullOrEmpty(request.SecondLastName));
+            .When(request => !string.IsNullOrEmpty(request.SecondFamilyName));
 
         RuleFor(request => request.DisplayName)
             .MaximumLength(50)
@@ -39,9 +39,9 @@ internal sealed class Validator : AbstractValidator<Request>
     }
 
     private static bool HaveAtLeastOneField(Request request) =>
-        request.FirstName is not null ||
-        request.LastName is not null ||
-        request.SecondLastName is not null ||
+        request.GivenName is not null ||
+        request.FamilyName is not null ||
+        request.SecondFamilyName is not null ||
         request.DisplayName is not null ||
         request.PhoneNumber is not null ||
         request.Gender.HasValue;

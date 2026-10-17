@@ -16,9 +16,9 @@ public class User : AuditableEntity, INormalizable
     public bool IsEmailVerified { get; set; } = false;
     public string? ControlNumber { get; set; }
     
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
-    public string? SecondLastName { get; set; }
+    public string GivenName { get; set; } = string.Empty;
+    public string FamilyName { get; set; } = string.Empty;
+    public string? SecondFamilyName { get; set; }
     public string? DisplayName { get; set; }
     
     public string? PhoneNumber { get; set; }
@@ -33,9 +33,9 @@ public class User : AuditableEntity, INormalizable
 
         ControlNumber = ControlNumber?.ToSanitized().ToUpperInvariant();
 
-        FirstName = FirstName.ToSanitized();
-        LastName = LastName.ToSanitized();
-        SecondLastName = SecondLastName?.ToSanitizedOrNull();
+        GivenName = GivenName.ToSanitized();
+        FamilyName = FamilyName.ToSanitized();
+        SecondFamilyName = SecondFamilyName?.ToSanitizedOrNull();
         DisplayName = DisplayName?.ToSanitizedOrNull();
 
         NormalizePhoneNumber();
