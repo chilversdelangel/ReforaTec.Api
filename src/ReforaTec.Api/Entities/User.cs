@@ -35,7 +35,23 @@ public class User : AuditableEntity, INormalizable
 
         FirstName = FirstName.ToSanitized();
         LastName = LastName.ToSanitized();
-        SecondLastName = SecondLastName?.ToSanitized();
-        DisplayName = DisplayName?.ToSanitized();
+        SecondLastName = SecondLastName?.ToSanitizedOrNull();
+        DisplayName = DisplayName?.ToSanitizedOrNull();
+
+        NormalizePhoneNumber();
+    }
+
+    private void NormalizePhoneNumber()
+    {
+        var phoneNumberSanitized = PhoneNumber?.Trim();
+        if (string.IsNullOrEmpty(phoneNumberSanitized))
+        {
+            PhoneNumber = null;
+            return;
+        }
+
+        PhoneNumber = phoneNumberSanitized.StartsWith('+')
+            ? phoneNumberSanitized
+            : $"+52{phoneNumberSanitized}";
     }
 }

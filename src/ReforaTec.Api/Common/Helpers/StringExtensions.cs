@@ -10,6 +10,12 @@ internal static class StringExtensions
             return string.Join(" ", words);
         }
 
+        public string? ToSanitizedOrNull()
+        {
+            var valueSanitized = value.ToSanitized();
+            return string.IsNullOrEmpty(valueSanitized) ? null : valueSanitized;
+        }
+
         public string ToNormalized()
         {
             return value.ToSanitized().ToLowerInvariant();

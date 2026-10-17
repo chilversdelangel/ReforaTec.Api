@@ -27,7 +27,8 @@ internal sealed class Validator : AbstractValidator<Request>
             .MaximumLength(30);
 
         RuleFor(request => request.PhoneNumber)
-            .MaximumLength(20);
+            .Matches(@"^(\+[1-9]\d{9,14}|\d{10})$")
+            .When(request => !string.IsNullOrWhiteSpace(request.PhoneNumber));
 
         RuleFor(request => request.Gender)
             .IsInEnum()

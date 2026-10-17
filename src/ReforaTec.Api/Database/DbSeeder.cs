@@ -210,7 +210,7 @@ internal static class DbSeeder
             LastName = "Pérez",
             SecondLastName = "Hernández",
             DisplayName = "Juancho",
-            PhoneNumber = "8331234567",
+            PhoneNumber = "+528331234567",
             Gender = Gender.Male
         };
         testUser.Normalize();
