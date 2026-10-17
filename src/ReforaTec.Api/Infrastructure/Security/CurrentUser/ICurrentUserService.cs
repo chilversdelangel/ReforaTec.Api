@@ -6,9 +6,9 @@ internal sealed record UserIdentity(int UserId, int TenantId);
 
 internal interface ICurrentUserService
 {
-    int? UserId { get; }
-    int? TenantId { get; }
-    bool IsAuthenticated { get; }
+    public int? UserId { get; }
+    public int? TenantId { get; }
+    public bool IsAuthenticated { get; }
 
-    ErrorOr<UserIdentity> GetIdentity();
+    public ErrorOr<UserIdentity> GetIdentity();
 }
