@@ -136,9 +136,9 @@ internal static class Handler
     {
         user.TenantId = tenant.Id;
         user.Email = request.Email;
-        user.FirstName = request.FirstName;
-        user.LastName = request.LastName;
-        user.SecondLastName = request.SecondLastName;
+        user.GivenName = request.GivenName;
+        user.FamilyName = request.FamilyName;
+        user.SecondFamilyName = request.SecondFamilyName;
         user.ControlNumber = request.ControlNumber;
         user.PhoneNumber = request.PhoneNumber;
         user.Gender = request.Gender;
@@ -151,9 +151,9 @@ internal static class Handler
             user.Id,
             user.TenantId,
             user.Email,
-            user.FirstName,
-            user.LastName,
-            user.SecondLastName,
+            user.GivenName,
+            user.FamilyName,
+            user.SecondFamilyName,
             user.DisplayName,
             user.ControlNumber,
             user.PhoneNumber,

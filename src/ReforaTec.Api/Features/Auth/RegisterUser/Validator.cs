@@ -11,15 +11,15 @@ internal sealed class Validator : AbstractValidator<Request>
             .EmailAddress()
             .MaximumLength(150);
 
-        RuleFor(request => request.FirstName)
+        RuleFor(request => request.GivenName)
             .NotEmpty()
             .MaximumLength(100);
 
-        RuleFor(request => request.LastName)
+        RuleFor(request => request.FamilyName)
             .NotEmpty()
             .MaximumLength(50);
 
-        RuleFor(request => request.SecondLastName)
+        RuleFor(request => request.SecondFamilyName)
             .MaximumLength(50);
 
         RuleFor(request => request.ControlNumber)
@@ -27,7 +27,8 @@ internal sealed class Validator : AbstractValidator<Request>
             .MaximumLength(30);
 
         RuleFor(request => request.PhoneNumber)
-            .MaximumLength(20);
+            .Matches(@"^(\+[1-9]\d{9,14}|\d{10})$")
+            .When(request => !string.IsNullOrWhiteSpace(request.PhoneNumber));
 
         RuleFor(request => request.Gender)
             .IsInEnum()

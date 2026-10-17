@@ -712,15 +712,21 @@ namespace ReforaTec.Api.Migrations
                         .HasColumnType("character varying(150)")
                         .HasColumnName("email");
 
-                    b.Property<string>("FirstName")
+                    b.Property<string>("FamilyName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("first_name");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("family_name");
 
                     b.Property<int>("Gender")
                         .HasColumnType("integer")
                         .HasColumnName("gender");
+
+                    b.Property<string>("GivenName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("given_name");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
@@ -729,12 +735,6 @@ namespace ReforaTec.Api.Migrations
                     b.Property<bool>("IsEmailVerified")
                         .HasColumnType("boolean")
                         .HasColumnName("is_email_verified");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("last_name");
 
                     b.Property<DateTime>("ModifiedAt")
                         .HasColumnType("timestamp with time zone")
@@ -745,10 +745,10 @@ namespace ReforaTec.Api.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("phone_number");
 
-                    b.Property<string>("SecondLastName")
+                    b.Property<string>("SecondFamilyName")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("second_last_name");
+                        .HasColumnName("second_family_name");
 
                     b.Property<int>("TenantId")
                         .HasColumnType("integer")

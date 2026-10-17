@@ -77,9 +77,9 @@ internal static class Handler
             .Select(assignment => new AssignedStudentDto(
                 assignment.User!.Id,
                 assignment.User.ControlNumber,
-                assignment.User.FirstName,
-                assignment.User.LastName,
-                assignment.User.SecondLastName,
+                assignment.User.GivenName,
+                assignment.User.FamilyName,
+                assignment.User.SecondFamilyName,
                 assignment.User.DisplayName))
             .ToListAsync(cancellationToken);
     }

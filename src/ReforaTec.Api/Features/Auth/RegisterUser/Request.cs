@@ -4,9 +4,9 @@ namespace ReforaTec.Api.Features.Auth.RegisterUser;
 
 internal sealed record Request(
     string Email,
-    string FirstName,
-    string LastName,
-    string? SecondLastName,
+    string GivenName,
+    string FamilyName,
+    string? SecondFamilyName,
     string ControlNumber,
     string? PhoneNumber,
     Gender Gender);

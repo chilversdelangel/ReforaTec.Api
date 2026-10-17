@@ -3,9 +3,9 @@ using ReforaTec.Api.Entities.Enums;
 namespace ReforaTec.Api.Features.Users.GetUserProfile;
 
 internal sealed record Response(
-    string FirstName,
-    string LastName,
-    string? SecondLastName,
+    string GivenName,
+    string FamilyName,
+    string? SecondFamilyName,
     string? DisplayName,
     string? ControlNumber,
     string? PhoneNumber,

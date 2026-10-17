@@ -26,7 +26,7 @@ internal sealed record LocationDto(
 internal sealed record AssignedStudentDto(
     int Id,
     string? ControlNumber,
-    string FirstName,
-    string LastName,
-    string? SecondLastName,
+    string GivenName,
+    string FamilyName,
+    string? SecondFamilyName,
     string? DisplayName);
