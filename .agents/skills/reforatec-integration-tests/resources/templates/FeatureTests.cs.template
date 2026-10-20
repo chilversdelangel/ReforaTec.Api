@@ -1,0 +1,93 @@
+using System.Net;
+using System.Net.Http.Json;
+using FluentAssertions;
+using ReforaTec.Api.Entities;
+using ReforaTec.Api.Entities.Enums;
+using ReforaTec.Api.Features.{{Domain}}.{{UseCase}};
+using ReforaTec.Api.IntegrationTests.Fixtures;
+using ReforaTec.Api.IntegrationTests.Fixtures.Assertions;
+
+namespace ReforaTec.Api.IntegrationTests.Features.{{Domain}};
+
+public class {{UseCase}}Tests(ReforaTecWebApplicationFactory factory) : IntegrationTestBase(factory)
+{
+    // --- 1. Security ---
+    [Fact]
+    public async Task {{UseCase}}_WhenUnauthenticated_ShouldReturnUnauthorized()
+    {
+        // Act
+        var response = await Client.GetAsync("/api/v1/{{Route}}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task {{UseCase}}_WhenResourceBelongsToForeignTenant_ShouldReturnNotFound()
+    {
+        // Arrange
+        var foreignResource = await Create{{Entity}}Async(tenantId: TestTenants.Foreign);
+
+        var user = await CreateUserAsync(tenantId: TestTenants.Primary);
+        Authenticate(user);
+
+        // Act
+        var response = await Client.GetAsync($"/api/v1/{{Route}}/{foreignResource.Id}");
+
+        // Assert
+        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.{{Entity}}NotFound);
+    }
+
+    // --- 2. Validation ---
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData(null)]
+    public async Task {{UseCase}}_WithInvalid{{Property}}_ShouldReturnBadRequest(string? value)
+    {
+        // Arrange
+        var user = await CreateUserAsync();
+        Authenticate(user);
+
+        var request = new Request(value!);
+
+        // Act
+        var response = await Client.PostAsJsonAsync("/api/v1/{{Route}}", request);
+
+        // Assert
+        await response.ShouldBeValidationProblemAsync("{{Property}}");
+    }
+
+    // --- 3. Business Errors ---
+    [Fact]
+    public async Task {{UseCase}}_When{{Condition}}_ShouldReturnNotFound()
+    {
+        // Arrange
+        var user = await CreateUserAsync();
+        Authenticate(user);
+
+        // Act
+        var response = await Client.GetAsync("/api/v1/{{Route}}");
+
+        // Assert
+        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.{{Entity}}NotFound);
+    }
+
+    // --- 4. Happy Path ---
+    [Fact]
+    public async Task {{UseCase}}_WhenValid_ShouldReturnOk()
+    {
+        // Arrange
+        var user = await CreateUserAsync();
+        Authenticate(user);
+
+        // Act
+        var response = await Client.GetAsync("/api/v1/{{Route}}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Content.ReadFromJsonAsync<Response>();
+        result.Should().NotBeNull();
+    }
+}

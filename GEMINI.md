@@ -58,6 +58,7 @@
   - Always use descriptive lambda parameter names in LINQ queries and FluentValidation rules (`tree => tree.Id`, `assignment => assignment.UserId`, `request => request.ServiceTypeId`), strictly avoiding single-letter abbreviations (`x =>`, `t =>`).
   - Identity resolution result variable MUST be named `identityResult` (`var identityResult = currentUser.GetIdentity(); if (identityResult.IsError)`).
 - **OpenAPI Documentation:** Every endpoint MUST declare `.WithName()`, `.WithTags()`, `.WithSummary()`, `.WithDescription()`, and explicit `.Produces<T>()` status codes.
+- **Integration Testing:** Every vertical slice endpoint must be covered by integration tests adhering to the 4-layer slice testing matrix (*Security, Validation, Business Errors, Happy Path*) via the `reforatec-integration-tests` skill.
 - **Build Health:** Must verify zero compiler warnings and zero errors via `dotnet build` at the completion of each task.
 
 ## 6. Git Workflow
