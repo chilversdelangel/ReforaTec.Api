@@ -1,14 +1,18 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using ReforaTec.Api.Features.Auth.RequestOtp;
 using ReforaTec.Api.IntegrationTests.Fixtures;
+using ReforaTec.Api.IntegrationTests.Fixtures.Assertions;
 
 namespace ReforaTec.Api.IntegrationTests.Features.Auth;
 
 public class RequestOtpTests(ReforaTecWebApplicationFactory factory) : IntegrationTestBase(factory)
 {
+    // --- 1. Security ---
+    // Security: N/A — anonymous endpoint (AllowAnonymous)
+
+    // --- 2. Validation ---
     [Theory]
     [InlineData("invalid-email")]
     [InlineData("")]
@@ -23,13 +27,13 @@ public class RequestOtpTests(ReforaTecWebApplicationFactory factory) : Integrati
         var response = await Client.PostAsJsonAsync("/api/v1/otp-codes", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problem = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>();
-        problem.Should().NotBeNull();
-        problem.Errors.Should().ContainKey("Email");
+        await response.ShouldBeValidationProblemAsync("Email");
     }
 
+    // --- 3. Business Errors ---
+    // Business Errors: N/A — OWASP anti-enumeration (always 204 NoContent)
+
+    // --- 4. Happy Path ---
     [Fact]
     public async Task RequestOtp_WithValidEmail_ShouldReturnNoContent()
     {

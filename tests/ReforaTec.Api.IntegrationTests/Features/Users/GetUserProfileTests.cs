@@ -1,18 +1,19 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
 using ReforaTec.Api.Entities;
 using ReforaTec.Api.Entities.Enums;
 using ReforaTec.Api.Features.Users.GetUserProfile;
 using ReforaTec.Api.IntegrationTests.Fixtures;
+using ReforaTec.Api.IntegrationTests.Fixtures.Assertions;
 
 namespace ReforaTec.Api.IntegrationTests.Features.Users;
 
 public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : IntegrationTestBase(factory)
 {
+    // --- 1. Security ---
     [Fact]
-    public async Task GetProfile_WhenUnauthenticated_ShouldReturnUnauthorized()
+    public async Task GetUserProfile_WhenUnauthenticated_ShouldReturnUnauthorized()
     {
         // Act
         var response = await Client.GetAsync("/api/v1/users/me/profile");
@@ -22,13 +23,39 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
     }
 
     [Fact]
-    public async Task GetProfile_WhenUserDoesNotExist_ShouldReturnNotFound()
+    public async Task GetUserProfile_WhenUserBelongsToForeignTenant_ShouldReturnNotFound()
+    {
+        // Arrange: User is persisted in database under a foreign tenant
+        var foreignUser = await CreateUserAsync(tenantId: TestTenants.Foreign);
+
+        // Authenticate simulating an identity token bound to Primary tenant
+        var tokenUser = new User
+        {
+            Id = foreignUser.Id,
+            TenantId = TestTenants.Primary,
+            CurrentRole = foreignUser.CurrentRole
+        };
+        Authenticate(tokenUser);
+
+        // Act
+        var response = await Client.GetAsync("/api/v1/users/me/profile");
+
+        // Assert
+        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(foreignUser.Id));
+    }
+
+    // --- 2. Validation ---
+    // Validation: N/A — no request body or query parameters
+
+    // --- 3. Business Errors ---
+    [Fact]
+    public async Task GetUserProfile_WhenUserDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
         var nonExistentUser = new User
         {
             Id = 99999,
-            TenantId = 1,
+            TenantId = TestTenants.Primary,
             CurrentRole = UserRole.Student,
             Email = "ghost@cdmadero.tecnm.mx"
         };
@@ -38,15 +65,11 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         var response = await Client.GetAsync("/api/v1/users/me/profile");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-        problem.Should().NotBeNull();
-        problem!.Type.Should().Be("https://api.reforatec.com/errors/user/not-found");
+        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(nonExistentUser.Id));
     }
 
     [Fact]
-    public async Task GetProfile_WhenUserIsSoftDeleted_ShouldReturnNotFound()
+    public async Task GetUserProfile_WhenUserIsSoftDeleted_ShouldReturnNotFound()
     {
         // Arrange
         var deletedUser = await CreateUserAsync(isDeleted: true);
@@ -56,15 +79,12 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         var response = await Client.GetAsync("/api/v1/users/me/profile");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-        problem.Should().NotBeNull();
-        problem!.Type.Should().Be("https://api.reforatec.com/errors/user/not-found");
+        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(deletedUser.Id));
     }
 
+    // --- 4. Happy Path ---
     [Fact]
-    public async Task GetProfile_WhenAuthenticated_ShouldReturnOkWithProfile()
+    public async Task GetUserProfile_WhenAuthenticated_ShouldReturnOkWithProfile()
     {
         // Arrange
         const string givenName = "Carlos";
@@ -102,7 +122,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
     }
 
     [Fact]
-    public async Task GetProfile_WhenUserHasActivity_ShouldReturnCalculatedStats()
+    public async Task GetUserProfile_WhenUserHasActivity_ShouldReturnCalculatedStats()
     {
         // Arrange
         var user = await CreateUserAsync();
