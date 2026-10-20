@@ -22,5 +22,8 @@
     <PackageReference Include="Scalar.AspNetCore" Version="2.13.20" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="ReforaTec.Api.IntegrationTests" />
+  </ItemGroup>
 
 </Project>

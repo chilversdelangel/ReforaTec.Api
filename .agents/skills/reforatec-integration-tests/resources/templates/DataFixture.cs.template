@@ -1,0 +1,32 @@
+using Microsoft.Extensions.DependencyInjection;
+using ReforaTec.Api.Database;
+using ReforaTec.Api.Entities;
+
+// ReSharper disable once CheckNamespace
+namespace ReforaTec.Api.IntegrationTests.Fixtures;
+
+public abstract partial class IntegrationTestBase
+{
+    protected async Task<{{Entity}}> Create{{Entity}}Async(
+        int tenantId = 1,
+        // Entity-specific properties with coherent defaults
+        )
+    {
+        using var scope = Factory.Services.CreateScope();
+        var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        var entity = new {{Entity}}
+        {
+            TenantId = tenantId,
+            // Assign properties
+        };
+
+        // If entity implements INormalizable:
+        // entity.Normalize();
+
+        appDbContext.{{DbSet}}.Add(entity);
+        await appDbContext.SaveChangesAsync();
+
+        return entity;
+    }
+}

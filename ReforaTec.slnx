@@ -7,4 +7,7 @@
   <Folder Name="/src/">
     <Project Path="src/ReforaTec.Api/ReforaTec.Api.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ReforaTec.Api.IntegrationTests/ReforaTec.Api.IntegrationTests.csproj" />
+  </Folder>
 </Solution>
