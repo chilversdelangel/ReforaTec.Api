@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using ReforaTec.Api.Database;
+using ReforaTec.Api.Entities;
 using Respawn;
 using Testcontainers.PostgreSql;
 
@@ -32,12 +36,36 @@ public class ReforaTecWebApplicationFactory : WebApplicationFactory<Program>, IA
         // Forces the in-memory server to start to run migrations and seeders
         _ = Server;
 
+        await SeedForeignTenantAsync();
+
         var connectionString = _dbContainer.GetConnectionString();
         _dbConnection = new NpgsqlConnection(connectionString);
 
         await _dbConnection.OpenAsync();
 
         _respawner = await CreateRespawnerAsync(_dbConnection);
+    }
+
+    private async Task SeedForeignTenantAsync()
+    {
+        using var scope = Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        if (await context.Tenants.CountAsync() >= 2)
+        {
+            return;
+        }
+
+        var foreignTenant = new Tenant
+        {
+            InstitutionName = "Instituto Tecnológico de Tampico",
+            Acronym = "ITT",
+            InstitutionalEmailDomain = "tampico.tecnm.mx"
+        };
+        foreignTenant.Normalize();
+
+        context.Tenants.Add(foreignTenant);
+        await context.SaveChangesAsync();
     }
 
     public Task ResetDatabaseAsync()
