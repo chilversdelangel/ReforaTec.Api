@@ -40,6 +40,7 @@ Group changes so that each commit addresses a specific logical concern. Examples
 
 ### Step 3: Stage and Commit
 - Format: `type(scope): concise imperative description in English`
+- **Single-Line Invariant:** MUST strictly be a single-line commit (`git commit -m "type(scope): description"`). NEVER use multi-line commit messages, secondary `-m` flags, or bullet points in git commit bodies. All detailed summaries, rationale, and 3-prisms evaluations belong strictly in the **Pull Request description**.
 - Permitted types: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`, `perf`, `build`, `ci`.
 - Examples:
   - `feat(trees): implement CreateTreeService endpoint`
