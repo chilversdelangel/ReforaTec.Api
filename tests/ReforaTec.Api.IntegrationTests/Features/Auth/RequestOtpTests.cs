@@ -24,7 +24,7 @@ public class RequestOtpTests(ReforaTecWebApplicationFactory factory) : Integrati
         var request = new Request(email!);
 
         // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/otp-codes", request);
+        var response = await Client.PostAsJsonAsync(ApiRoutes.Auth.OtpCodes, request);
 
         // Assert
         await response.ShouldBeValidationProblemAsync("Email");
@@ -41,7 +41,7 @@ public class RequestOtpTests(ReforaTecWebApplicationFactory factory) : Integrati
         var request = new Request("student@campus.edu");
 
         // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/otp-codes", request);
+        var response = await Client.PostAsJsonAsync(ApiRoutes.Auth.OtpCodes, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
