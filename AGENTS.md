@@ -65,10 +65,10 @@ ReforaTec/
 * **Timezones:** DTOs accepting timestamps MUST use `DateTimeOffset`. Database entities store `.UtcDateTime`.
 * **Read Performance:** All read-only database queries MUST use `.AsNoTracking()`.
 * **LINQ Style:** Always use **Fluent Method Syntax** (`context.Entity.AsNoTracking().Where(...).Select(...)`). Never use Query Syntax (`from ... join ... select`). For unmapped relations, use subqueries with `IQueryable.Contains(...)`.
-* **Handler Query Decomposition:** Handlers executing multiple queries or complex lookups MUST decompose each independent operation into private static helper methods.
+* **Handler & Method Decomposition:** Handlers executing multiple queries, complex middleware configurations, or deeply nested lambdas MUST decompose each independent operation into private static helper methods.
 * **Control Flow & Formatting:**
   * Always use braces `{}` on separate lines (Allman style) for control blocks (`if`, `foreach`, `while`).
-  * Favor early exits and guard clauses to minimize indentation.
+  * Favor early exits and guard clauses to minimize indentation (strictly maximum 2-3 indentation levels; no arrow-shaped callback pyramids).
   * Use expression-bodied members (`=>`) for concise single-statement methods and properties.
   * Always use descriptive lambda parameter names (`tree => tree.Id`, `request => request.ServiceTypeId`), strictly avoiding single-letter abbreviations (`x =>`, `t =>`).
 * **OpenAPI Documentation:** Every endpoint MUST declare `.WithName()`, `.WithTags()`, `.WithSummary()`, `.WithDescription()`, and explicit `.Produces<T>()` status codes.
@@ -79,6 +79,7 @@ ReforaTec/
 * **DO NOT** use traditional MVC Controllers, MediatR, or CQRS libraries. Keep use cases self-contained in Minimal APIs.
 * **DO NOT** use LINQ SQL Query Syntax (`from ... select`).
 * **DO NOT** use single-letter lambda parameter names (`x =>`, `t =>`, `e =>`).
+* **DO NOT** write deeply nested lambdas, callback hell, or arrow-shaped code pyramids exceeding 2-3 indentation levels; decompose into private static helpers.
 * **DO NOT** throw exceptions for expected business errors; use `ErrorOr<T>`.
 * **DO NOT** modify test assertions in `tests/` to force a failing test to pass during implementation phases.
 
