@@ -2,11 +2,11 @@ using FluentValidation;
 
 namespace ReforaTec.Api.Features.Auth.RequestOtp;
 
-public class Validator : AbstractValidator<Request>
+internal sealed class Validator : AbstractValidator<Request>
 {
     public Validator()
     {
-        RuleFor(x => x.Email)
+        RuleFor(request => request.Email)
             .NotEmpty()
             .EmailAddress();
     }
