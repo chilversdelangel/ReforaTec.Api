@@ -8,6 +8,7 @@
   * Technical Architecture & Ingress: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
   * Database & Persistence Invariants: [`docs/DATABASE.md`](docs/DATABASE.md)
   * Testing Guidelines & Fixtures: [`tests/ReforaTec.Api.IntegrationTests/AGENTS.md`](tests/ReforaTec.Api.IntegrationTests/AGENTS.md)
+  * Subagent Topology & Parallel Execution: [`docs/SUBAGENTS.md`](docs/SUBAGENTS.md)
   * Contribution & Git Workflow: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
 ---
@@ -100,7 +101,7 @@ dotnet test --no-build --filter "FullyQualifiedName~{UseCase}Tests"
 
 ## 7. Multi-Agent Collaboration & Authorization Gate
 * **Primary Agent (Coordinator):** WAIT for explicit user authorization before modifying codebase files or launching subagents.
-* **Delegated Subagents:** Once authorized by the user, subagents execute autonomously within their assigned boundaries:
+* **Delegated Subagents:** Once authorized by the user, subagents execute autonomously within their assigned boundaries (see [`docs/SUBAGENTS.md`](docs/SUBAGENTS.md) for full personas, system prompts, and parallel execution protocol):
   * **Test Architect Agent (Phase 1 Red):** Operates strictly within `tests/ReforaTec.Api.IntegrationTests/`.
   * **Implementer Agent (Phase 2 Green):** Operates strictly within `src/ReforaTec.Api/`.
   * **Reviewer Agent (Phase 3 Refactor):** Read-only inspection against this file and zero-warning verification.
