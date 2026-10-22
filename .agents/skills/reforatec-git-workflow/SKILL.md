@@ -109,11 +109,18 @@ gh pr checks <pr-number> --watch
 ```
 Ensure all checks pass (`CI/Build & Verify`) before proceeding to merge.
 
+### Step 4: Merge Pull Request
+```bash
+gh pr merge <pr-number> --merge
+```
+> [!IMPORTANT]
+> Always use `--merge` (standard merge commit) to preserve individual atomic commits and git history on `main`. NEVER use `--squash` or `--rebase`.
+
 ---
 
 ## Phase 3: Post-Merge Repository Hygiene
 
-Once the PR has been merged on GitHub (either by the user or via `gh pr merge`), immediately clean up the local environment:
+Once the PR has been merged on GitHub (either by the user or via `gh pr merge --merge`), immediately clean up the local environment:
 
 ### Step 1: Switch to `main` and Pull
 ```bash
@@ -148,4 +155,5 @@ git stash list
 | **PR Template** | Must follow `.github/PULL_REQUEST_TEMPLATE.md`. |
 | **Prisms Requirement** | Explain "Why" under Performance, Maintainability, Security. |
 | **CI Gate** | Must verify all checks pass (`gh pr checks <pr> --watch`). |
+| **Merge Method** | Standard merge commit (`gh pr merge <pr> --merge`). Never squash. |
 | **Clean Up** | `checkout main` $\rightarrow$ `pull` $\rightarrow$ `fetch --prune` $\rightarrow$ `branch -d`. |

@@ -69,7 +69,7 @@ Every change merged into `main` must pass through a Pull Request and adhere stri
    * 🧠 **Why this approach?:** Architectural trade-offs and rationale (evaluated under *Performance, Maintainability, Security*).
    * ✅ **Validation:** Confirmation of build health and integration test execution.
 3. **CI Quality Gate:** All GitHub Actions checks (`CI / Build & Verify`) must be 100% green before merging.
-4. **Merge Method:** Use **Squash and Merge** or **Rebase and Merge** to maintain a clean linear history on `main`.
+4. **Merge Method:** Use standard **Merge Commit** (`--merge`) to preserve individual atomic commits and git history on `main`. NEVER squash or rebase commits.
 
 ---
 
