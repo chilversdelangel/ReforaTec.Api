@@ -53,6 +53,11 @@ Every test method MUST clearly separate the three phases with comments:
 ...
 ```
 
+### Clean Test Standards & Anti-Patterns:
+* **NO XML Documentation Noise:** Strictly avoid XML doc comments (`/// <summary>`) on test methods. Test method names must be fully self-documenting following the `{UseCase}_{Condition}_Should{Outcome}` pattern.
+* **NO Hardcoded Route Strings:** Always reference centralized endpoint routes via `ApiRoutes` (e.g. `ApiRoutes.Auth.OtpCodes`, `ApiRoutes.Users.Profile`), never raw magic strings like `"/api/v1/..."`.
+* **NO Single-Letter Lambdas:** Always use descriptive parameter names in LINQ/assertions (`user => user.Email`).
+
 ---
 
 ## 4. Assertion Standards & Helpers

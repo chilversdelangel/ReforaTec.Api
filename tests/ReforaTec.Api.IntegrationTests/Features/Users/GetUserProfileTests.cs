@@ -16,7 +16,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
     public async Task GetUserProfile_WhenUnauthenticated_ShouldReturnUnauthorized()
     {
         // Act
-        var response = await Client.GetAsync("/api/v1/users/me/profile");
+        var response = await Client.GetAsync(ApiRoutes.Users.Profile);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -38,7 +38,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         Authenticate(tokenUser);
 
         // Act
-        var response = await Client.GetAsync("/api/v1/users/me/profile");
+        var response = await Client.GetAsync(ApiRoutes.Users.Profile);
 
         // Assert
         await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(foreignUser.Id));
@@ -62,7 +62,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         Authenticate(nonExistentUser);
 
         // Act
-        var response = await Client.GetAsync("/api/v1/users/me/profile");
+        var response = await Client.GetAsync(ApiRoutes.Users.Profile);
 
         // Assert
         await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(nonExistentUser.Id));
@@ -76,7 +76,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         Authenticate(deletedUser);
 
         // Act
-        var response = await Client.GetAsync("/api/v1/users/me/profile");
+        var response = await Client.GetAsync(ApiRoutes.Users.Profile);
 
         // Assert
         await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(deletedUser.Id));
@@ -112,7 +112,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
             TotalServices: 0);
 
         // Act
-        var response = await Client.GetAsync("/api/v1/users/me/profile");
+        var response = await Client.GetAsync(ApiRoutes.Users.Profile);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -136,7 +136,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         await CreateTreeServiceAsync(tree.Id, user.Id, campaign.Id);
 
         // Act
-        var response = await Client.GetAsync("/api/v1/users/me/profile");
+        var response = await Client.GetAsync(ApiRoutes.Users.Profile);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

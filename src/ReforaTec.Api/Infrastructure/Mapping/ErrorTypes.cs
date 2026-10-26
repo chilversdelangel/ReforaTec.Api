@@ -7,4 +7,5 @@ internal static class ErrorTypes
     public const string Validation = $"{Prefix}validation";
     public const string BadRequest = $"{Prefix}bad-request";
     public const string InternalServer = $"{Prefix}internal-server";
+    public const string TooManyRequests = $"{Prefix}too-many-requests";
 }

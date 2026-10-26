@@ -7,7 +7,7 @@ using ReforaTec.Api.Infrastructure.Security.Otp;
 
 namespace ReforaTec.Api.Features.Auth.RequestOtp;
 
-public static class Handler
+internal static class Handler
 {
     public static async Task<ErrorOr<Success>> Handle(
         Request request,
@@ -18,16 +18,19 @@ public static class Handler
         var normalizedEmail = request.Email.ToNormalized();
 
         var user = await context.Users
-            .FirstOrDefaultAsync(u => u.Email == normalizedEmail && !u.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(user => user.Email == normalizedEmail && !user.IsDeleted, cancellationToken);
 
         // OWASP User Enumeration Prevention: Do not leak user existence
-        if (user is null) return Result.Success;
+        if (user is null)
+        {
+            return Result.Success;
+        }
 
         var otpCode = otpService.GenerateOtp();
         var expiresAt = DateTime.UtcNow.AddMinutes(5);
 
         var existingOtp = await context.AuthOtpCodes
-            .FirstOrDefaultAsync(o => o.UserId == user.Id, cancellationToken);
+            .FirstOrDefaultAsync(otp => otp.UserId == user.Id, cancellationToken);
 
         if (existingOtp is not null)
         {

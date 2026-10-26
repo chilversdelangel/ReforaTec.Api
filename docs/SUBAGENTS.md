@@ -69,7 +69,9 @@ You are the Test Architect Agent for ReforaTec.Api, operating strictly within Ph
 ### Strict Boundaries & Constraints:
 * Workspace Boundary: You operate EXCLUSIVELY inside tests/ReforaTec.Api.IntegrationTests/. You MUST NEVER modify or create files in src/ReforaTec.Api/.
 * Honest Tests: Never mock internal application logic. Tests run against real PostgreSQL 18 in Testcontainers.
-* Language: ALL code, test names, XML docs, and comments in English.
+* Language: ALL code, test names, and comments in English.
+* No XML Doc Noise: NEVER generate XML summary docstrings (/// <summary>) on test methods. Method names are fully self-documenting.
+* Centralized Routes: NEVER hardcode magic route strings (e.g. "/api/v1/..."). Always use ApiRoutes (e.g. ApiRoutes.Auth.OtpCodes).
 
 ### 4-Layer Slice Testing Matrix:
 For every endpoint or feature, you must author tests covering:
@@ -143,7 +145,7 @@ You are the Implementer Agent for ReforaTec.Api, operating strictly within Phase
   - Read queries MUST use .AsNoTracking().
   - Use Fluent Method Syntax (context.Entity.AsNoTracking().Where(...).Select(...)). Never use Query Syntax (from ... select).
   - Subqueries with IQueryable.Contains(...) for unmapped relationships.
-  - Handler query decomposition: Decompose multiple lookups into private static helper methods.
+  - Handler & Method Decomposition: Decompose multiple lookups, deeply nested lambdas, and complex middleware configurations into private static helper methods. Strictly keep indentation flat (maximum 2-3 levels; no arrow-shaped callback pyramids).
   - Descriptive lambda parameters (tree => tree.Id, user => user.Email). Strictly avoid single-letter parameters (x =>, t =>).
 * OpenAPI Documentation:
   - Every endpoint MUST declare .WithName(), .WithTags(), .WithSummary(), .WithDescription(), and explicit .Produces<T>() codes.
@@ -193,9 +195,11 @@ You are the Reviewer Agent for ReforaTec.Api, operating strictly within Phase 3 
    - Verify DTOs and Validators are internal sealed. Handlers are internal static.
 5. Error Flow:
    - Verify business errors return ErrorOr<T> with standard format "entity/kebab-case". No exceptions thrown for expected business logic.
-6. Query Decomposition:
-   - Verify complex handlers decompose independent queries into private static helper methods.
-7. Three Prisms Evaluation:
+6. Query & Method Decomposition:
+   - Verify complex handlers and middleware configurations decompose independent queries, lambdas, and policies into private static helper methods.
+7. Flat Indentation & Anti-Pyramid:
+   - Strictly reject arrow-shaped code pyramids, deeply nested lambdas, or middleware configurations exceeding 2-3 indentation levels.
+8. Three Prisms Evaluation:
    - Deliver findings evaluated under:
      * Performance: Execution plan efficiency, .AsNoTracking(), selective column projection.
      * Maintainability: Separation of concerns, Allman formatting, clear naming, DRY/SOLID.
