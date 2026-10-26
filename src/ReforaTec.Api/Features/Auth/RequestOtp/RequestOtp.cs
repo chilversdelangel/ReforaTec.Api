@@ -4,6 +4,7 @@ using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
 using ReforaTec.Api.Infrastructure.OpenApi;
 using ReforaTec.Api.Infrastructure.Security.Otp;
+using ReforaTec.Api.Infrastructure.Security.RateLimiting;
 
 namespace ReforaTec.Api.Features.Auth.RequestOtp;
 
@@ -14,9 +15,12 @@ internal sealed class RequestOtp : IEndpoint
         app.MapPost("/otp-codes", HandleRequest)
             .WithTags(OpenApiTags.Auth)
             .AllowAnonymous()
+            .RequireRateLimiting(RateLimitingPolicies.Otp)
+            .AddEndpointFilter<OtpRateLimitingFilter>()
             .AddEndpointFilter<ValidationFilter<Request>>()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
+            .ProducesProblem(StatusCodes.Status429TooManyRequests)
             .WithSummary("Request login OTP code")
             .WithDescription("Sends a one-time password code to the registered email address if it exists.");
     }
@@ -30,7 +34,7 @@ internal sealed class RequestOtp : IEndpoint
         var result = await Handler.Handle(request, context, otpService, cancellationToken);
 
         return result.Match(
-            _ => Results.NoContent(),
+            success => Results.NoContent(),
             errors => errors.ToProblem());
     }
 }
