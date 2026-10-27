@@ -37,7 +37,7 @@ Inspect registered endpoints and schemas directly from the OpenAPI 3.0 document:
 curl -s http://localhost:5210/openapi/v1.json | jq '.paths | keys'
 
 # Inspect a specific endpoint definition
-curl -s http://localhost:5210/openapi/v1.json | jq '.paths["/api/v1/trees"]'
+curl -s http://localhost:5210/openapi/v1.json | jq '.paths["/v1/trees"]'
 ```
 
 ---
@@ -48,7 +48,7 @@ ReforaTec uses passwordless email + OTP authentication. In non-production enviro
 
 ### Step A: Request OTP Code
 ```bash
-curl -i -X POST http://localhost:5210/api/v1/otp-codes \
+curl -i -X POST http://localhost:5210/v1/otp-codes \
   -H "Content-Type: application/json" \
   -d '{"email":"student@cdmadero.tecnm.mx"}'
 ```
@@ -56,7 +56,7 @@ Expected response: `HTTP/1.1 204 No Content`.
 
 ### Step B: Verify OTP & Obtain Tokens
 ```bash
-RESPONSE=$(curl -s -X POST http://localhost:5210/api/v1/sessions \
+RESPONSE=$(curl -s -X POST http://localhost:5210/v1/sessions \
   -H "Content-Type: application/json" \
   -d '{
     "email": "student@cdmadero.tecnm.mx",
@@ -91,11 +91,11 @@ Pass the access token in the `Authorization: Bearer` header:
 
 ```bash
 # Example: Get assigned trees for authenticated user
-curl -i -X GET http://localhost:5210/api/v1/users/me/trees \
+curl -i -X GET http://localhost:5210/v1/users/me/trees \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # Example: Create a new resource
-curl -i -X POST http://localhost:5210/api/v1/trees/1/services \
+curl -i -X POST http://localhost:5210/v1/trees/1/services \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{

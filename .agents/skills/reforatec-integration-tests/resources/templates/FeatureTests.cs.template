@@ -16,7 +16,7 @@ public class {{UseCase}}Tests(ReforaTecWebApplicationFactory factory) : Integrat
     public async Task {{UseCase}}_WhenUnauthenticated_ShouldReturnUnauthorized()
     {
         // Act
-        var response = await Client.GetAsync("/api/v1/{{Route}}");
+        var response = await Client.GetAsync("/v1/{{Route}}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -32,7 +32,7 @@ public class {{UseCase}}Tests(ReforaTecWebApplicationFactory factory) : Integrat
         Authenticate(user);
 
         // Act
-        var response = await Client.GetAsync($"/api/v1/{{Route}}/{foreignResource.Id}");
+        var response = await Client.GetAsync($"/v1/{{Route}}/{foreignResource.Id}");
 
         // Assert
         await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.{{Entity}}NotFound);
@@ -52,7 +52,7 @@ public class {{UseCase}}Tests(ReforaTecWebApplicationFactory factory) : Integrat
         var request = new Request(value!);
 
         // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/{{Route}}", request);
+        var response = await Client.PostAsJsonAsync("/v1/{{Route}}", request);
 
         // Assert
         await response.ShouldBeValidationProblemAsync("{{Property}}");
@@ -67,7 +67,7 @@ public class {{UseCase}}Tests(ReforaTecWebApplicationFactory factory) : Integrat
         Authenticate(user);
 
         // Act
-        var response = await Client.GetAsync("/api/v1/{{Route}}");
+        var response = await Client.GetAsync("/v1/{{Route}}");
 
         // Assert
         await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.{{Entity}}NotFound);
@@ -82,7 +82,7 @@ public class {{UseCase}}Tests(ReforaTecWebApplicationFactory factory) : Integrat
         Authenticate(user);
 
         // Act
-        var response = await Client.GetAsync("/api/v1/{{Route}}");
+        var response = await Client.GetAsync("/v1/{{Route}}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
