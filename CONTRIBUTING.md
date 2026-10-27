@@ -67,9 +67,9 @@ Every change merged into `main` must pass through a Pull Request:
 * **CI Quality Gate:** All GitHub Actions checks (`CI / Build & Verify`) must be green before merging.
 
 ### Merge Policy
-The merge strategy is context-dependent to balance commit granularity with a clean linear history:
-* **Multi-commit feature branches:** Use standard **Merge Commit** (`gh pr merge --merge`) to preserve individual atomic commits and git history on `main`.
-* **Single-commit or cohesive docs/chore/hotfix branches:** Use **Squash and Merge** (`gh pr merge --squash`) to maintain a clean linear history without redundant merge bubbles. NEVER rebase indiscriminately.
+The merge strategy is context-dependent, always passing `--delete-branch` to automatically prune the remote branch:
+* **Multi-commit feature branches:** Use standard **Merge Commit** (`gh pr merge --merge --delete-branch`) to preserve individual atomic commits and git history on `main`.
+* **Single-commit or cohesive docs/chore/hotfix branches:** Use **Squash and Merge** (`gh pr merge --squash --delete-branch`) to maintain a clean linear history without redundant merge bubbles. NEVER rebase indiscriminately.
 
 ---
 
