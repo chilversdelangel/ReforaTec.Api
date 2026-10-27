@@ -54,8 +54,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/chilversdelangel/reforatec:latest
-            ghcr.io/chilversdelangel/reforatec:${{ github.sha }}
+            ghcr.io/chilversdelangel/reforatec-api:latest
+            ghcr.io/chilversdelangel/reforatec-api:${{ github.sha }}
 
   deploy:
     name: Deploy to Production
