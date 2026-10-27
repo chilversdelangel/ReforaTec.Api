@@ -112,15 +112,15 @@ Ensure all checks pass (`CI/Build & Verify`) before proceeding to merge.
 ### Step 4: Merge Pull Request
 ```bash
 # Multi-commit feature branches (preserves granular atomic commits):
-gh pr merge <pr-number> --merge
+gh pr merge <pr-number> --merge --delete-branch
 
 # Single-commit or cohesive docs/chore/hotfix branches (preserves clean linear history):
-gh pr merge <pr-number> --squash
+gh pr merge <pr-number> --squash --delete-branch
 ```
 > [!IMPORTANT]
-> Choose the merge strategy based on context:
-> - **Multi-commit feature branches:** Always use `--merge` (standard merge commit) to preserve individual atomic commits on `main`.
-> - **Single-commit or cohesive docs/chore branches:** Use `--squash` to prevent empty, redundant merge commit bubbles while keeping a clean linear git history. NEVER rebase indiscriminately.
+> Choose the merge strategy based on context, always passing `--delete-branch` to automatically prune the remote branch on GitHub:
+> - **Multi-commit feature branches:** Always use `--merge --delete-branch` to preserve individual atomic commits on `main`.
+> - **Single-commit or cohesive docs/chore branches:** Use `--squash --delete-branch` to prevent empty, redundant merge commit bubbles while keeping a clean linear git history. NEVER rebase indiscriminately.
 
 ---
 
@@ -161,5 +161,5 @@ git stash list
 | **PR Template** | Must follow `.github/PULL_REQUEST_TEMPLATE.md`. |
 | **Prisms Requirement** | Explain "Why" under Performance, Maintainability, Security. |
 | **CI Gate** | Must verify all checks pass (`gh pr checks <pr> --watch`). |
-| **Merge Method** | Context-dependent: `--merge` for multi-commit atomic branches; `--squash` for single-commit or cohesive docs/chore branches. |
+| **Merge Method** | Context-dependent: `--merge --delete-branch` for multi-commit atomic branches; `--squash --delete-branch` for single-commit or cohesive docs/chore branches. |
 | **Clean Up** | `checkout main` $\rightarrow$ `pull` $\rightarrow$ `fetch --prune` $\rightarrow$ `branch -d`. |
