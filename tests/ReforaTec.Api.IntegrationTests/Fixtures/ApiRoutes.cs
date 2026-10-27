@@ -2,7 +2,7 @@ namespace ReforaTec.Api.IntegrationTests.Fixtures;
 
 public static class ApiRoutes
 {
-    private const string Base = "/api/v1";
+    private const string Base = "/v1";
 
     public static class Auth
     {

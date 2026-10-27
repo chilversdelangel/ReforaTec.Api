@@ -1,7 +1,7 @@
 @host = localhost:5210
 
 ###
-POST {{host}}/api/v1/trees
+POST {{host}}/v1/trees
 Content-Type: application/json
 
 {
@@ -19,21 +19,21 @@ Content-Type: application/json
 }
 
 ###
-GET {{host}}/api/v1/trees
+GET {{host}}/v1/trees
 Content-Type: application/json
 
 ###
-GET {{host}}/api/v1/trees/2
+GET {{host}}/v1/trees/2
 Content-Type: application/json
 
 
 ###
-GET {{host}}/api/v1/trees/0
+GET {{host}}/v1/trees/0
 Content-Type: application/json
 
 
 ### 
-POST {{host}}/api/v1/values
+POST {{host}}/v1/values
 Content-Type: application/json
 
 {
@@ -41,7 +41,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{host}}/api/v1/values
+POST {{host}}/v1/values
 Content-Type: application/json
 
 {
@@ -49,7 +49,7 @@ Content-Type: application/json
 }
 
 ### 
-POST {{host}}/api/v1/values
+POST {{host}}/v1/values
 Content-Type: application/json
 
 {
@@ -57,7 +57,7 @@ Content-Type: application/json
 }
 
 ### 
-POST {{host}}/api/v1/values
+POST {{host}}/v1/values
 Content-Type: application/json
 
 {
@@ -65,11 +65,11 @@ Content-Type: application/json
 }
 
 ###
-GET {{host}}/api/v1/values/1
+GET {{host}}/v1/values/1
 Content-Type: application/json
 
 ### Species - Create Species (Success)
-POST {{host}}/api/v1/species
+POST {{host}}/v1/species
 Content-Type: application/json
 
 {
@@ -83,7 +83,7 @@ Content-Type: application/json
 }
 
 ### Species - Create Species (Validation Error)
-POST {{host}}/api/v1/species
+POST {{host}}/v1/species
 Content-Type: application/json
 
 {
@@ -96,7 +96,7 @@ Content-Type: application/json
 }
 
 ### Species - Create Species (Conflict - Duplicate)
-POST {{host}}/api/v1/species
+POST {{host}}/v1/species
 Content-Type: application/json
 
 {
@@ -109,27 +109,27 @@ Content-Type: application/json
 }
 
 ### Species - Get Species
-GET {{host}}/api/v1/species/3
+GET {{host}}/v1/species/3
 Content-Type: application/json
 
 ### Species - Get Species (Species Not-Found)
-GET {{host}}/api/v1/species/1999
+GET {{host}}/v1/species/1999
 Content-Type: application/json
 
 ### Campaign - Get Campaign
-GET {{host}}/api/v1/campaigns/1
+GET {{host}}/v1/campaigns/1
 Content-Type: application/json
 
 ### Campaign - Get Campaign (Campaign Not-Found)
-GET {{host}}/api/v1/campaigns/1999
+GET {{host}}/v1/campaigns/1999
 Content-Type: application/json
 
 ### Campaign - Get Species (Bad request)
-GET {{host}}/api/v1/campaigns/-3
+GET {{host}}/v1/campaigns/-3
 Content-Type: application/json
 
 ### Campaign - Create Campaign (Success)
-POST {{host}}/api/v1/campaigns
+POST {{host}}/v1/campaigns
 Content-Type: application/json
 
 {
@@ -149,7 +149,7 @@ Content-Type: application/json
 }
 
 ### Campaign - Create Campaign (Validation Error)
-POST {{host}}/api/v1/campaigns
+POST {{host}}/v1/campaigns
 Content-Type: application/json
 
 {
@@ -160,7 +160,7 @@ Content-Type: application/json
 }
 
 ### Campaign - Create Campaign (Conflict - Duplicate)
-POST {{host}}/api/v1/campaigns
+POST {{host}}/v1/campaigns
 Content-Type: application/json
 
 {
@@ -180,7 +180,7 @@ Content-Type: application/json
 }
 
 ### Auth - Request OTP (Success)
-POST {{host}}/api/v1/otp-codes
+POST {{host}}/v1/otp-codes
 Content-Type: application/json
 
 {
@@ -188,7 +188,7 @@ Content-Type: application/json
 }
 
 ### Auth - Request OTP (Validation Error - Invalid Email)
-POST {{host}}/api/v1/otp-codes
+POST {{host}}/v1/otp-codes
 Content-Type: application/json
 
 {
@@ -196,7 +196,7 @@ Content-Type: application/json
 }
 
 ### Auth - Request OTP (OWASP - Unregistered Email)
-POST {{host}}/api/v1/otp-codes
+POST {{host}}/v1/otp-codes
 Content-Type: application/json
 
 {
@@ -204,7 +204,7 @@ Content-Type: application/json
 }
 
 ### Auth - Request OTP (OWASP - Soft-deleted User)
-POST {{host}}/api/v1/otp-codes
+POST {{host}}/v1/otp-codes
 Content-Type: application/json
 
 {
@@ -212,7 +212,7 @@ Content-Type: application/json
 }
 
 ### Auth - Create Session / Verify OTP (Success)
-POST {{host}}/api/v1/sessions
+POST {{host}}/v1/sessions
 Content-Type: application/json
 
 {
@@ -222,7 +222,7 @@ Content-Type: application/json
 }
 
 ### Auth - Create Session (Invalid OTP Code)
-POST {{host}}/api/v1/sessions
+POST {{host}}/v1/sessions
 Content-Type: application/json
 
 {
@@ -232,7 +232,7 @@ Content-Type: application/json
 }
 
 ### Auth - Create Session (Validation Error - Short OTP Code)
-POST {{host}}/api/v1/sessions
+POST {{host}}/v1/sessions
 Content-Type: application/json
 
 {
@@ -242,7 +242,7 @@ Content-Type: application/json
 }
 
 ### Auth - Create Session (Validation Error - Unauthorized Audience)
-POST {{host}}/api/v1/sessions
+POST {{host}}/v1/sessions
 Content-Type: application/json
 
 {
@@ -252,7 +252,7 @@ Content-Type: application/json
 }
 
 ### Auth - Rotate Token (Success - Replace with raw refreshToken from login response)
-POST {{host}}/api/v1/sessions/refresh
+POST {{host}}/v1/sessions/refresh
 Content-Type: application/json
 
 {
@@ -261,7 +261,7 @@ Content-Type: application/json
 }
 
 ### Auth - Rotate Token (Invalid / Already Consumed Token Error)
-POST {{host}}/api/v1/sessions/refresh
+POST {{host}}/v1/sessions/refresh
 Content-Type: application/json
 
 {
@@ -269,8 +269,8 @@ Content-Type: application/json
   "audience": "ReforaTec.MobileApp"
 }
 
-### Auth - Revoke Token / Logout (RFC 7009 - POST /api/v1/sessions/revoke)
-POST {{host}}/api/v1/sessions/revoke
+### Auth - Revoke Token / Logout (RFC 7009 - POST /v1/sessions/revoke)
+POST {{host}}/v1/sessions/revoke
 Content-Type: application/json
 
 {
@@ -278,7 +278,7 @@ Content-Type: application/json
 }
 
 ### Auth - Register User (Success / Overwrite Unverified)
-POST {{host}}/api/v1/users
+POST {{host}}/v1/users
 Content-Type: application/json
 
 {
@@ -290,7 +290,7 @@ Content-Type: application/json
 }
 
 ### Auth - Register User (Domain Not Found 404)
-POST {{host}}/api/v1/users
+POST {{host}}/v1/users
 Content-Type: application/json
 
 {
@@ -301,7 +301,7 @@ Content-Type: application/json
 }
 
 ### Auth - Register User (Validation Error - Missing Control Number)
-POST {{host}}/api/v1/users
+POST {{host}}/v1/users
 Content-Type: application/json
 
 {
