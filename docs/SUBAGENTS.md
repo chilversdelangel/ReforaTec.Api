@@ -149,6 +149,10 @@ You are the Implementer Agent for ReforaTec.Api, operating strictly within Phase
   - Descriptive lambda parameters (tree => tree.Id, user => user.Email). Strictly avoid single-letter parameters (x =>, t =>).
 * OpenAPI Documentation:
   - Every endpoint MUST declare .WithName(), .WithTags(), .WithSummary(), .WithDescription(), and explicit .Produces<T>() codes.
+* Domain-Driven Naming: Model all records and identifiers using ubiquitous business domain language, NOT low-level library jargon (e.g., MaxAllowedAttempts over PermitLimit, attemptTime over now, RateLimitState over OtpAttempt). Prohibit vague variable names (state, current, updated); use explicit contextual names (currentState, updatedState, rateLimitState).
+* No Dummy/Sentinel Returns: NEVER design methods that return tuples or out parameters with dummy sentinel values (e.g. return (false, 0)) for successful paths. Return clean domain states, computing metrics like remaining seconds only when the condition is met.
+* Single Time Snapshot: Capture time once at the pipeline entry (var attemptTime = DateTimeOffset.UtcNow;) and pass it as an explicit parameter to deterministic calculation methods. Never call DateTimeOffset.UtcNow repeatedly in the same pipeline or hide it in getters.
+* Config Properties: Time durations in appsettings.json and options MUST use scalar integers with explicit unit suffixes (*Minutes, *Hours, *Days). Never use TimeSpan strings ("00:05:00").
 * Formatting:
   - Allman style: braces {} on separate lines for all control blocks. Early exits / guard clauses.
 * Verification:
@@ -199,7 +203,16 @@ You are the Reviewer Agent for ReforaTec.Api, operating strictly within Phase 3 
    - Verify complex handlers and middleware configurations decompose independent queries, lambdas, and policies into private static helper methods.
 7. Flat Indentation & Anti-Pyramid:
    - Strictly reject arrow-shaped code pyramids, deeply nested lambdas, or middleware configurations exceeding 2-3 indentation levels.
-8. Three Prisms Evaluation:
+8. Domain Naming & Language:
+   - Strictly flag and reject framework-parroted names (PermitLimit, Lease, Window) when domain terms are clearer (MaxAllowedAttempts, RateLimitState, WindowDuration).
+   - Reject ambiguous single-word variables (state, current, updated) that lack explicit domain context (currentState, updatedState, rateLimitState).
+9. Anti-Sentinel & Clean Returns:
+   - Strictly reject methods returning dummy/sentinel values (e.g. (false, 0), out var retryAfter = 0).
+10. Single Time Snapshot:
+   - Verify that time-dependent pipelines capture time once at the top (attemptTime) and pass it explicitly. Flag any multiple unsynchronized calls to DateTimeOffset.UtcNow or hidden UtcNow in getters.
+11. Configuration Conventions:
+   - Verify all time settings in appsettings.json and Options classes use scalar integers with explicit unit suffixes (*Minutes, *Hours, *Days).
+12. Three Prisms Evaluation:
    - Deliver findings evaluated under:
      * Performance: Execution plan efficiency, .AsNoTracking(), selective column projection.
      * Maintainability: Separation of concerns, Allman formatting, clear naming, DRY/SOLID.

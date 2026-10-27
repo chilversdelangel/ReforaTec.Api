@@ -58,24 +58,24 @@ dotnet test --no-build
 
 ---
 
-## 4. Pull Request Standards
+## 4. Pull Request Guidelines
 
-Every change merged into `main` must pass through a Pull Request and adhere strictly to [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md):
+Every change merged into `main` must pass through a Pull Request:
 
-1. **Title:** Match Conventional Commits (e.g. `feat(users): implement UpdateUserProfile endpoint`).
-2. **Body:** Complete all template sections:
-   * 📝 **Summary:** Business value and problem solved.
-   * 🛠️ **Changes:** Bulleted list of implemented components.
-   * 🧠 **Why this approach?:** Architectural trade-offs and rationale (evaluated under *Performance, Maintainability, Security*).
-   * ✅ **Validation:** Confirmation of build health and integration test execution.
-3. **CI Quality Gate:** All GitHub Actions checks (`CI / Build & Verify`) must be 100% green before merging.
-4. **Merge Method:** Use standard **Merge Commit** (`--merge`) to preserve individual atomic commits and git history on `main`. NEVER squash or rebase commits.
+* **Title:** Follow the Conventional Commits format matching the branch's primary concern (e.g. `feat(users): implement UpdateUserProfile endpoint`).
+* **Description:** Adhere to [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) without omitting any section, providing high-signal technical rationale and flat `- [x]` checklist items.
+* **CI Quality Gate:** All GitHub Actions checks (`CI / Build & Verify`) must be green before merging.
+
+### Merge Policy
+The merge strategy is context-dependent to balance commit granularity with a clean linear history:
+* **Multi-commit feature branches:** Use standard **Merge Commit** (`gh pr merge --merge`) to preserve individual atomic commits and git history on `main`.
+* **Single-commit or cohesive docs/chore/hotfix branches:** Use **Squash and Merge** (`gh pr merge --squash`) to maintain a clean linear history without redundant merge bubbles. NEVER rebase indiscriminately.
 
 ---
 
-## 5. Post-Merge Repository Hygiene
+## 5. Local Branch Cleanup
 
-After a PR is merged into `main`:
+Once your PR has been merged into `main`, update your local repository and delete the feature branch:
 ```bash
 git checkout main
 git pull origin main
