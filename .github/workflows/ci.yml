@@ -1,10 +1,12 @@
 name: CI
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - 'docs/**'
+      - '.agents/**'
+      - '*.md'
   workflow_dispatch:
 
 concurrency:
@@ -32,11 +34,11 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore ReforaTec.slnx
 
-      - name: Build solution (Release)
+      - name: Build solution
         run: dotnet build ReforaTec.slnx --no-restore --configuration Release
 
       - name: Run tests
         run: dotnet test ReforaTec.slnx --no-build --configuration Release
 
       - name: Verify Docker build
-        run: docker build -t reforatec-api:ci .
+        run: docker build --check .
