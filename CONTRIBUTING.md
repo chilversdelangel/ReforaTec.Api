@@ -69,7 +69,9 @@ Every change merged into `main` must pass through a Pull Request and adhere stri
    * 🧠 **Why this approach?:** Architectural trade-offs and rationale (evaluated under *Performance, Maintainability, Security*).
    * ✅ **Validation:** Confirmation of build health and integration test execution.
 3. **CI Quality Gate:** All GitHub Actions checks (`CI / Build & Verify`) must be 100% green before merging.
-4. **Merge Method:** Use standard **Merge Commit** (`--merge`) to preserve individual atomic commits and git history on `main`. NEVER squash or rebase commits.
+4. **Merge Method:** Context-dependent:
+   * **Multi-commit feature branches:** Use standard **Merge Commit** (`gh pr merge --merge`) to preserve individual atomic commits and git history on `main`.
+   * **Single-commit or cohesive docs/chore/hotfix branches:** Use **Squash and Merge** (`gh pr merge --squash`) to maintain a clean linear history without redundant merge bubbles. NEVER rebase indiscriminately.
 
 ---
 

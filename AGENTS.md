@@ -128,5 +128,5 @@ dotnet test --no-build --filter "FullyQualifiedName~{UseCase}Tests"
 * **Format:** Strict single-line Conventional Commits in English (`type(scope): description`). NEVER include multi-line bodies or bullet points in git commit messages; all detailed rationale and prism evaluations belong exclusively in the GitHub Pull Request description.
 * **PR Standards:** Adhere strictly to [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) with flat single-level bullets, `- [x]` syntax, and rationale evaluated under the 3 Prisms (*Performance, Maintainability, Security*).
 * **CI Quality Gate:** All GitHub Actions checks must pass (`gh pr checks <pr> --watch`) before merging.
-* **Merge Method:** Standard merge commit (`gh pr merge --merge`). NEVER squash commits, to preserve the atomic commit history.
+* **Merge Method:** Context-dependent. Use standard merge commit (`gh pr merge --merge`) for multi-commit feature branches to preserve atomic commit history. Use squash and merge (`gh pr merge --squash`) for single-commit or cohesive documentation/chore/hotfix branches to maintain a clean linear history without redundant merge bubbles.
 * **Canonical Runbook:** Consult [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`reforatec-git-workflow`](.agents/skills/reforatec-git-workflow/SKILL.md) for full branch lifecycle and post-merge hygiene.
