@@ -66,6 +66,16 @@ ReforaTec/
 * **Read Performance:** All read-only database queries MUST use `.AsNoTracking()`.
 * **LINQ Style:** Always use **Fluent Method Syntax** (`context.Entity.AsNoTracking().Where(...).Select(...)`). Never use Query Syntax (`from ... join ... select`). For unmapped relations, use subqueries with `IQueryable.Contains(...)`.
 * **Handler & Method Decomposition:** Handlers executing multiple queries, complex middleware configurations, or deeply nested lambdas MUST decompose each independent operation into private static helper methods.
+* **Domain Ubiquitous Language over Framework Jargon:**
+  * Model identifiers and class/record names after the domain purpose and user intent, NEVER by blindly parroting low-level framework artifacts (e.g. use `MaxAllowedAttempts` over `PermitLimit`, `attemptTime` over `now`, `RateLimitState` over `OtpAttempt`, `WindowDuration` over raw `Window`).
+  * Variables MUST describe what they represent; strictly avoid vague pronouns or generic nouns (`state`, `current`, `updated`, `obj`, `data`). Use explicit contextual names (`currentState`, `updatedState`, `rateLimitState`).
+* **Temporal Consistency (Single Time Snapshot):**
+  * When executing operations that evaluate or record timestamps across multiple checks, capture time **EXACTLY ONCE** at the entry point of the pipeline (`var attemptTime = DateTimeOffset.UtcNow;`).
+  * Pass this immutable snapshot as an explicit parameter (`attemptTime`) to pure domain calculation methods (`HasReset(attemptTime)`, `GetSecondsUntilReset(attemptTime)`).
+  * NEVER make multiple unsynchronized calls to `DateTimeOffset.UtcNow` across a request pipeline, and NEVER hide calls to `UtcNow` inside record properties or getters.
+* **Configuration Time Unit Suffixes (`appsettings.json`):**
+  * Time durations in `appsettings.json` and options POCO classes MUST be scalar integers with explicit unit suffixes (`*Minutes`, `*Hours`, `*Days`) (e.g., `OtpEmailWindowMinutes: 5`, `AccessTokenExpirationHours: 3`).
+  * NEVER use raw string-based `TimeSpan` formats (e.g. `"00:05:00"`) in configuration, preventing parsing ambiguities and .NET TimeSpan formatting traps (e.g., `"05:00"` parsing as 5 hours instead of 5 minutes).
 * **Control Flow & Formatting:**
   * Always use braces `{}` on separate lines (Allman style) for control blocks (`if`, `foreach`, `while`).
   * Favor early exits and guard clauses to minimize indentation (strictly maximum 2-3 indentation levels; no arrow-shaped callback pyramids).
@@ -81,6 +91,10 @@ ReforaTec/
 * **DO NOT** use single-letter lambda parameter names (`x =>`, `t =>`, `e =>`).
 * **DO NOT** write deeply nested lambdas, callback hell, or arrow-shaped code pyramids exceeding 2-3 indentation levels; decompose into private static helpers.
 * **DO NOT** throw exceptions for expected business errors; use `ErrorOr<T>`.
+* **DO NOT** return tuples, structs, or `out` parameters containing artificial dummy/sentinel values (e.g., `return (false, 0)`) for non-applicable states. Keep methods single-responsibility: return explicit domain records/results, and evaluate conditional metrics (`GetSecondsUntilReset`) on demand only when applicable.
+* **DO NOT** use raw `out var` parameters in business/application logic; prefer explicit return types, pattern matching, or domain records.
+* **DO NOT** query `DateTimeOffset.UtcNow` repeatedly across a method or hide it inside domain records/structs; capture a single immutable `attemptTime` snapshot at the pipeline entry.
+* **DO NOT** name domain classes or properties after third-party library abstractions when ubiquitous domain names exist.
 * **DO NOT** modify test assertions in `tests/` to force a failing test to pass during implementation phases.
 
 ---
