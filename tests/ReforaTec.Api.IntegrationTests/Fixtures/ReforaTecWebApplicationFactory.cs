@@ -23,9 +23,13 @@ public class ReforaTecWebApplicationFactory : WebApplicationFactory<Program>, IA
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        const string notificationsEmailProvider = "Notifications:Email:Provider";
         const string connectionStringKey = "ConnectionStrings:DefaultConnection";
-        var connectionString = _dbContainer.GetConnectionString();
 
+        const string emailProvider = "None";
+        var connectionString = _dbContainer.GetConnectionString();
+        
+        builder.UseSetting(notificationsEmailProvider, emailProvider);
         builder.UseSetting(connectionStringKey, connectionString);
     }
 
