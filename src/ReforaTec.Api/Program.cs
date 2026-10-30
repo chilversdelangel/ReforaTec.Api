@@ -40,13 +40,14 @@ app.UseExceptionHandler();
 app.UseLocalStorage();
 
 await app.MigrateDatabaseAsync();
+await app.SeedCatalogsAsync();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi().AllowAnonymous();
     app.MapScalarApiReference().AllowAnonymous();
 
-    await app.SeedDatabaseAsync();
+    await app.SeedDevelopmentDataAsync();
 }
 
 app.UseHttpsRedirection();
