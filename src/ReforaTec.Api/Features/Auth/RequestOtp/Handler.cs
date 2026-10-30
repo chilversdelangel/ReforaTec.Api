@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Common.Helpers;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Entities;
+using ReforaTec.Api.Infrastructure.Email;
 using ReforaTec.Api.Infrastructure.Security.Otp;
 
 namespace ReforaTec.Api.Features.Auth.RequestOtp;
@@ -13,6 +14,7 @@ internal static class Handler
         Request request,
         AppDbContext context,
         IOtpService otpService,
+        IEmailQueue emailQueue,
         CancellationToken cancellationToken = default)
     {
         var normalizedEmail = request.Email.ToNormalized();
@@ -51,8 +53,8 @@ internal static class Handler
 
         await context.SaveChangesAsync(cancellationToken);
 
-        // Development simulation: Print OTP to console until Email service is integrated
-        Console.WriteLine($"[DEV ONLY] OTP Code for {user.Email}: {otpCode}");
+        var email = EmailTemplates.CreateOtpEmail(user.Email, otpCode);
+        await emailQueue.EnqueueAsync(email, cancellationToken);
 
         return Result.Success;
     }

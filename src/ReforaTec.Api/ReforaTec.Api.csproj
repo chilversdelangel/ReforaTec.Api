@@ -26,4 +26,8 @@
     <InternalsVisibleTo Include="ReforaTec.Api.IntegrationTests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Infrastructure/Email/Templates/OtpTemplate.html" />
+  </ItemGroup>
+
 </Project>
