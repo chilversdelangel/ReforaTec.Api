@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using ReforaTec.Api.Database.Seeding;
 
 namespace ReforaTec.Api.Database;
 
@@ -31,11 +32,18 @@ internal static class DatabaseExtensions
             await dbContext.Database.MigrateAsync();
         }
 
-        internal async Task SeedDatabaseAsync()
+        internal async Task SeedCatalogsAsync()
         {
             using var scope = app.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            await DbSeeder.SeedAsync(dbContext);
+            await DbSeeder.SeedCatalogsAsync(dbContext);
+        }
+
+        internal async Task SeedDevelopmentDataAsync()
+        {
+            using var scope = app.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await DbSeeder.SeedDevelopmentDataAsync(dbContext);
         }
     }
 
