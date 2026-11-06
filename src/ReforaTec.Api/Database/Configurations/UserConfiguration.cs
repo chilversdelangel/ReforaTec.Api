@@ -32,7 +32,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(user => user.PhoneNumber)
             .HasMaxLength(20);
 
-        builder.Property(user => user.CurrentRole)
+        builder.Property(user => user.Role)
             .IsRequired();
 
         builder.HasIndex(user => user.Email)

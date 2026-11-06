@@ -18,7 +18,7 @@ internal static partial class DbSeeder
         var testUser = new User
         {
             TenantId = tenant.Id,
-            CurrentRole = UserRole.Student,
+            Role = UserRole.Student,
             Email = "student@cdmadero.tecnm.mx",
             IsEmailVerified = true,
             ControlNumber = "21070001",
@@ -34,7 +34,7 @@ internal static partial class DbSeeder
         var deletedUser = new User
         {
             TenantId = tenant.Id,
-            CurrentRole = UserRole.Student,
+            Role = UserRole.Student,
             Email = "deleted_student@cdmadero.tecnm.mx",
             IsEmailVerified = false,
             ControlNumber = "21070002",
@@ -49,7 +49,7 @@ internal static partial class DbSeeder
         var adminUser = new User
         {
             TenantId = tenant.Id,
-            CurrentRole = UserRole.SystemAdmin,
+            Role = UserRole.SystemAdmin,
             Email = "admin@cdmadero.tecnm.mx",
             IsEmailVerified = true,
             GivenName = "Administrador",

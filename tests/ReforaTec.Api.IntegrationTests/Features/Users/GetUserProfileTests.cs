@@ -33,7 +33,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         {
             Id = foreignUser.Id,
             TenantId = TestTenants.Primary,
-            CurrentRole = foreignUser.CurrentRole
+            Role = foreignUser.Role
         };
         Authenticate(tokenUser);
 
@@ -56,7 +56,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         {
             Id = 99999,
             TenantId = TestTenants.Primary,
-            CurrentRole = UserRole.Student,
+            Role = UserRole.Student,
             Email = "ghost@cdmadero.tecnm.mx"
         };
         Authenticate(nonExistentUser);

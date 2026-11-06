@@ -39,7 +39,7 @@ public abstract partial class IntegrationTestBase
             FamilyName = familyName,
             
             Gender = gender,
-            CurrentRole = role,
+            Role = role,
             
             IsDeleted = isDeleted,
             DeletedAt = isDeleted ? now : null

@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace ReforaTec.Api.Migrations
+namespace ReforaTec.Api.Database.Migrations
 {
     /// <inheritdoc />
     public partial class InitialSchema : Migration
@@ -143,14 +143,16 @@ namespace ReforaTec.Api.Migrations
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     tenant_id = table.Column<int>(type: "integer", nullable: false),
-                    current_role = table.Column<int>(type: "integer", nullable: false),
+                    role = table.Column<int>(type: "integer", nullable: false),
                     email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    is_email_verified = table.Column<bool>(type: "boolean", nullable: false),
                     control_number = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
-                    first_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    middle_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    last_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    second_last_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    given_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    family_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    second_family_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    display_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     phone_number = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    gender = table.Column<int>(type: "integer", nullable: false),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -226,6 +228,30 @@ namespace ReforaTec.Api.Migrations
                     table.PrimaryKey("pk_auth_otp_codes", x => x.user_id);
                     table.ForeignKey(
                         name: "fk_auth_otp_codes_users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "auth_refresh_tokens",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    hashed_token = table.Column<string>(type: "character(64)", fixedLength: true, maxLength: 64, nullable: false),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    audience = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    revoked_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_auth_refresh_tokens", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_auth_refresh_tokens_users_user_id",
                         column: x => x.user_id,
                         principalTable: "users",
                         principalColumn: "id",
@@ -487,6 +513,22 @@ namespace ReforaTec.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "ix_auth_refresh_tokens_expires_at",
+                table: "auth_refresh_tokens",
+                column: "expires_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_auth_refresh_tokens_hashed_token",
+                table: "auth_refresh_tokens",
+                column: "hashed_token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_auth_refresh_tokens_user_id_created_at",
+                table: "auth_refresh_tokens",
+                columns: new[] { "user_id", "created_at" });
+
+            migrationBuilder.CreateIndex(
                 name: "ix_campaign_manages_trees_campaign_id",
                 table: "campaign_manages_trees",
                 column: "campaign_id");
@@ -688,6 +730,9 @@ namespace ReforaTec.Api.Migrations
         {
             migrationBuilder.DropTable(
                 name: "auth_otp_codes");
+
+            migrationBuilder.DropTable(
+                name: "auth_refresh_tokens");
 
             migrationBuilder.DropTable(
                 name: "campaign_manages_trees");

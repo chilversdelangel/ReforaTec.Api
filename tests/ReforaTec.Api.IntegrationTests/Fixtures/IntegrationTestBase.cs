@@ -27,7 +27,7 @@ public abstract partial class IntegrationTestBase(ReforaTecWebApplicationFactory
         var token = jwtService.GenerateAccessToken(new TokenGenerationRequest(
             user.Id,
             user.TenantId,
-            user.CurrentRole,
+            user.Role,
             audience));
 
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);

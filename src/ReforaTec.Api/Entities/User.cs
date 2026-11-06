@@ -10,7 +10,7 @@ public class User : AuditableEntity, INormalizable
     public int TenantId { get; set; }
     public Tenant? Tenant { get; set; }
     
-    public UserRole CurrentRole { get; set; } = UserRole.Student;
+    public UserRole Role { get; set; } = UserRole.Student;
     
     public string Email { get; set; } = string.Empty;
     public bool IsEmailVerified { get; set; } = false;

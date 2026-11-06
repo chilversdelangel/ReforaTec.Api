@@ -49,10 +49,10 @@ internal static class Handler
             user.IsEmailVerified = true;
         }
         
-        await EnforceMaxSessionsAsync(context, user.Id, user.CurrentRole, jwtOptions, cancellationToken);
+        await EnforceMaxSessionsAsync(context, user.Id, user.Role, jwtOptions, cancellationToken);
 
         var accessToken = jwtTokenService.GenerateAccessToken(
-            new TokenGenerationRequest(user.Id, user.TenantId, user.CurrentRole, request.Audience));
+            new TokenGenerationRequest(user.Id, user.TenantId, user.Role, request.Audience));
 
         var rawRefreshToken = jwtTokenService.GenerateRawRefreshToken();
         var hashedRefreshToken = jwtTokenService.HashRefreshToken(rawRefreshToken);

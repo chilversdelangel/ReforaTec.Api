@@ -37,7 +37,7 @@ internal static class Handler
             PhoneNumber: userEntity.PhoneNumber,
             Gender: userEntity.Gender,
             Email: userEntity.Email,
-            CurrentRole: userEntity.CurrentRole);
+            Role: userEntity.Role);
     }
 
     private static void ApplyUpdates(User userEntity, Request request)
