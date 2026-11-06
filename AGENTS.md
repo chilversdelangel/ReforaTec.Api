@@ -102,6 +102,9 @@ ReforaTec/
 ## 6. Deterministic Verification Commands
 
 ```bash
+# Generate an EF Core migration (strictly inside Database/Migrations)
+dotnet ef migrations add {MigrationName} --project src/ReforaTec.Api --startup-project src/ReforaTec.Api --output-dir Database/Migrations
+
 # Verify build health with zero warnings and zero errors
 dotnet build --disable-build-servers
 

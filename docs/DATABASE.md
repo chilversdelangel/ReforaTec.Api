@@ -3,7 +3,10 @@
 ## 1. Engine & ORM
 * **Database Engine:** PostgreSQL 18
 * **ORM:** Entity Framework Core 10 (Npgsql.EntityFrameworkCore.PostgreSQL)
-* **Migrations:** Code-First EF Core Migrations located in `src/ReforaTec.Api/Database/Migrations/`
+* **Migrations:** Code-First EF Core Migrations strictly consolidated in `src/ReforaTec.Api/Database/Migrations/` (namespace `ReforaTec.Api.Database.Migrations`). Never place migrations in a root `Migrations/` directory.
+  ```bash
+  dotnet ef migrations add <MigrationName> --project src/ReforaTec.Api --startup-project src/ReforaTec.Api --output-dir Database/Migrations
+  ```
 
 ---
 
