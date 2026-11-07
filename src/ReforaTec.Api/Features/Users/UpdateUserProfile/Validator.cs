@@ -6,10 +6,6 @@ internal sealed class Validator : AbstractValidator<Request>
 {
     public Validator()
     {
-        RuleFor(request => request)
-            .Must(HaveAtLeastOneField)
-            .WithMessage("At least one field must be provided for update.");
-
         RuleFor(request => request.GivenName)
             .NotEmpty()
             .MaximumLength(100)
@@ -37,12 +33,4 @@ internal sealed class Validator : AbstractValidator<Request>
             .WithMessage("Gender must be a valid value: 0 (Male), 1 (Female), or 2 (Other).")
             .When(request => request.Gender.HasValue);
     }
-
-    private static bool HaveAtLeastOneField(Request request) =>
-        request.GivenName is not null ||
-        request.FamilyName is not null ||
-        request.SecondFamilyName is not null ||
-        request.DisplayName is not null ||
-        request.PhoneNumber is not null ||
-        request.Gender.HasValue;
 }

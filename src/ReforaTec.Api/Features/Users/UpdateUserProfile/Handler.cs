@@ -25,7 +25,10 @@ internal static class Handler
 
         userEntity.Normalize();
 
-        await context.SaveChangesAsync(cancellationToken);
+        if (context.ChangeTracker.HasChanges())
+        {
+            await context.SaveChangesAsync(cancellationToken);
+        }
 
         return new Response(
             Id: userEntity.Id,
