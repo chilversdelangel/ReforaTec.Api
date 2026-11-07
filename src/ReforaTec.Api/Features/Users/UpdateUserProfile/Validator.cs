@@ -25,7 +25,7 @@ internal sealed class Validator : AbstractValidator<Request>
             .When(request => !string.IsNullOrEmpty(request.DisplayName));
 
         RuleFor(request => request.PhoneNumber)
-            .Matches(@"^(\+[1-9]\d{9,14}|\d{10})$")
+            .Matches(@"^(\+[1-9]\d{6,14}|\d{10})$")
             .When(request => !string.IsNullOrWhiteSpace(request.PhoneNumber));
 
         RuleFor(request => request.Gender)

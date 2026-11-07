@@ -107,6 +107,8 @@ public class RegisterUserTests(ReforaTecWebApplicationFactory factory) : Integra
     [Theory]
     [InlineData("123")]
     [InlineData("letters-not-allowed")]
+    [InlineData("+123456")]
+    [InlineData("+1234567890123456")]
     public async Task RegisterUser_WithInvalidPhoneNumber_ShouldReturnBadRequest(string invalidPhone)
     {
         // Arrange

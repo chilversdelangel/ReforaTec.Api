@@ -82,6 +82,7 @@ public class UpdateUserProfileTests(ReforaTecWebApplicationFactory factory) : In
     [Theory]
     [InlineData("12345")]
     [InlineData("not-a-number")]
+    [InlineData("+123456")]
     [InlineData("+1234567890123456")]
     public async Task UpdateUserProfile_WhenPhoneNumberIsInvalid_ShouldReturnBadRequest(string invalidPhone)
     {
