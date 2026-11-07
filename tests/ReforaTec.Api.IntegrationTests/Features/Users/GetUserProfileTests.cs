@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using ReforaTec.Api.Entities;
 using ReforaTec.Api.Entities.Enums;
 using ReforaTec.Api.Features.Users.GetUserProfile;
 using ReforaTec.Api.IntegrationTests.Fixtures;
@@ -25,23 +24,15 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
     [Fact]
     public async Task GetUserProfile_WhenUserBelongsToForeignTenant_ShouldReturnNotFound()
     {
-        // Arrange: User is persisted in database under a foreign tenant
-        var foreignUser = await CreateUserAsync(tenantId: TestTenants.Foreign);
-
-        // Authenticate simulating an identity token bound to Primary tenant
-        var tokenUser = new User
-        {
-            Id = foreignUser.Id,
-            TenantId = TestTenants.Primary,
-            Role = foreignUser.Role
-        };
-        Authenticate(tokenUser);
+        // Arrange
+        var user = await CreateUserAsync();
+        AuthenticateWithClaims(userId: user.Id, tenantId: TestTenants.Foreign);
 
         // Act
         var response = await Client.GetAsync(ApiRoutes.Users.Profile);
 
         // Assert
-        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(foreignUser.Id));
+        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(user.Id));
     }
 
     // --- 2. Validation ---
@@ -52,20 +43,14 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
     public async Task GetUserProfile_WhenUserDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
-        var nonExistentUser = new User
-        {
-            Id = 99999,
-            TenantId = TestTenants.Primary,
-            Role = UserRole.Student,
-            Email = "ghost@cdmadero.tecnm.mx"
-        };
-        Authenticate(nonExistentUser);
+        const int nonExistentUserId = 99999;
+        AuthenticateWithClaims(userId: nonExistentUserId);
 
         // Act
         var response = await Client.GetAsync(ApiRoutes.Users.Profile);
 
         // Assert
-        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(nonExistentUser.Id));
+        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(nonExistentUserId));
     }
 
     [Fact]

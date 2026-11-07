@@ -17,6 +17,9 @@ public abstract partial class IntegrationTestBase
         string? controlNumber = null,
         string givenName = "Juan",
         string familyName = "Pérez",
+        string? secondFamilyName = null,
+        string? displayName = null,
+        string? phoneNumber = null,
         
         Gender gender = Gender.Male,
         UserRole role = UserRole.Student,
@@ -37,6 +40,10 @@ public abstract partial class IntegrationTestBase
             ControlNumber = controlNumber ?? $"20{Random.Shared.Next(100000, 999999)}",
             GivenName = givenName,
             FamilyName = familyName,
+            
+            SecondFamilyName = secondFamilyName,
+            DisplayName = displayName,
+            PhoneNumber = phoneNumber,
             
             Gender = gender,
             Role = role,
