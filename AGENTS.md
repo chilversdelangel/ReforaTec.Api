@@ -55,6 +55,13 @@ ReforaTec/
 * **Unique Text Fields:** Unique text properties MUST implement `INormalizable` (handled by `AppDbContext`).
 * **Soft Delete:** Entities implementing soft delete MUST filter out deleted records (`!x.IsDeleted`).
 * **User-Scoped Routing:** Endpoints operating on or projecting data for the authenticated user MUST use the `/users/me/...` route hierarchy (e.g. `GET /users/me/profile`, `PATCH /users/me`).
+* **Phone Number Format & E.164 Standard:**
+  * Phone number fields in validators MUST use the standardized regex pattern:
+    ```csharp
+    ^(\+[1-9]\d{6,14}|\d{10})$
+    ```
+  * **Rationale:** Adheres strictly to the real-world ITU-T E.164 specification (global minimum of 7 digits: 3-digit country code + 4-digit subscriber, up to 15 digits maximum), while supporting 10-digit national Mexican numbers without country code. Rejects invalid short junk (< 7 digits).
+  * **Normalization:** Entities implementing phone storage MUST automatically normalize 10-digit national numbers by prepending `+52` and preserving international `+` numbers as-is in UTC/E.164. Avoid pulling in heavy external telecommunication libraries (YAGNI).
 * **Security:** Never leak user existence in authentication flows (OWASP User Enumeration Prevention).
 * **Language:** ALL code, identifiers, XML docs, comments, git commits, and documentation in English.
 
