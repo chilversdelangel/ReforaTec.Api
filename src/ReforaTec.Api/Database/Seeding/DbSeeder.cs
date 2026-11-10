@@ -13,7 +13,7 @@ internal static partial class DbSeeder
     public static async Task SeedDevelopmentDataAsync(AppDbContext context)
     {
         await SeedSpeciesAsync(context);
-        await SeedValuesAsync(context);
+        await SeedVirtuesAsync(context);
         await SeedServiceTypesAsync(context);
         await SeedDevelopmentUsersAsync(context);
         await SeedTreesAsync(context);

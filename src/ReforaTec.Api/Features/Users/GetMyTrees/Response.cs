@@ -5,7 +5,7 @@ internal sealed record Response(
     int SpeciesId,
     string CommonName,
     string ScientificName,
-    string ValueName,
+    string VirtueName,
     string? CurrentCampaignName,
     string? CurrentCampaignFolio,
     string HealthState,

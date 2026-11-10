@@ -1,38 +1,31 @@
-using System.Security.Claims;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
-using ReforaTec.Api.Infrastructure.Security;
+using ReforaTec.Api.Infrastructure.Security.CurrentUser;
 
 namespace ReforaTec.Api.Features.Users.GetMyTrees;
 
 internal static class Handler
 {
     public static async Task<ErrorOr<List<Response>>> Handle(
-        ClaimsPrincipal user,
+        UserIdentity loggedUser,
         AppDbContext context,
         CancellationToken cancellationToken)
     {
-        var userId = user.GetUserId();
+        var userExists = await context.Users
+            .AsNoTracking()
+            .Where(user => user.TenantId == loggedUser.TenantId)
+            .Where(user => user.Id == loggedUser.UserId)
+            .Where(user => !user.IsDeleted)
+            .AnyAsync(cancellationToken);
 
-        if (userId is null)
+        if (!userExists)
         {
-            return Error.Unauthorized(
-                code: ErrorCodes.Unauthorized,
-                description: "User identity could not be determined from the authentication token.");
-        }
-
-        var tenantId = await GetUserTenantIdAsync(context, userId.Value, cancellationToken);
-
-        if (tenantId is null)
-        {
-            return Error.NotFound(
-                code: ErrorCodes.UserNotFound,
-                description: $"User with ID {userId} was not found.");
+            return Errors.UserNotFound(loggedUser.UserId);
         }
 
         var assignedCareRecords =
-            await GetActiveAssignmentsAsync(context, tenantId.Value, userId.Value, cancellationToken);
+            await GetActiveAssignmentsAsync(context, loggedUser.TenantId, loggedUser.UserId, cancellationToken);
 
         if (assignedCareRecords.Count == 0)
         {
@@ -42,10 +35,10 @@ internal static class Handler
         var treeIds = assignedCareRecords.Select(assignment => assignment.TreeId).ToList();
 
         var activeCampaignByTreeId =
-            await GetActiveCampaignsAsync(context, tenantId.Value, treeIds, cancellationToken);
+            await GetActiveCampaignsAsync(context, loggedUser.TenantId, treeIds, cancellationToken);
 
         var latestPhotoByTreeId =
-            await GetLatestPhotosAsync(context, tenantId.Value, treeIds, cancellationToken);
+            await GetLatestPhotosAsync(context, loggedUser.TenantId, treeIds, cancellationToken);
 
         var response = assignedCareRecords.Select(assignment =>
         {
@@ -62,7 +55,7 @@ internal static class Handler
                 ScientificName: tree.Species!.ScientificName,
                 SpeciesImageUrl: tree.Species!.ImageUrl,
                 
-                ValueName: tree.Value!.ValueName,
+                VirtueName: tree.Virtue!.Name,
                 
                 CurrentCampaignName: campaignRecord?.Campaign?.CampaignName,
                 CurrentCampaignFolio: campaignRecord?.CampaignFolio,
@@ -92,20 +85,11 @@ internal static class Handler
             .Where(assignment => assignment.EndDate == null)
             .Where(assignment => assignment.Tree != null)
             .Include(assignment => assignment.Tree)
-            .ThenInclude(t => t!.Species)
+            .ThenInclude(tree => tree!.Species)
             .Include(assignment => assignment.Tree)
-            .ThenInclude(t => t!.Value)
+            .ThenInclude(tree => tree!.Virtue)
             .OrderBy(assignment => assignment.TreeId)
             .ToListAsync(cancellationToken);
-    }
-
-    private static Task<int?> GetUserTenantIdAsync(AppDbContext context, int userId, CancellationToken cancellationToken)
-    {
-        return context.Users
-            .Where(user => user.Id == userId)
-            .Where(user => !user.IsDeleted)
-            .Select(user => (int?)user.TenantId)
-            .FirstOrDefaultAsync(cancellationToken);
     }
 
     private static Task<Dictionary<int, Entities.CampaignManagesTree>> GetActiveCampaignsAsync(

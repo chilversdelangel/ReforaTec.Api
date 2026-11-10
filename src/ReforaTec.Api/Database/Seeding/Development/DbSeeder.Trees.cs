@@ -15,7 +15,7 @@ internal static partial class DbSeeder
 
         var tenant = await context.Tenants.FirstAsync(tenant => tenant.Acronym == "ITCM");
         var speciesList = await context.Species.Take(2).ToListAsync();
-        var value = await context.Values.FirstAsync();
+        var virtue = await context.Virtues.FirstAsync();
 
         if (speciesList.Count < 2)
         {
@@ -26,7 +26,7 @@ internal static partial class DbSeeder
         {
             TenantId = tenant.Id,
             SpeciesId = speciesList[0].Id,
-            ValueId = value.Id,
+            VirtueId = virtue.Id,
             HealthState = TreeHealthState.Healthy,
             PlantingDate = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(-1)),
             HeightCentimeters = 150.5m,
@@ -38,7 +38,7 @@ internal static partial class DbSeeder
         {
             TenantId = tenant.Id,
             SpeciesId = speciesList[1].Id,
-            ValueId = value.Id,
+            VirtueId = virtue.Id,
             HealthState = TreeHealthState.NeedsAttention,
             PlantingDate = null,
             HeightCentimeters = null,

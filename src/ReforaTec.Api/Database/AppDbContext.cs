@@ -6,7 +6,7 @@ using ReforaTec.Api.Entities.Common;
 
 namespace ReforaTec.Api.Database;
 
-public class AppDbContext(DbContextOptions options) : DbContext(options)
+public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
 {
     #region Multi-Tenant & Identity
     public DbSet<Tenant> Tenants { get; set; }
@@ -17,7 +17,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 
     #region Master Catalogs
     public DbSet<Species> Species { get; set; }
-    public DbSet<Value> Values { get; set; }
+    public DbSet<Virtue> Virtues { get; set; }
     public DbSet<ServiceType> ServiceTypes { get; set; }
     #endregion
 

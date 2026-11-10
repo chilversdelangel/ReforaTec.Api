@@ -656,9 +656,9 @@ namespace ReforaTec.Api.Database.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("tenant_id");
 
-                    b.Property<int>("ValueId")
+                    b.Property<int>("VirtueId")
                         .HasColumnType("integer")
-                        .HasColumnName("value_id");
+                        .HasColumnName("virtue_id");
 
                     b.HasKey("Id")
                         .HasName("pk_trees");
@@ -669,8 +669,8 @@ namespace ReforaTec.Api.Database.Migrations
                     b.HasIndex("TenantId")
                         .HasDatabaseName("ix_trees_tenant_id");
 
-                    b.HasIndex("ValueId")
-                        .HasDatabaseName("ix_trees_value_id");
+                    b.HasIndex("VirtueId")
+                        .HasDatabaseName("ix_trees_virtue_id");
 
                     b.ToTable("trees", (string)null);
                 });
@@ -938,7 +938,7 @@ namespace ReforaTec.Api.Database.Migrations
                     b.ToTable("user_inspects_campaigns", (string)null);
                 });
 
-            modelBuilder.Entity("ReforaTec.Api.Entities.Value", b =>
+            modelBuilder.Entity("ReforaTec.Api.Entities.Virtue", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -955,26 +955,26 @@ namespace ReforaTec.Api.Database.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("modified_at");
 
-                    b.Property<string>("NormalizedValueName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("character varying(25)")
-                        .HasColumnName("normalized_value_name");
+                        .HasColumnName("name");
 
-                    b.Property<string>("ValueName")
+                    b.Property<string>("NormalizedName")
                         .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("character varying(25)")
-                        .HasColumnName("value_name");
+                        .HasColumnName("normalized_name");
 
                     b.HasKey("Id")
-                        .HasName("pk_values");
+                        .HasName("pk_virtues");
 
-                    b.HasIndex("NormalizedValueName")
+                    b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("ix_values_normalized_value_name");
+                        .HasDatabaseName("ix_virtues_normalized_name");
 
-                    b.ToTable("values", (string)null);
+                    b.ToTable("virtues", (string)null);
                 });
 
             modelBuilder.Entity("ReforaTec.Api.Entities.AuthOtpCode", b =>
@@ -1210,12 +1210,12 @@ namespace ReforaTec.Api.Database.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_trees_tenants_tenant_id");
 
-                    b.HasOne("ReforaTec.Api.Entities.Value", "Value")
+                    b.HasOne("ReforaTec.Api.Entities.Virtue", "Virtue")
                         .WithMany()
-                        .HasForeignKey("ValueId")
+                        .HasForeignKey("VirtueId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_trees_values_value_id");
+                        .HasConstraintName("fk_trees_virtues_virtue_id");
 
                     b.OwnsOne("ReforaTec.Api.Entities.Common.Location", "Location", b1 =>
                         {
@@ -1261,7 +1261,7 @@ namespace ReforaTec.Api.Database.Migrations
 
                     b.Navigation("Tenant");
 
-                    b.Navigation("Value");
+                    b.Navigation("Virtue");
                 });
 
             modelBuilder.Entity("ReforaTec.Api.Entities.User", b =>

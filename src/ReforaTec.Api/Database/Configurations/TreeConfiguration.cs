@@ -8,34 +8,34 @@ public class TreeConfiguration : IEntityTypeConfiguration<Tree>
 {
     public void Configure(EntityTypeBuilder<Tree> builder)
     {
-        builder.OwnsOne(t => t.Location);
+        builder.OwnsOne(tree => tree.Location);
 
-        builder.Property(t => t.HeightCentimeters)
+        builder.Property(tree => tree.HeightCentimeters)
             .HasPrecision(7, 2);
 
-        builder.Property(t => t.DiameterCentimeters)
+        builder.Property(tree => tree.DiameterCentimeters)
             .HasPrecision(7, 2);
 
-        builder.Property(t => t.Notes)
+        builder.Property(tree => tree.Notes)
             .HasMaxLength(500);
 
-        builder.HasIndex(t => t.TenantId);
-        builder.HasIndex(t => t.SpeciesId);
-        builder.HasIndex(t => t.ValueId);
+        builder.HasIndex(tree => tree.TenantId);
+        builder.HasIndex(tree => tree.SpeciesId);
+        builder.HasIndex(tree => tree.VirtueId);
 
-        builder.HasOne(t => t.Tenant)
+        builder.HasOne(tree => tree.Tenant)
             .WithMany()
-            .HasForeignKey(t => t.TenantId)
+            .HasForeignKey(tree => tree.TenantId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(t => t.Species)
+        builder.HasOne(tree => tree.Species)
             .WithMany()
-            .HasForeignKey(t => t.SpeciesId)
+            .HasForeignKey(tree => tree.SpeciesId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(t => t.Value)
+        builder.HasOne(tree => tree.Virtue)
             .WithMany()
-            .HasForeignKey(t => t.ValueId)
+            .HasForeignKey(tree => tree.VirtueId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

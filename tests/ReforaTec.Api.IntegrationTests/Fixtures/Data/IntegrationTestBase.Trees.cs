@@ -12,7 +12,7 @@ public abstract partial class IntegrationTestBase
     protected async Task<Tree> CreateTreeAsync(
         int tenantId = 1,
         int speciesId = 1,
-        int valueId = 1,
+        int virtueId = 1,
         
         DateOnly? plantingDate = null,
         decimal? heightCentimeters = 150.0m,
@@ -29,7 +29,7 @@ public abstract partial class IntegrationTestBase
         {
             TenantId = tenantId,
             SpeciesId = speciesId,
-            ValueId = valueId,
+            VirtueId = virtueId,
             
             PlantingDate = plantingDate ?? DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-6)),
             HeightCentimeters = heightCentimeters,

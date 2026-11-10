@@ -16,8 +16,8 @@ public class Tree : AuditableEntity
     /// </summary>
     public DateOnly? PlantingDate { get; set; }
     
-    public int ValueId { get; set; }
-    public Value? Value { get; set; }
+    public int VirtueId { get; set; }
+    public Virtue? Virtue { get; set; }
     
     public int SpeciesId { get; set; }
     public Species? Species { get; set; }

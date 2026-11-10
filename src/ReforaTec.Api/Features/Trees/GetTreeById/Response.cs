@@ -6,7 +6,7 @@ internal sealed record Response(
     string HealthState,
     DateOnly? PlantingDate,
     string? Observations,
-    string Value,
+    string Virtue,
     string Species,
     string SpeciesScientificName,
     string? SpeciesImageUrl,

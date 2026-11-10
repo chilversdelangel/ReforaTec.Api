@@ -33,7 +33,7 @@ internal static class Handler
         return context.Trees
             .AsNoTracking()
             .Include(tree => tree.Species)
-            .Include(tree => tree.Value)
+            .Include(tree => tree.Virtue)
             .FirstOrDefaultAsync(tree => tree.Id == treeId, cancellationToken);
     }
 
@@ -105,7 +105,7 @@ internal static class Handler
             HealthState: tree.HealthState.ToString(),
             PlantingDate: tree.PlantingDate,
             Observations: tree.Notes,
-            Value: tree.Value!.ValueName,
+            Virtue: tree.Virtue!.Name,
             Species: tree.Species!.CommonName,
             SpeciesScientificName: tree.Species.ScientificName,
             SpeciesImageUrl: tree.Species.ImageUrl,
