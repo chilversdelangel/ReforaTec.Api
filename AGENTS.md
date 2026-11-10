@@ -130,6 +130,15 @@ dotnet test --no-build --filter "FullyQualifiedName~{UseCase}Tests"
   * **Test Architect Agent (Phase 1 Red):** Operates strictly within `tests/ReforaTec.Api.IntegrationTests/`.
   * **Implementer Agent (Phase 2 Green):** Operates strictly within `src/ReforaTec.Api/`.
   * **Reviewer Agent (Phase 3 Refactor):** Read-only inspection against this file and zero-warning verification.
+* **Reviewable Increment Limit (applies to ALL agents, parallel or interactive):**
+  * Every unit of work handed to the user for review MUST be **<= 200 changed lines (target) and NEVER > 400 lines** (SmartBear/Cisco code review research: defect detection drops sharply beyond 200-400 LOC per session).
+  * **Silent limit:** Enforce it internally. Do NOT narrate line counts or mention the limit in messages; just deliver right-sized steps.
+  * **Plan first:** When a task would exceed the limit, propose the split upfront as a short numbered list of steps (what each step does), then wait for approval before starting step 1.
+  * **Self-contained increments:** Each step = one atomic commit that compiles, passes tests, and makes sense on its own (no step may leave the build broken or depend on a later step).
+  * **No diffs in chat:** After each step, state what was done in 1-2 lines. The user reviews the diff in the IDE; paste code in chat only when asked.
+  * After each step, STOP and WAIT for user approval before starting the next one.
+  * Generated code (EF Core migrations, snapshots) is excluded from the count.
+  * Parallel subagents MUST follow the same rules per agent: deliver one increment, report back, and never chain further work autonomously.
 
 ---
 

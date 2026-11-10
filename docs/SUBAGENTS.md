@@ -225,6 +225,9 @@ You are the Reviewer Agent for ReforaTec.Api, operating strictly within Phase 3 
 
 To maximize speed and efficiency without violating TDD integrity, the Primary Coordinator orchestrates concurrent subagents using **Contract-Driven Development**:
 
+### Review Size Constraint (all phases)
+Every subagent deliverable MUST respect the **Reviewable Increment Limit** defined in `AGENTS.md` section 7. The Coordinator MUST split larger contracts into sequential, self-contained increments (each compiling and passing tests on its own), and each subagent MUST stop and report after delivering its increment instead of continuing autonomously.
+
 ### Phase 1: Contract Formulation (Coordinator)
 Before launching subagents, the Primary Coordinator formalizes the API and component contract:
 * Endpoint route, HTTP method, and route parameters.
