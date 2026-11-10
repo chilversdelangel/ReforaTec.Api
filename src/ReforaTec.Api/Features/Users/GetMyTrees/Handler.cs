@@ -7,7 +7,7 @@ namespace ReforaTec.Api.Features.Users.GetMyTrees;
 
 internal static class Handler
 {
-    public static async Task<ErrorOr<List<Response>>> Handle(
+    public static async Task<ErrorOr<Response>> Handle(
         UserIdentity loggedUser,
         AppDbContext context,
         CancellationToken cancellationToken)
@@ -29,7 +29,7 @@ internal static class Handler
 
         if (assignedCareRecords.Count == 0)
         {
-            return new List<Response>();
+            return new Response([]);
         }
 
         var treeIds = assignedCareRecords.Select(assignment => assignment.TreeId).ToList();
@@ -40,14 +40,14 @@ internal static class Handler
         var latestPhotoByTreeId =
             await GetLatestPhotosAsync(context, loggedUser.TenantId, treeIds, cancellationToken);
 
-        var response = assignedCareRecords.Select(assignment =>
+        var assignedTrees = assignedCareRecords.Select(assignment =>
         {
             var tree = assignment.Tree!;
             
             var campaignRecord = activeCampaignByTreeId.GetValueOrDefault(tree.Id);
             var latestPhotoUrl = latestPhotoByTreeId.GetValueOrDefault(tree.Id);
 
-            return new Response(
+            return new AssignedTreeDto(
                 Id: tree.Id,
                 
                 SpeciesId: tree.SpeciesId,
@@ -69,7 +69,7 @@ internal static class Handler
                 LatestPhotoUrl: latestPhotoUrl);
         }).ToList();
 
-        return response;
+        return new Response(assignedTrees);
     }
 
     private static async Task<List<Entities.UserCaresForTree>> GetActiveAssignmentsAsync(

@@ -13,7 +13,7 @@ internal sealed class GetMyTrees : IEndpoint
         app.MapGet("/users/me/trees", HandleRequest)
             .WithName("GetMyAssignedTrees")
             .WithTags(OpenApiTags.Users)
-            .Produces<List<Response>>(StatusCodes.Status200OK)
+            .Produces<Response>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Get assigned trees for current user")

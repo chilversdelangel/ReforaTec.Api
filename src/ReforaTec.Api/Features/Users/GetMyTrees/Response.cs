@@ -1,6 +1,8 @@
 namespace ReforaTec.Api.Features.Users.GetMyTrees;
 
-internal sealed record Response(
+internal sealed record Response(IReadOnlyList<AssignedTreeDto> Trees);
+
+internal sealed record AssignedTreeDto(
     int Id,
     int SpeciesId,
     string CommonName,
