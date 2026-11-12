@@ -886,58 +886,6 @@ namespace ReforaTec.Api.Database.Migrations
                     b.ToTable("user_devices", (string)null);
                 });
 
-            modelBuilder.Entity("ReforaTec.Api.Entities.UserInspectsCampaign", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CampaignId")
-                        .HasColumnType("integer")
-                        .HasColumnName("campaign_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateOnly?>("EndDate")
-                        .HasColumnType("date")
-                        .HasColumnName("end_date");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("modified_at");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date")
-                        .HasColumnName("start_date");
-
-                    b.Property<int>("TenantId")
-                        .HasColumnType("integer")
-                        .HasColumnName("tenant_id");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_user_inspects_campaigns");
-
-                    b.HasIndex("CampaignId")
-                        .HasDatabaseName("ix_user_inspects_campaigns_campaign_id");
-
-                    b.HasIndex("TenantId")
-                        .HasDatabaseName("ix_user_inspects_campaigns_tenant_id");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_user_inspects_campaigns_user_id");
-
-                    b.ToTable("user_inspects_campaigns", (string)null);
-                });
-
             modelBuilder.Entity("ReforaTec.Api.Entities.Virtue", b =>
                 {
                     b.Property<int>("Id")
@@ -1329,36 +1277,6 @@ namespace ReforaTec.Api.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_devices_users_user_id");
-
-                    b.Navigation("Tenant");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ReforaTec.Api.Entities.UserInspectsCampaign", b =>
-                {
-                    b.HasOne("ReforaTec.Api.Entities.Campaign", "Campaign")
-                        .WithMany()
-                        .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_inspects_campaigns_campaigns_campaign_id");
-
-                    b.HasOne("ReforaTec.Api.Entities.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_inspects_campaigns_tenants_tenant_id");
-
-                    b.HasOne("ReforaTec.Api.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_inspects_campaigns_users_user_id");
-
-                    b.Navigation("Campaign");
 
                     b.Navigation("Tenant");
 
