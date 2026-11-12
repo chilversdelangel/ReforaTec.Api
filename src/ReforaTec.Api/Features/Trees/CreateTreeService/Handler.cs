@@ -26,7 +26,7 @@ internal static class Handler
             return Errors.TreeNotFound;
         }
 
-        var assignment = await context.UserCaresForTrees
+        var assignment = await context.CareAssignments
             .Where(assignment => assignment.UserId == user.UserId)
             .Where(assignment => assignment.TreeId == treeId)
             .Where(assignment => assignment.EndDate == null)

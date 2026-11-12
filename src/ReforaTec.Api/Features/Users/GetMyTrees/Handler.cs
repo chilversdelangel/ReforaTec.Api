@@ -56,7 +56,7 @@ internal static class Handler
     }
 
     private static AssignedTreeDto MapToAssignedTreeDto(
-        UserCaresForTree assignment,
+        CareAssignment assignment,
         IReadOnlyDictionary<int, string?> latestPhotoByTreeId)
     {
         var tree = assignment.Tree!;
@@ -83,13 +83,13 @@ internal static class Handler
             LatestPhotoUrl: latestPhotoUrl);
     }
 
-    private static async Task<List<UserCaresForTree>> GetActiveAssignmentsAsync(
+    private static async Task<List<CareAssignment>> GetActiveAssignmentsAsync(
         AppDbContext context,
         int tenantId,
         int userId,
         CancellationToken cancellationToken)
     {
-        return await context.UserCaresForTrees
+        return await context.CareAssignments
             .AsNoTracking()
             .Where(assignment => assignment.TenantId == tenantId)
             .Where(assignment => assignment.UserId == userId)

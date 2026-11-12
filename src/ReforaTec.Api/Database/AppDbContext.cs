@@ -27,7 +27,8 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     #endregion
 
     #region Domain Junction Entities
-    public DbSet<UserCaresForTree> UserCaresForTrees { get; set; }
+    public DbSet<CampaignEnrollment> CampaignEnrollments { get; set; }
+    public DbSet<CareAssignment> CareAssignments { get; set; }
     #endregion
 
     #region Field Activity Logs

@@ -71,6 +71,7 @@ public class GetTreeByIdTests(ReforaTecWebApplicationFactory factory) : Integrat
         const string folio = "0042";
         const string notes = "Frente a biblioteca";
 
+        var campaign = await CreateCampaignAsync();
         var expectedSpecies = await QueryDbAsync(context => context.Species.FirstAsync());
         var expectedVirtue = await QueryDbAsync(context => context.Virtues.FirstAsync());
 
@@ -80,7 +81,7 @@ public class GetTreeByIdTests(ReforaTecWebApplicationFactory factory) : Integrat
             folio: folio,
             notes: notes);
 
-        await AssignTreeToUserAsync(tree.Id, student.Id);
+        await AssignTreeToUserAsync(tree.Id, student.Id, campaign.Id);
 
         var expectedStudent = new AssignedStudentDto(
             Id: student.Id,

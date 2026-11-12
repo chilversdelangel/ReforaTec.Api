@@ -124,9 +124,11 @@ public class GetMyTreesTests(ReforaTecWebApplicationFactory factory) : Integrati
         var user = await CreateUserAsync();
         Authenticate(user);
 
+        var campaign = await CreateCampaignAsync();
         var tree = await CreateTreeAsync();
         var yesterday = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
-        await AssignTreeToUserAsync(tree.Id, user.Id, endDate: yesterday);
+        var lastWeek = yesterday.AddDays(-7);
+        await AssignTreeToUserAsync(tree.Id, user.Id, campaign.Id, startDate: lastWeek, endDate: yesterday);
 
         // Act
         var response = await Client.GetAsync(ApiRoutes.Users.MyTrees);

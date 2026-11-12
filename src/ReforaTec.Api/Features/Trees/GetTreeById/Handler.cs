@@ -65,7 +65,7 @@ internal static class Handler
         int treeId,
         CancellationToken cancellationToken)
     {
-        return context.UserCaresForTrees
+        return context.CareAssignments
             .AsNoTracking()
             .Where(assignment => assignment.TenantId == tenantId)
             .Where(assignment => assignment.TreeId == treeId)

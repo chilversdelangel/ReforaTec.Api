@@ -7,13 +7,22 @@ internal static partial class DbSeeder
 {
     private static async Task SeedStudentAssignmentsAsync(AppDbContext context)
     {
-        if (await context.UserCaresForTrees.AnyAsync())
+        if (await context.CareAssignments.AnyAsync())
         {
             return;
         }
 
         var user = await context.Users.FirstOrDefaultAsync(user => user.Email == "student@cdmadero.tecnm.mx");
         if (user is null)
+        {
+            return;
+        }
+
+        var campaign = await context.Campaigns
+            .Where(campaign => campaign.TenantId == user.TenantId)
+            .FirstOrDefaultAsync();
+
+        if (campaign is null)
         {
             return;
         }
@@ -29,29 +38,25 @@ internal static partial class DbSeeder
             return;
         }
 
-        var campaign = await context.Campaigns
-            .Where(campaign => campaign.TenantId == user.TenantId)
-            .FirstOrDefaultAsync();
-
-        var firstAssignment = new UserCaresForTree
+        var firstAssignment = new CareAssignment
         {
             TenantId = user.TenantId,
+            CampaignId = campaign.Id,
             UserId = user.Id,
             TreeId = trees[0].Id,
-            CampaignId = campaign?.Id,
             StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-6))
         };
 
-        var secondAssignment = new UserCaresForTree
+        var secondAssignment = new CareAssignment
         {
             TenantId = user.TenantId,
+            CampaignId = campaign.Id,
             UserId = user.Id,
             TreeId = trees[1].Id,
-            CampaignId = campaign?.Id,
             StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-1))
         };
 
-        context.UserCaresForTrees.AddRange(firstAssignment, secondAssignment);
+        context.CareAssignments.AddRange(firstAssignment, secondAssignment);
 
         await context.SaveChangesAsync();
     }

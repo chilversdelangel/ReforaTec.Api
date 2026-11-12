@@ -55,7 +55,7 @@ internal static class Handler
         UserIdentity loggedUser,
         CancellationToken cancellationToken)
     {
-        return context.UserCaresForTrees
+        return context.CareAssignments
             .AsNoTracking()
             .Where(assignment => assignment.TenantId == loggedUser.TenantId)
             .Where(assignment => assignment.UserId == loggedUser.UserId)
@@ -80,12 +80,11 @@ internal static class Handler
         UserIdentity loggedUser,
         CancellationToken cancellationToken)
     {
-        return context.UserCaresForTrees
+        return context.CareAssignments
             .AsNoTracking()
             .Where(assignment => assignment.TenantId == loggedUser.TenantId)
             .Where(assignment => assignment.UserId == loggedUser.UserId)
             .Where(assignment => assignment.EndDate == null)
-            .Where(assignment => assignment.Campaign != null)
             .Select(assignment => assignment.Campaign!.CampaignName)
             .FirstOrDefaultAsync(cancellationToken);
     }
