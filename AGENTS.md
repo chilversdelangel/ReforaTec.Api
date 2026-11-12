@@ -68,7 +68,7 @@ ReforaTec/
 ---
 
 ## 4. Code Conventions
-* **Encapsulation:** DTOs (`Request`, `Response`) and `Validator` classes MUST be `internal sealed`. Handlers MUST be `internal static`.
+* **Encapsulation:** DTOs (`Request`, `Response`) and `Validator` classes MUST be `internal sealed`. Handlers MUST be `internal static`. EF Core `IEntityTypeConfiguration<T>` classes MUST be `internal sealed`. Concrete domain entities MUST be `public sealed` (kept `public` so `IntegrationTestBase` fixture helpers avoid `CS0051`).
 * **Timezones:** DTOs accepting timestamps MUST use `DateTimeOffset`. Database entities store `.UtcDateTime`.
 * **Read Performance:** All read-only database queries MUST use `.AsNoTracking()`.
 * **LINQ Style:** Always use **Fluent Method Syntax** (`context.Entity.AsNoTracking().Where(...).Select(...)`). Never use Query Syntax (`from ... join ... select`). For unmapped relations, use subqueries with `IQueryable.Contains(...)`.
@@ -88,6 +88,8 @@ ReforaTec/
   * Favor early exits and guard clauses to minimize indentation (strictly maximum 2-3 indentation levels; no arrow-shaped callback pyramids).
   * Use expression-bodied members (`=>`) for concise single-statement methods and properties.
   * Always use descriptive lambda parameter names (`tree => tree.Id`, `request => request.ServiceTypeId`), strictly avoiding single-letter abbreviations (`x =>`, `t =>`).
+  * Use domain-qualified ID parameter names in route templates and handlers (`int treeId`, `int campaignId`) instead of generic `int id`.
+  * Group related fields with blank lines in `Response` DTO records and constructor mappings (6+ parameters) to reduce visual fatigue.
 * **OpenAPI Documentation:** Every endpoint MUST declare `.WithName()`, `.WithTags()`, `.WithSummary()`, `.WithDescription()`, and explicit `.Produces<T>()` status codes.
 
 ---
@@ -136,7 +138,7 @@ dotnet test --no-build --filter "FullyQualifiedName~{UseCase}Tests"
   * **Plan first:** When a task would exceed the limit, propose the split upfront as a short numbered list of steps (what each step does), then wait for approval before starting step 1.
   * **Self-contained increments:** Each step = one atomic commit that compiles, passes tests, and makes sense on its own (no step may leave the build broken or depend on a later step).
   * **No diffs in chat:** After each step, state what was done in 1-2 lines. The user reviews the diff in the IDE; paste code in chat only when asked.
-  * After each step, STOP and WAIT for user approval before starting the next one.
+  * **Review-before-commit:** After verifying build and tests for an increment, present the modified files for IDE review and WAIT for explicit user approval before running `git commit` or starting the next step.
   * Generated code (EF Core migrations, snapshots) is excluded from the count.
   * Parallel subagents MUST follow the same rules per agent: deliver one increment, report back, and never chain further work autonomously.
 

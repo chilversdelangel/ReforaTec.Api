@@ -29,7 +29,6 @@ tests/ReforaTec.Api.IntegrationTests/
       │   ├── IntegrationTestBase.Users.cs     # 1 file = 1 table = 1 direct INSERT helper
       │   ├── IntegrationTestBase.Campaigns.cs
       │   ├── IntegrationTestBase.Trees.cs
-      │   ├── IntegrationTestBase.CampaignTrees.cs
       │   ├── IntegrationTestBase.UserTrees.cs
       │   └── IntegrationTestBase.Services.cs
       ├── IntegrationTestBase.cs               # Base class with Factory, Client, Authenticate, QueryDbAsync
@@ -109,6 +108,7 @@ Every Happy Path test MUST follow the strict **Input & Expectation (Arrange) -> 
 1. **Arrange holds the Single Source of Truth:**
    * Prepare input data (`request`) and local constants (`phoneNumber`).
    * Build `expectedResponse` inside `// Arrange` referencing the `request` properties (never hardcoding duplicate strings).
+   * **Avoid nested indentation in `expectedResponse`:** Extract nested child DTOs or collection items into local variables (`var expectedStudent = new AssignedStudentDto(...);`) before instantiating `expectedResponse`, and group related properties with blank lines.
 2. **Act is purely isolated:** Exactly one line invoking the endpoint client (`await Client.PostAsJsonAsync(...)` / `PatchAsJsonAsync(...)`).
 3. **Assert is purely verification:** Contains zero model construction. Reads payloads and verifies assertions.
 
@@ -186,12 +186,13 @@ When tests need test data in PostgreSQL, use the modular fixture helpers in `tes
      $$\text{Tree (6 months ago)} \le \text{Campaign (1 month ago)} \le \text{Assignment (today)} \le \text{Service (now)}$$
 3. **No Domain Logic in Test Fixtures:**
    - Complex domain calculations (generating semester inscription codes, closing campaigns, enrollment rules) belong in `src/ReforaTec.Api`, never inside test helpers.
+4. **Deterministic Unique Fields:**
+   - For fields backed by unique database constraints (e.g. `Tree.Folio`), use a `static` counter with `Interlocked.Increment` rather than `Random.Shared.Next` to prevent flaky collisions across xUnit test instances.
 
 ### Available Fixture Methods:
 * `CreateUserAsync(tenantId, email, controlNumber, givenName, familyName, gender, role, isDeleted)`
 * `CreateCampaignAsync(tenantId, campaignName, inscriptionCode, period, location)`
-* `CreateTreeAsync(tenantId, speciesId, valueId, plantingDate, height, diameter, healthState)`
-* `AddTreeToCampaignAsync(treeId, campaignId, tenantId, campaignFolio, startDate, endDate)`
+* `CreateTreeAsync(tenantId, speciesId, virtueId, folio, plantingDate, height, diameter, healthState, location, notes)`
 * `AssignTreeToUserAsync(treeId, userId, campaignId, tenantId, startDate, endDate)`
 * `CreateTreeServiceAsync(treeId, studentId, serviceTypeId, campaignId, tenantId, deviceCapturedAt)`
 
