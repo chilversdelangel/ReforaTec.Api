@@ -25,6 +25,7 @@ internal static partial class DbSeeder
         var tree1 = new Tree
         {
             TenantId = tenant.Id,
+            Folio = "01",
             SpeciesId = speciesList[0].Id,
             VirtueId = virtue.Id,
             HealthState = TreeHealthState.Healthy,
@@ -33,10 +34,12 @@ internal static partial class DbSeeder
             DiameterCentimeters = 15.2m,
             Notes = "Árbol veterano plantado cerca del edificio de sistemas."
         };
+        tree1.Normalize();
 
         var tree2 = new Tree
         {
             TenantId = tenant.Id,
+            Folio = "02",
             SpeciesId = speciesList[1].Id,
             VirtueId = virtue.Id,
             HealthState = TreeHealthState.NeedsAttention,
@@ -45,6 +48,7 @@ internal static partial class DbSeeder
             DiameterCentimeters = null,
             Notes = "Árbol recién registrado sin medidas iniciales."
         };
+        tree2.Normalize();
 
         context.Trees.AddRange(tree1, tree2);
         await context.SaveChangesAsync();

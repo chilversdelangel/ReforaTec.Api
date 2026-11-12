@@ -80,18 +80,13 @@ internal static class Handler
         UserIdentity loggedUser,
         CancellationToken cancellationToken)
     {
-        var activeTreeIds = context.UserCaresForTrees
+        return context.UserCaresForTrees
+            .AsNoTracking()
             .Where(assignment => assignment.TenantId == loggedUser.TenantId)
             .Where(assignment => assignment.UserId == loggedUser.UserId)
             .Where(assignment => assignment.EndDate == null)
-            .Select(assignment => assignment.TreeId);
-
-        return context.CampaignManagesTrees
-            .AsNoTracking()
-            .Where(campaignTree => campaignTree.TenantId == loggedUser.TenantId)
-            .Where(campaignTree => campaignTree.EndDate == null)
-            .Where(campaignTree => activeTreeIds.Contains(campaignTree.TreeId))
-            .Select(campaignTree => campaignTree.Campaign!.CampaignName)
+            .Where(assignment => assignment.Campaign != null)
+            .Select(assignment => assignment.Campaign!.CampaignName)
             .FirstOrDefaultAsync(cancellationToken);
     }
 }

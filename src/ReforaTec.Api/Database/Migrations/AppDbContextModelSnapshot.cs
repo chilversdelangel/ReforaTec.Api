@@ -101,74 +101,6 @@ namespace ReforaTec.Api.Database.Migrations
                     b.ToTable("campaigns", (string)null);
                 });
 
-            modelBuilder.Entity("ReforaTec.Api.Entities.CampaignManagesTree", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CampaignFolio")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("campaign_folio");
-
-                    b.Property<int>("CampaignId")
-                        .HasColumnType("integer")
-                        .HasColumnName("campaign_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateOnly?>("EndDate")
-                        .HasColumnType("date")
-                        .HasColumnName("end_date");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("modified_at");
-
-                    b.Property<string>("NormalizedCampaignFolio")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("normalized_campaign_folio");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date")
-                        .HasColumnName("start_date");
-
-                    b.Property<int>("TenantId")
-                        .HasColumnType("integer")
-                        .HasColumnName("tenant_id");
-
-                    b.Property<int>("TreeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("tree_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_campaign_manages_trees");
-
-                    b.HasIndex("CampaignId")
-                        .HasDatabaseName("ix_campaign_manages_trees_campaign_id");
-
-                    b.HasIndex("TenantId")
-                        .HasDatabaseName("ix_campaign_manages_trees_tenant_id");
-
-                    b.HasIndex("TreeId")
-                        .HasDatabaseName("ix_campaign_manages_trees_tree_id");
-
-                    b.HasIndex("CampaignId", "NormalizedCampaignFolio")
-                        .IsUnique()
-                        .HasDatabaseName("ix_campaign_manages_trees_campaign_id_normalized_campaign_folio");
-
-                    b.ToTable("campaign_manages_trees", (string)null);
-                });
-
             modelBuilder.Entity("ReforaTec.Api.Entities.Measurement", b =>
                 {
                     b.Property<int>("Id")
@@ -626,6 +558,12 @@ namespace ReforaTec.Api.Database.Migrations
                         .HasColumnType("numeric(7,2)")
                         .HasColumnName("diameter_centimeters");
 
+                    b.Property<string>("Folio")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("folio");
+
                     b.Property<int>("HealthState")
                         .HasColumnType("integer")
                         .HasColumnName("health_state");
@@ -638,6 +576,12 @@ namespace ReforaTec.Api.Database.Migrations
                     b.Property<DateTime>("ModifiedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("modified_at");
+
+                    b.Property<string>("NormalizedFolio")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("normalized_folio");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
@@ -671,6 +615,10 @@ namespace ReforaTec.Api.Database.Migrations
 
                     b.HasIndex("VirtueId")
                         .HasDatabaseName("ix_trees_virtue_id");
+
+                    b.HasIndex("TenantId", "NormalizedFolio")
+                        .IsUnique()
+                        .HasDatabaseName("ix_trees_tenant_id_normalized_folio");
 
                     b.ToTable("trees", (string)null);
                 });
@@ -1013,36 +961,6 @@ namespace ReforaTec.Api.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("ReforaTec.Api.Entities.CampaignManagesTree", b =>
-                {
-                    b.HasOne("ReforaTec.Api.Entities.Campaign", "Campaign")
-                        .WithMany()
-                        .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_campaign_manages_trees_campaigns_campaign_id");
-
-                    b.HasOne("ReforaTec.Api.Entities.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_campaign_manages_trees_tenants_tenant_id");
-
-                    b.HasOne("ReforaTec.Api.Entities.Tree", "Tree")
-                        .WithMany()
-                        .HasForeignKey("TreeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_campaign_manages_trees_trees_tree_id");
-
-                    b.Navigation("Campaign");
-
-                    b.Navigation("Tenant");
-
-                    b.Navigation("Tree");
                 });
 
             modelBuilder.Entity("ReforaTec.Api.Entities.Measurement", b =>

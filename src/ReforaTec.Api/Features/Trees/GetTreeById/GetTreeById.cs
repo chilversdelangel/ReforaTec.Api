@@ -2,6 +2,7 @@ using ReforaTec.Api.Database;
 using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Mapping;
 using ReforaTec.Api.Infrastructure.OpenApi;
+using ReforaTec.Api.Infrastructure.Security.CurrentUser;
 
 namespace ReforaTec.Api.Features.Trees.GetTreeById;
 
@@ -9,7 +10,7 @@ internal sealed class GetTreeById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/trees/{id:int}", HandleRequest)
+        app.MapGet("/trees/{treeId:int}", HandleRequest)
             .WithName("GetTreeById")
             .WithTags(OpenApiTags.Trees)
             .Produces<Response>(StatusCodes.Status200OK)
@@ -21,11 +22,18 @@ internal sealed class GetTreeById : IEndpoint
     }
 
     private static async Task<IResult> HandleRequest(
-        int id,
+        int treeId,
+        ICurrentUserService currentUser,
         AppDbContext context,
         CancellationToken cancellationToken)
     {
-        var result = await Handler.Handle(id, context, cancellationToken);
+        var identityResult = currentUser.GetIdentity();
+        if (identityResult.IsError)
+        {
+            return identityResult.Errors.ToProblem();
+        }
+
+        var result = await Handler.Handle(treeId, identityResult.Value, context, cancellationToken);
 
         return result.Match(
             Results.Ok,

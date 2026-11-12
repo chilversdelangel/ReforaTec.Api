@@ -29,24 +29,29 @@ internal static partial class DbSeeder
             return;
         }
 
-        var care1 = new UserCaresForTree
+        var campaign = await context.Campaigns
+            .Where(campaign => campaign.TenantId == user.TenantId)
+            .FirstOrDefaultAsync();
+
+        var firstAssignment = new UserCaresForTree
         {
             TenantId = user.TenantId,
             UserId = user.Id,
             TreeId = trees[0].Id,
+            CampaignId = campaign?.Id,
             StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-6))
         };
 
-        var care2 = new UserCaresForTree
+        var secondAssignment = new UserCaresForTree
         {
             TenantId = user.TenantId,
             UserId = user.Id,
             TreeId = trees[1].Id,
+            CampaignId = campaign?.Id,
             StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-1))
         };
 
-        context.UserCaresForTrees.Add(care1);
-        context.UserCaresForTrees.Add(care2);
+        context.UserCaresForTrees.AddRange(firstAssignment, secondAssignment);
 
         await context.SaveChangesAsync();
     }

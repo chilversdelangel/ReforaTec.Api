@@ -4,11 +4,17 @@ using ReforaTec.Api.Entities;
 
 namespace ReforaTec.Api.Database.Configurations;
 
-public class TreeConfiguration : IEntityTypeConfiguration<Tree>
+internal sealed class TreeConfiguration : IEntityTypeConfiguration<Tree>
 {
     public void Configure(EntityTypeBuilder<Tree> builder)
     {
         builder.OwnsOne(tree => tree.Location);
+
+        builder.Property(tree => tree.Folio)
+            .HasMaxLength(10);
+
+        builder.Property(tree => tree.NormalizedFolio)
+            .HasMaxLength(10);
 
         builder.Property(tree => tree.HeightCentimeters)
             .HasPrecision(7, 2);
@@ -22,6 +28,9 @@ public class TreeConfiguration : IEntityTypeConfiguration<Tree>
         builder.HasIndex(tree => tree.TenantId);
         builder.HasIndex(tree => tree.SpeciesId);
         builder.HasIndex(tree => tree.VirtueId);
+
+        builder.HasIndex(tree => new { tree.TenantId, tree.NormalizedFolio })
+            .IsUnique();
 
         builder.HasOne(tree => tree.Tenant)
             .WithMany()

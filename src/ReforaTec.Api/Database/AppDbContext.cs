@@ -27,7 +27,6 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     #endregion
 
     #region Domain Junction Entities
-    public DbSet<CampaignManagesTree> CampaignManagesTrees { get; set; }
     public DbSet<UserCaresForTree> UserCaresForTrees { get; set; }
     #endregion
 
@@ -73,7 +72,7 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
         }
 
         var normalizableEntries = ChangeTracker.Entries<INormalizable>()
-            .Where(e => e.State is EntityState.Added or EntityState.Modified);
+            .Where(entry => entry.State is EntityState.Added or EntityState.Modified);
 
         foreach (var entry in normalizableEntries)
         {

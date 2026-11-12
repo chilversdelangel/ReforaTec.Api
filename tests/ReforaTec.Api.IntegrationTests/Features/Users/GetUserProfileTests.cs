@@ -116,7 +116,6 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         var campaign = await CreateCampaignAsync();
         var tree = await CreateTreeAsync();
 
-        await AddTreeToCampaignAsync(tree.Id, campaign.Id);
         await AssignTreeToUserAsync(tree.Id, user.Id, campaign.Id);
         await CreateTreeServiceAsync(tree.Id, user.Id, campaign.Id);
 

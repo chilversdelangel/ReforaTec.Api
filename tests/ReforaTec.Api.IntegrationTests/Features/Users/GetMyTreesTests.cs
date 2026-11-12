@@ -97,7 +97,6 @@ public class GetMyTreesTests(ReforaTecWebApplicationFactory factory) : Integrati
         var expectedVirtue = await QueryDbAsync(context => context.Virtues.FirstAsync());
         var tree = await CreateTreeAsync(virtueId: expectedVirtue.Id);
 
-        await AddTreeToCampaignAsync(tree.Id, campaign.Id);
         await AssignTreeToUserAsync(tree.Id, user.Id, campaign.Id);
 
         // Act
@@ -112,6 +111,7 @@ public class GetMyTreesTests(ReforaTecWebApplicationFactory factory) : Integrati
 
         var assignedTree = result.Trees[0];
         assignedTree.Id.Should().Be(tree.Id);
+        assignedTree.Folio.Should().Be(tree.Folio);
         assignedTree.SpeciesId.Should().Be(tree.SpeciesId);
         assignedTree.VirtueName.Should().Be(expectedVirtue.Name);
         assignedTree.CurrentCampaignName.Should().Be(campaign.CampaignName);

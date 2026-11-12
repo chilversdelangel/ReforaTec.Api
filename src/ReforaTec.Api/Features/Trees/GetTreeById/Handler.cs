@@ -2,61 +2,56 @@ using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Entities;
+using ReforaTec.Api.Infrastructure.Security.CurrentUser;
 
 namespace ReforaTec.Api.Features.Trees.GetTreeById;
 
 internal static class Handler
 {
     public static async Task<ErrorOr<Response>> Handle(
-        int id,
+        int treeId,
+        UserIdentity loggedUser,
         AppDbContext context,
         CancellationToken cancellationToken)
     {
-        var tree = await FindTreeWithDetailsAsync(context, id, cancellationToken);
+        var tenantId = loggedUser.TenantId;
+
+        var tree = await FindTreeWithDetailsAsync(context, tenantId, treeId, cancellationToken);
         if (tree is null)
         {
             return Errors.TreeNotFound;
         }
 
-        var currentFolio = await GetActiveCampaignFolioAsync(context, id, cancellationToken);
-        var latestPhotoUrl = await GetLatestEvidencePhotoUrlAsync(context, id, cancellationToken);
-        var assignedStudents = await GetAssignedStudentsAsync(context, id, cancellationToken);
+        var latestPhotoUrl = await GetLatestEvidencePhotoUrlAsync(context, tenantId, treeId, cancellationToken);
+        var assignedStudents = await GetAssignedStudentsAsync(context, tenantId, treeId, cancellationToken);
 
-        return MapToResponse(tree, currentFolio, latestPhotoUrl, assignedStudents);
+        return MapToResponse(tree, latestPhotoUrl, assignedStudents);
     }
 
     private static Task<Tree?> FindTreeWithDetailsAsync(
         AppDbContext context,
+        int tenantId,
         int treeId,
         CancellationToken cancellationToken)
     {
         return context.Trees
             .AsNoTracking()
+            .Where(tree => tree.TenantId == tenantId)
+            .Where(tree => tree.Id == treeId)
             .Include(tree => tree.Species)
             .Include(tree => tree.Virtue)
-            .FirstOrDefaultAsync(tree => tree.Id == treeId, cancellationToken);
-    }
-
-    private static Task<string?> GetActiveCampaignFolioAsync(
-        AppDbContext context,
-        int treeId,
-        CancellationToken cancellationToken)
-    {
-        return context.CampaignManagesTrees
-            .AsNoTracking()
-            .Where(campaign => campaign.TreeId == treeId)
-            .Where(campaign => campaign.EndDate == null)
-            .Select(campaign => campaign.CampaignFolio)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
     private static Task<string?> GetLatestEvidencePhotoUrlAsync(
         AppDbContext context,
+        int tenantId,
         int treeId,
         CancellationToken cancellationToken)
     {
         return context.Measurements
             .AsNoTracking()
+            .Where(measurement => measurement.TenantId == tenantId)
             .Where(measurement => measurement.TreeId == treeId)
             .Where(measurement => measurement.EvidencePhotoUrl != null)
             .OrderByDescending(measurement => measurement.DeviceCapturedAt)
@@ -66,14 +61,17 @@ internal static class Handler
 
     private static Task<List<AssignedStudentDto>> GetAssignedStudentsAsync(
         AppDbContext context,
+        int tenantId,
         int treeId,
         CancellationToken cancellationToken)
     {
         return context.UserCaresForTrees
             .AsNoTracking()
+            .Where(assignment => assignment.TenantId == tenantId)
             .Where(assignment => assignment.TreeId == treeId)
             .Where(assignment => assignment.EndDate == null)
-            .Where(assignment => assignment.User != null && !assignment.User.IsDeleted)
+            .Where(assignment => assignment.User != null)
+            .Where(assignment => !assignment.User!.IsDeleted)
             .Select(assignment => new AssignedStudentDto(
                 assignment.User!.Id,
                 assignment.User.ControlNumber,
@@ -86,7 +84,6 @@ internal static class Handler
 
     private static Response MapToResponse(
         Tree tree,
-        string? currentFolio,
         string? latestPhotoUrl,
         List<AssignedStudentDto> assignedStudents)
     {
@@ -101,17 +98,21 @@ internal static class Handler
 
         return new Response(
             Id: tree.Id,
-            CurrentCampaignFolio: currentFolio,
+            Folio: tree.Folio,
+            
             HealthState: tree.HealthState.ToString(),
             PlantingDate: tree.PlantingDate,
             Observations: tree.Notes,
+            
             Virtue: tree.Virtue!.Name,
             Species: tree.Species!.CommonName,
             SpeciesScientificName: tree.Species.ScientificName,
             SpeciesImageUrl: tree.Species.ImageUrl,
+            
             CurrentHeightCentimeters: tree.HeightCentimeters,
             CurrentDiameterCentimeters: tree.DiameterCentimeters,
             LatestPhotoUrl: latestPhotoUrl,
+            
             Location: locationDto,
             CurrentAssignedStudents: assignedStudents);
     }
