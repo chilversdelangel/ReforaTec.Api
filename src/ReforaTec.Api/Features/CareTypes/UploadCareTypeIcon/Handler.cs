@@ -1,11 +1,11 @@
 using ErrorOr;
 using ReforaTec.Api.Infrastructure.Storage;
 
-namespace ReforaTec.Api.Features.ServiceTypes.UploadServiceTypeIcon;
+namespace ReforaTec.Api.Features.CareTypes.UploadCareTypeIcon;
 
 internal static class Handler
 {
-    private const string TargetPath = "catalog/service-types";
+    private const string TargetPath = "catalog/care-types";
 
     public static async Task<ErrorOr<Response>> Handle(
         Request request,

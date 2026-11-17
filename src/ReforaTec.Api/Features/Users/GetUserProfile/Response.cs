@@ -15,4 +15,4 @@ internal sealed record Response(
 
     bool IsEnrolledInActiveCampaign,
     int TotalTrees,
-    int TotalServices);
+    int TotalCareLogs);

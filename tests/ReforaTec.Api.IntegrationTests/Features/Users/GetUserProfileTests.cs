@@ -94,7 +94,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
             Email: user.Email,
             IsEnrolledInActiveCampaign: false,
             TotalTrees: 0,
-            TotalServices: 0);
+            TotalCareLogs: 0);
 
         // Act
         var response = await Client.GetAsync(ApiRoutes.Users.Profile);
@@ -129,7 +129,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         var profile = await response.Content.ReadFromJsonAsync<Response>();
         profile.Should().NotBeNull();
         profile.TotalTrees.Should().Be(1);
-        profile.TotalServices.Should().Be(1);
+        profile.TotalCareLogs.Should().Be(1);
         profile.IsEnrolledInActiveCampaign.Should().BeTrue();
     }
 }

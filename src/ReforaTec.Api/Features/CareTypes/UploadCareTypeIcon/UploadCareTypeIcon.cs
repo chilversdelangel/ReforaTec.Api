@@ -6,20 +6,21 @@ using ReforaTec.Api.Infrastructure.OpenApi;
 using ReforaTec.Api.Infrastructure.Security.Authorization;
 using ReforaTec.Api.Infrastructure.Storage;
 
-namespace ReforaTec.Api.Features.ServiceTypes.UploadServiceTypeIcon;
+namespace ReforaTec.Api.Features.CareTypes.UploadCareTypeIcon;
 
-internal sealed class UploadServiceTypeIcon : IEndpoint
+internal sealed class UploadCareTypeIcon : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/service-types/icons", HandleRequest)
+        app.MapPost("/care-types/icons", HandleRequest)
+            .WithName("UploadCareTypeIcon")
             .WithTags(OpenApiTags.Catalogs)
             .DisableAntiforgery()
             .AddEndpointFilter<ValidationFilter<Request>>()
             .Produces<Response>(StatusCodes.Status201Created)
             .ProducesValidationProblem()
-            .WithSummary("Upload service type icon")
-            .WithDescription("Uploads an icon image (PNG/WebP/JPEG, max 1MB) for a service type catalog entry.")
+            .WithSummary("Upload care type icon")
+            .WithDescription("Uploads an icon image (PNG/WebP/JPEG, max 1MB) for a care type catalog entry.")
             .RequireAuthorization(Policy.CanManageCatalogs);
     }
 

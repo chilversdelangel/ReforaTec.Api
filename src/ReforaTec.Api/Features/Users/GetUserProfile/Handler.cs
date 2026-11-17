@@ -20,7 +20,7 @@ internal static class Handler
         }
 
         var totalTrees = await GetAssignedTreesCountAsync(context, loggedUser, cancellationToken);
-        var totalServices = await GetCareLogsCountAsync(context, loggedUser, cancellationToken);
+        var totalCareLogs = await GetCareLogsCountAsync(context, loggedUser, cancellationToken);
         var isEnrolledInActiveCampaign = await IsEnrolledInActiveCampaignAsync(context, loggedUser, cancellationToken);
 
         return new Response(
@@ -36,7 +36,7 @@ internal static class Handler
 
             IsEnrolledInActiveCampaign: isEnrolledInActiveCampaign,
             TotalTrees: totalTrees,
-            TotalServices: totalServices);
+            TotalCareLogs: totalCareLogs);
     }
 
     private static Task<User?> FindUserAsync(

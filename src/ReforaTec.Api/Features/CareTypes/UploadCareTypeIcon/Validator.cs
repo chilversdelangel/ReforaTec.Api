@@ -1,7 +1,7 @@
 using FluentValidation;
 using ReforaTec.Api.Infrastructure.Validation;
 
-namespace ReforaTec.Api.Features.ServiceTypes.UploadServiceTypeIcon;
+namespace ReforaTec.Api.Features.CareTypes.UploadCareTypeIcon;
 
 internal sealed class Validator : AbstractValidator<Request>
 {
@@ -10,7 +10,7 @@ internal sealed class Validator : AbstractValidator<Request>
 
     public Validator()
     {
-        RuleFor(x => x.IconFile)
+        RuleFor(request => request.IconFile)
             .NotNull()
             .NotEmptyFile()
             .MaxFileSize(maxMegabytes: 1)
