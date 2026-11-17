@@ -78,13 +78,13 @@ podman exec -i reforatec-db psql -U postgres -d reforatec -c \
 ### Verify Trees by Tenant
 ```bash
 podman exec -i reforatec-db psql -U postgres -d reforatec -c \
-  "SELECT id, tenant_id, species_id, health_state, planting_date FROM trees WHERE tenant_id = 1;"
+  "SELECT id, tenant_id, folio, species_id, planting_date FROM trees WHERE tenant_id = 1;"
 ```
 
 ### Verify Active Student Tree Assignments
 ```bash
 podman exec -i reforatec-db psql -U postgres -d reforatec -c \
-  "SELECT id, user_id, tree_id, campaign_id, start_date, end_date FROM user_cares_for_trees WHERE end_date IS NULL;"
+  "SELECT id, user_id, tree_id, campaign_id, start_date, end_date FROM care_assignments WHERE end_date IS NULL;"
 ```
 
 ### Inspect Active OTP Codes
