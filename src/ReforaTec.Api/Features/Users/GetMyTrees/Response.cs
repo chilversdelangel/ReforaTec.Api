@@ -12,7 +12,6 @@ internal sealed record AssignedTreeDto(
     string? SpeciesImageUrl,
     
     string VirtueName,
-    string? CurrentCampaignName,
     
     string HealthState,
     DateOnly? PlantingDate,

@@ -20,19 +20,21 @@ internal static class Handler
         }
 
         var totalTrees = await GetAssignedTreesCountAsync(context, loggedUser, cancellationToken);
-        var totalServices = await GetServicesCountAsync(context, loggedUser, cancellationToken);
-        var currentCampaign = await GetCurrentCampaignNameAsync(context, loggedUser, cancellationToken);
+        var totalServices = await GetCareLogsCountAsync(context, loggedUser, cancellationToken);
+        var isEnrolledInActiveCampaign = await IsEnrolledInActiveCampaignAsync(context, loggedUser, cancellationToken);
 
         return new Response(
             GivenName: userEntity.GivenName,
             FamilyName: userEntity.FamilyName,
             SecondFamilyName: userEntity.SecondFamilyName,
             DisplayName: userEntity.DisplayName,
+
             ControlNumber: userEntity.ControlNumber,
             PhoneNumber: userEntity.PhoneNumber,
             Gender: userEntity.Gender,
             Email: userEntity.Email,
-            CurrentCampaign: currentCampaign,
+
+            IsEnrolledInActiveCampaign: isEnrolledInActiveCampaign,
             TotalTrees: totalTrees,
             TotalServices: totalServices);
     }
@@ -63,7 +65,7 @@ internal static class Handler
             .CountAsync(cancellationToken);
     }
 
-    private static Task<int> GetServicesCountAsync(
+    private static Task<int> GetCareLogsCountAsync(
         AppDbContext context,
         UserIdentity loggedUser,
         CancellationToken cancellationToken)
@@ -75,17 +77,21 @@ internal static class Handler
             .CountAsync(cancellationToken);
     }
 
-    private static Task<string?> GetCurrentCampaignNameAsync(
+    private static Task<bool> IsEnrolledInActiveCampaignAsync(
         AppDbContext context,
         UserIdentity loggedUser,
         CancellationToken cancellationToken)
     {
-        return context.CareAssignments
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        return context.CampaignEnrollments
             .AsNoTracking()
-            .Where(assignment => assignment.TenantId == loggedUser.TenantId)
-            .Where(assignment => assignment.UserId == loggedUser.UserId)
-            .Where(assignment => assignment.EndDate == null)
-            .Select(assignment => assignment.Campaign!.CampaignName)
-            .FirstOrDefaultAsync(cancellationToken);
+            .Where(enrollment => enrollment.TenantId == loggedUser.TenantId)
+            .Where(enrollment => enrollment.UserId == loggedUser.UserId)
+            .Where(enrollment => enrollment.IsApproved == null)
+            .Where(enrollment =>
+                enrollment.Campaign!.Period.EndDate == null ||
+                enrollment.Campaign.Period.EndDate >= today)
+            .AnyAsync(cancellationToken);
     }
 }

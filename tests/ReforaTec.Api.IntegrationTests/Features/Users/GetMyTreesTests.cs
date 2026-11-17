@@ -114,7 +114,6 @@ public class GetMyTreesTests(ReforaTecWebApplicationFactory factory) : Integrati
         assignedTree.Folio.Should().Be(tree.Folio);
         assignedTree.SpeciesId.Should().Be(tree.SpeciesId);
         assignedTree.VirtueName.Should().Be(expectedVirtue.Name);
-        assignedTree.CurrentCampaignName.Should().Be(campaign.CampaignName);
     }
 
     [Fact]

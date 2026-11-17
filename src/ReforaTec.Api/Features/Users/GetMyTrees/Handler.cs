@@ -70,7 +70,6 @@ internal static class Handler
             .Where(assignment => assignment.UserId == userId)
             .Where(assignment => assignment.EndDate == null)
             .Where(assignment => assignment.Tree != null)
-            .Include(assignment => assignment.Campaign)
             .Include(assignment => assignment.Tree)
             .ThenInclude(tree => tree!.Species)
             .Include(assignment => assignment.Tree)
@@ -192,7 +191,6 @@ internal static class Handler
             SpeciesImageUrl: tree.Species.ImageUrl,
 
             VirtueName: tree.Virtue!.Name,
-            CurrentCampaignName: assignment.Campaign?.CampaignName,
 
             HealthState: snapshot.HealthState.ToString(),
             PlantingDate: tree.PlantingDate,

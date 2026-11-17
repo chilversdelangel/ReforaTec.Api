@@ -92,7 +92,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
             PhoneNumber: null,
             Gender: Gender.Male,
             Email: user.Email,
-            CurrentCampaign: null,
+            IsEnrolledInActiveCampaign: false,
             TotalTrees: 0,
             TotalServices: 0);
 
@@ -116,6 +116,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         var campaign = await CreateCampaignAsync();
         var tree = await CreateTreeAsync();
 
+        await EnrollUserInCampaignAsync(campaign.Id, user.Id);
         await AssignTreeToUserAsync(tree.Id, user.Id, campaign.Id);
         await CreateCareLogAsync(tree.Id, user.Id);
 
@@ -129,6 +130,6 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         profile.Should().NotBeNull();
         profile.TotalTrees.Should().Be(1);
         profile.TotalServices.Should().Be(1);
-        profile.CurrentCampaign.Should().Be(campaign.CampaignName);
+        profile.IsEnrolledInActiveCampaign.Should().BeTrue();
     }
 }

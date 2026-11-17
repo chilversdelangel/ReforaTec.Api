@@ -12,7 +12,7 @@ using ReforaTec.Api.Database;
 namespace ReforaTec.Api.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261117063548_InitialSchema")]
+    [Migration("20261117212450_InitialSchema")]
     partial class InitialSchema
     {
         /// <inheritdoc />
@@ -60,31 +60,25 @@ namespace ReforaTec.Api.Database.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CampaignName")
+                    b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("campaign_name");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("code");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("InscriptionCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("inscription_code");
-
                     b.Property<DateTime>("ModifiedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("modified_at");
 
-                    b.Property<string>("NormalizedCampaignName")
+                    b.Property<string>("NormalizedCode")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("normalized_campaign_name");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("normalized_code");
 
                     b.Property<int>("TenantId")
                         .HasColumnType("integer")
@@ -93,13 +87,12 @@ namespace ReforaTec.Api.Database.Migrations
                     b.HasKey("Id")
                         .HasName("pk_campaigns");
 
-                    b.HasIndex("InscriptionCode")
+                    b.HasIndex("NormalizedCode")
                         .IsUnique()
-                        .HasDatabaseName("ix_campaigns_inscription_code");
+                        .HasDatabaseName("ix_campaigns_normalized_code");
 
-                    b.HasIndex("TenantId", "NormalizedCampaignName")
-                        .IsUnique()
-                        .HasDatabaseName("ix_campaigns_tenant_id_normalized_campaign_name");
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_campaigns_tenant_id");
 
                     b.ToTable("campaigns", (string)null);
                 });
@@ -966,44 +959,6 @@ namespace ReforaTec.Api.Database.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_campaigns_tenants_tenant_id");
 
-                    b.OwnsOne("ReforaTec.Api.Entities.Common.Location", "Location", b1 =>
-                        {
-                            b1.Property<int>("CampaignId")
-                                .HasColumnType("integer")
-                                .HasColumnName("id");
-
-                            b1.Property<double?>("Latitude")
-                                .HasColumnType("double precision")
-                                .HasColumnName("location_latitude");
-
-                            b1.Property<double?>("Longitude")
-                                .HasColumnType("double precision")
-                                .HasColumnName("location_longitude");
-
-                            b1.Property<string>("Neighborhood")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("location_neighborhood");
-
-                            b1.Property<string>("Street")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("location_street");
-
-                            b1.Property<string>("StreetNumber")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("location_street_number");
-
-                            b1.HasKey("CampaignId");
-
-                            b1.ToTable("campaigns");
-
-                            b1.WithOwner()
-                                .HasForeignKey("CampaignId")
-                                .HasConstraintName("fk_campaigns_campaigns_id");
-                        });
-
                     b.OwnsOne("ReforaTec.Api.Entities.Common.Period", "Period", b1 =>
                         {
                             b1.Property<int>("CampaignId")
@@ -1026,8 +981,6 @@ namespace ReforaTec.Api.Database.Migrations
                                 .HasForeignKey("CampaignId")
                                 .HasConstraintName("fk_campaigns_campaigns_id");
                         });
-
-                    b.Navigation("Location");
 
                     b.Navigation("Period")
                         .IsRequired();
