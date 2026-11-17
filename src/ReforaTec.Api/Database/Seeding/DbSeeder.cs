@@ -21,5 +21,6 @@ internal static partial class DbSeeder
         await SeedCampaignEnrollmentsAsync(context);
         await SeedStudentAssignmentsAsync(context);
         await SeedMeasurementsAsync(context);
+        await SeedInspectionsAsync(context);
     }
 }

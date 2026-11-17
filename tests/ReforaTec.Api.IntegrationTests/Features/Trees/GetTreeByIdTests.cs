@@ -78,10 +78,11 @@ public class GetTreeByIdTests(ReforaTecWebApplicationFactory factory) : Integrat
         var tree = await CreateTreeAsync(
             speciesId: expectedSpecies.Id,
             virtueId: expectedVirtue.Id,
-            folio: folio,
-            notes: notes);
+            folio: folio);
 
         await AssignTreeToUserAsync(tree.Id, student.Id, campaign.Id);
+        var measurement = await RecordMeasurementAsync(tree.Id, student.Id);
+        var inspection = await RecordInspectionAsync(tree.Id, student.Id, notes: notes);
 
         var expectedStudent = new AssignedStudentDto(
             Id: student.Id,
@@ -95,7 +96,7 @@ public class GetTreeByIdTests(ReforaTecWebApplicationFactory factory) : Integrat
             Id: tree.Id,
             Folio: folio,
 
-            HealthState: tree.HealthState.ToString(),
+            HealthState: inspection.HealthState.ToString(),
             PlantingDate: tree.PlantingDate,
             Observations: notes,
 
@@ -104,9 +105,9 @@ public class GetTreeByIdTests(ReforaTecWebApplicationFactory factory) : Integrat
             SpeciesScientificName: expectedSpecies.ScientificName,
             SpeciesImageUrl: expectedSpecies.ImageUrl,
 
-            CurrentHeightCentimeters: tree.HeightCentimeters,
-            CurrentDiameterCentimeters: tree.DiameterCentimeters,
-            LatestPhotoUrl: null,
+            CurrentHeightCentimeters: measurement.HeightCentimeters,
+            CurrentDiameterCentimeters: measurement.DiameterCentimeters,
+            LatestPhotoUrl: measurement.PhotoUrl,
 
             Location: null,
             CurrentAssignedStudents: [expectedStudent]);

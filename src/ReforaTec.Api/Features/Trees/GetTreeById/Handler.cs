@@ -2,6 +2,7 @@ using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Entities;
+using ReforaTec.Api.Entities.Enums;
 using ReforaTec.Api.Infrastructure.Security.CurrentUser;
 
 namespace ReforaTec.Api.Features.Trees.GetTreeById;
@@ -22,10 +23,10 @@ internal static class Handler
             return Errors.TreeNotFound;
         }
 
-        var latestPhotoUrl = await GetLatestEvidencePhotoUrlAsync(context, tenantId, treeId, cancellationToken);
+        var snapshot = await GetTreeSnapshotAsync(context, tenantId, treeId, cancellationToken);
         var assignedStudents = await GetAssignedStudentsAsync(context, tenantId, treeId, cancellationToken);
 
-        return MapToResponse(tree, latestPhotoUrl, assignedStudents);
+        return MapToResponse(tree, snapshot, assignedStudents);
     }
 
     private static Task<Tree?> FindTreeWithDetailsAsync(
@@ -43,7 +44,25 @@ internal static class Handler
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    private static Task<string?> GetLatestEvidencePhotoUrlAsync(
+    private static async Task<TreeSnapshot> GetTreeSnapshotAsync(
+        AppDbContext context,
+        int tenantId,
+        int treeId,
+        CancellationToken cancellationToken)
+    {
+        var latestMeasurement = await GetLatestMeasurementAsync(context, tenantId, treeId, cancellationToken);
+        var latestPhotoUrl = await GetLatestPhotoUrlAsync(context, tenantId, treeId, cancellationToken);
+        var latestInspection = await GetLatestInspectionAsync(context, tenantId, treeId, cancellationToken);
+
+        return new TreeSnapshot(
+            latestMeasurement?.HeightCentimeters,
+            latestMeasurement?.DiameterCentimeters,
+            latestPhotoUrl,
+            latestInspection?.HealthState ?? TreeHealthState.Healthy,
+            latestInspection?.Notes);
+    }
+
+    private static Task<LatestMeasurementSnapshot?> GetLatestMeasurementAsync(
         AppDbContext context,
         int tenantId,
         int treeId,
@@ -53,9 +72,43 @@ internal static class Handler
             .AsNoTracking()
             .Where(measurement => measurement.TenantId == tenantId)
             .Where(measurement => measurement.TreeId == treeId)
-            .Where(measurement => measurement.EvidencePhotoUrl != null)
             .OrderByDescending(measurement => measurement.DeviceCapturedAt)
-            .Select(measurement => measurement.EvidencePhotoUrl)
+            .Select(measurement => new LatestMeasurementSnapshot(
+                measurement.HeightCentimeters,
+                measurement.DiameterCentimeters))
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    private static Task<string?> GetLatestPhotoUrlAsync(
+        AppDbContext context,
+        int tenantId,
+        int treeId,
+        CancellationToken cancellationToken)
+    {
+        return context.Measurements
+            .AsNoTracking()
+            .Where(measurement => measurement.TenantId == tenantId)
+            .Where(measurement => measurement.TreeId == treeId)
+            .Where(measurement => measurement.PhotoUrl != null)
+            .OrderByDescending(measurement => measurement.DeviceCapturedAt)
+            .Select(measurement => measurement.PhotoUrl)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    private static Task<LatestInspectionSnapshot?> GetLatestInspectionAsync(
+        AppDbContext context,
+        int tenantId,
+        int treeId,
+        CancellationToken cancellationToken)
+    {
+        return context.Inspections
+            .AsNoTracking()
+            .Where(inspection => inspection.TenantId == tenantId)
+            .Where(inspection => inspection.TreeId == treeId)
+            .OrderByDescending(inspection => inspection.DeviceCapturedAt)
+            .Select(inspection => new LatestInspectionSnapshot(
+                inspection.HealthState,
+                inspection.Notes))
             .FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -84,7 +137,7 @@ internal static class Handler
 
     private static Response MapToResponse(
         Tree tree,
-        string? latestPhotoUrl,
+        TreeSnapshot snapshot,
         List<AssignedStudentDto> assignedStudents)
     {
         var locationDto = tree.Location is not null
@@ -99,22 +152,36 @@ internal static class Handler
         return new Response(
             Id: tree.Id,
             Folio: tree.Folio,
-            
-            HealthState: tree.HealthState.ToString(),
+
+            HealthState: snapshot.HealthState.ToString(),
             PlantingDate: tree.PlantingDate,
-            Observations: tree.Notes,
-            
+            Observations: snapshot.Notes,
+
             Virtue: tree.Virtue!.Name,
             Species: tree.Species!.CommonName,
             SpeciesScientificName: tree.Species.ScientificName,
             SpeciesImageUrl: tree.Species.ImageUrl,
-            
-            CurrentHeightCentimeters: tree.HeightCentimeters,
-            CurrentDiameterCentimeters: tree.DiameterCentimeters,
-            LatestPhotoUrl: latestPhotoUrl,
-            
+
+            CurrentHeightCentimeters: snapshot.HeightCentimeters,
+            CurrentDiameterCentimeters: snapshot.DiameterCentimeters,
+            LatestPhotoUrl: snapshot.LatestPhotoUrl,
+
             Location: locationDto,
             CurrentAssignedStudents: assignedStudents);
     }
-}
 
+    private sealed record TreeSnapshot(
+        decimal? HeightCentimeters,
+        decimal? DiameterCentimeters,
+        string? LatestPhotoUrl,
+        TreeHealthState HealthState,
+        string? Notes);
+
+    private sealed record LatestMeasurementSnapshot(
+        decimal HeightCentimeters,
+        decimal DiameterCentimeters);
+
+    private sealed record LatestInspectionSnapshot(
+        TreeHealthState HealthState,
+        string? Notes);
+}

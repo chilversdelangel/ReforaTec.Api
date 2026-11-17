@@ -16,15 +16,6 @@ internal sealed class TreeConfiguration : IEntityTypeConfiguration<Tree>
         builder.Property(tree => tree.NormalizedFolio)
             .HasMaxLength(10);
 
-        builder.Property(tree => tree.HeightCentimeters)
-            .HasPrecision(7, 2);
-
-        builder.Property(tree => tree.DiameterCentimeters)
-            .HasPrecision(7, 2);
-
-        builder.Property(tree => tree.Notes)
-            .HasMaxLength(500);
-
         builder.HasIndex(tree => tree.TenantId);
         builder.HasIndex(tree => tree.SpeciesId);
         builder.HasIndex(tree => tree.VirtueId);

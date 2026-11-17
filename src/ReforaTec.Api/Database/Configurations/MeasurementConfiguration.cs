@@ -4,51 +4,36 @@ using ReforaTec.Api.Entities;
 
 namespace ReforaTec.Api.Database.Configurations;
 
-public class MeasurementConfiguration : IEntityTypeConfiguration<Measurement>
+internal sealed class MeasurementConfiguration : IEntityTypeConfiguration<Measurement>
 {
     public void Configure(EntityTypeBuilder<Measurement> builder)
     {
-        builder.Property(m => m.InspectionType)
-            .IsRequired();
-
-        builder.Property(m => m.DetectedHealthState)
-            .IsRequired();
-
-        builder.Property(m => m.HeightCentimeters)
+        builder.Property(measurement => measurement.HeightCentimeters)
             .HasPrecision(7, 2);
 
-        builder.Property(m => m.DiameterCentimeters)
+        builder.Property(measurement => measurement.DiameterCentimeters)
             .HasPrecision(7, 2);
 
-        builder.Property(m => m.EvidencePhotoUrl)
+        builder.Property(measurement => measurement.PhotoUrl)
             .HasMaxLength(300);
 
-        builder.Property(m => m.ObservationNotes)
-            .HasMaxLength(500);
+        builder.HasIndex(measurement => measurement.TenantId);
+        builder.HasIndex(measurement => measurement.TreeId);
+        builder.HasIndex(measurement => measurement.InspectorId);
 
-        builder.HasIndex(m => m.TenantId);
-        builder.HasIndex(m => m.TreeId);
-        builder.HasIndex(m => m.InspectorId);
-        builder.HasIndex(m => m.CampaignId);
-
-        builder.HasOne(m => m.Tenant)
+        builder.HasOne(measurement => measurement.Tenant)
             .WithMany()
-            .HasForeignKey(m => m.TenantId)
+            .HasForeignKey(measurement => measurement.TenantId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(m => m.Tree)
+        builder.HasOne(measurement => measurement.Tree)
             .WithMany()
-            .HasForeignKey(m => m.TreeId)
+            .HasForeignKey(measurement => measurement.TreeId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(m => m.Inspector)
+        builder.HasOne(measurement => measurement.Inspector)
             .WithMany()
-            .HasForeignKey(m => m.InspectorId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(m => m.Campaign)
-            .WithMany()
-            .HasForeignKey(m => m.CampaignId)
+            .HasForeignKey(measurement => measurement.InspectorId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

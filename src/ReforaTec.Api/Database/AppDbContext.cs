@@ -34,6 +34,7 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     #region Field Activity Logs
     public DbSet<Service> Services { get; set; }
     public DbSet<Measurement> Measurements { get; set; }
+    public DbSet<Inspection> Inspections { get; set; }
     #endregion
 
     #region Push Notifications & Devices
