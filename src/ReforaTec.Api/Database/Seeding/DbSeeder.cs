@@ -14,7 +14,7 @@ internal static partial class DbSeeder
     {
         await SeedSpeciesAsync(context);
         await SeedVirtuesAsync(context);
-        await SeedServiceTypesAsync(context);
+        await SeedCareTypesAsync(context);
         await SeedDevelopmentUsersAsync(context);
         await SeedTreesAsync(context);
         await SeedCampaignsAsync(context);

@@ -5,7 +5,7 @@ using ReforaTec.Api.Database;
 using ReforaTec.Api.Entities;
 using ReforaTec.Api.Infrastructure.Security.CurrentUser;
 
-namespace ReforaTec.Api.Features.Trees.CreateTreeService;
+namespace ReforaTec.Api.Features.Trees.CreateTreeCareLog;
 
 internal static class Handler
 {
@@ -23,43 +23,44 @@ internal static class Handler
 
         if (!treeExists)
         {
-            return Errors.TreeNotFound;
+            return Errors.TreeNotFound(treeId);
         }
 
-        var assignment = await context.CareAssignments
+        var isAssigned = await context.CareAssignments
+            .Where(assignment => assignment.TenantId == user.TenantId)
             .Where(assignment => assignment.UserId == user.UserId)
             .Where(assignment => assignment.TreeId == treeId)
             .Where(assignment => assignment.EndDate == null)
-            .SingleOrDefaultAsync(cancellationToken);
+            .AnyAsync(cancellationToken);
 
-        if (assignment is null)
+        if (!isAssigned)
         {
             return Errors.UserNotAssignedToTree;
         }
 
-        var serviceTypeExists = await context.ServiceTypes
-            .Where(serviceType => serviceType.Id == request.ServiceTypeId)
+        var careTypeExists = await context.CareTypes
+            .Where(careType => careType.Id == request.CareTypeId)
             .AnyAsync(cancellationToken);
 
-        if (!serviceTypeExists)
+        if (!careTypeExists)
         {
-            return Errors.ServiceTypeNotFound;
+            return Errors.CareTypeNotFound(request.CareTypeId);
         }
 
-        var service = new Service
+        var careLog = new CareLog
         {
             TenantId = user.TenantId,
-            StudentId = user.UserId,
+            UserId = user.UserId,
             TreeId = treeId,
-            ServiceTypeId = request.ServiceTypeId,
-            CampaignId = assignment.CampaignId,
+            CareTypeId = request.CareTypeId,
+            PerformedAt = request.PerformedAt.UtcDateTime,
             DeviceCapturedAt = request.DeviceCapturedAt.UtcDateTime,
-            Comment = request.Comment
+            Notes = request.Notes
         };
 
-        context.Services.Add(service);
+        context.CareLogs.Add(careLog);
         await context.SaveChangesAsync(cancellationToken);
 
-        return service.Adapt<Response>();
+        return careLog.Adapt<Response>();
     }
 }

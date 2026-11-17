@@ -10,8 +10,8 @@ public sealed class Measurement : AuditableEntity
     public int TreeId { get; set; }
     public Tree? Tree { get; set; }
 
-    public int InspectorId { get; set; }
-    public User? Inspector { get; set; }
+    public int UserId { get; set; }
+    public User? User { get; set; }
 
     public decimal HeightCentimeters { get; set; }
     public decimal DiameterCentimeters { get; set; }

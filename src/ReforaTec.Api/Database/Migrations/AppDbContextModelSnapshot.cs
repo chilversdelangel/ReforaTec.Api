@@ -222,6 +222,119 @@ namespace ReforaTec.Api.Database.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ReforaTec.Api.Entities.CareLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CareTypeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("care_type_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("DeviceCapturedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("device_captured_at");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_at");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("notes");
+
+                    b.Property<DateTime>("PerformedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("performed_at");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<int>("TreeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("tree_id");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_care_logs");
+
+                    b.HasIndex("CareTypeId")
+                        .HasDatabaseName("ix_care_logs_care_type_id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_care_logs_tenant_id");
+
+                    b.HasIndex("TreeId")
+                        .HasDatabaseName("ix_care_logs_tree_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_care_logs_user_id");
+
+                    b.ToTable("care_logs", (string)null);
+                });
+
+            modelBuilder.Entity("ReforaTec.Api.Entities.CareType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("IconUrl")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("icon_url");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_at");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("normalized_name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_care_types");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("ix_care_types_normalized_name");
+
+                    b.ToTable("care_types", (string)null);
+                });
+
             modelBuilder.Entity("ReforaTec.Api.Entities.Inspection", b =>
                 {
                     b.Property<int>("Id")
@@ -243,10 +356,6 @@ namespace ReforaTec.Api.Database.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("health_state");
 
-                    b.Property<int>("InspectorId")
-                        .HasColumnType("integer")
-                        .HasColumnName("inspector_id");
-
                     b.Property<DateTime>("ModifiedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("modified_at");
@@ -264,17 +373,21 @@ namespace ReforaTec.Api.Database.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("tree_id");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
                     b.HasKey("Id")
                         .HasName("pk_inspections");
-
-                    b.HasIndex("InspectorId")
-                        .HasDatabaseName("ix_inspections_inspector_id");
 
                     b.HasIndex("TenantId")
                         .HasDatabaseName("ix_inspections_tenant_id");
 
                     b.HasIndex("TreeId")
                         .HasDatabaseName("ix_inspections_tree_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_inspections_user_id");
 
                     b.ToTable("inspections", (string)null);
                 });
@@ -306,10 +419,6 @@ namespace ReforaTec.Api.Database.Migrations
                         .HasColumnType("numeric(7,2)")
                         .HasColumnName("height_centimeters");
 
-                    b.Property<int>("InspectorId")
-                        .HasColumnType("integer")
-                        .HasColumnName("inspector_id");
-
                     b.Property<DateTime>("ModifiedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("modified_at");
@@ -327,17 +436,21 @@ namespace ReforaTec.Api.Database.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("tree_id");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
                     b.HasKey("Id")
                         .HasName("pk_measurements");
-
-                    b.HasIndex("InspectorId")
-                        .HasDatabaseName("ix_measurements_inspector_id");
 
                     b.HasIndex("TenantId")
                         .HasDatabaseName("ix_measurements_tenant_id");
 
                     b.HasIndex("TreeId")
                         .HasDatabaseName("ix_measurements_tree_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_measurements_user_id");
 
                     b.ToTable("measurements", (string)null);
                 });
@@ -444,126 +557,6 @@ namespace ReforaTec.Api.Database.Migrations
                         .HasDatabaseName("ix_auth_refresh_tokens_user_id_created_at");
 
                     b.ToTable("auth_refresh_tokens", (string)null);
-                });
-
-            modelBuilder.Entity("ReforaTec.Api.Entities.Service", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CampaignId")
-                        .HasColumnType("integer")
-                        .HasColumnName("campaign_id");
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("comment");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime>("DeviceCapturedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("device_captured_at");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("modified_at");
-
-                    b.Property<DateTime?>("ServerSyncedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("server_synced_at");
-
-                    b.Property<int>("ServiceTypeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("service_type_id");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("integer")
-                        .HasColumnName("student_id");
-
-                    b.Property<int>("TenantId")
-                        .HasColumnType("integer")
-                        .HasColumnName("tenant_id");
-
-                    b.Property<int>("TreeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("tree_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_services");
-
-                    b.HasIndex("CampaignId")
-                        .HasDatabaseName("ix_services_campaign_id");
-
-                    b.HasIndex("ServiceTypeId")
-                        .HasDatabaseName("ix_services_service_type_id");
-
-                    b.HasIndex("StudentId")
-                        .HasDatabaseName("ix_services_student_id");
-
-                    b.HasIndex("TenantId")
-                        .HasDatabaseName("ix_services_tenant_id");
-
-                    b.HasIndex("TreeId")
-                        .HasDatabaseName("ix_services_tree_id");
-
-                    b.ToTable("services", (string)null);
-                });
-
-            modelBuilder.Entity("ReforaTec.Api.Entities.ServiceType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("IconUrl")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)")
-                        .HasColumnName("icon_url");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("modified_at");
-
-                    b.Property<string>("NormalizedServiceName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("normalized_service_name");
-
-                    b.Property<string>("ServiceName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("service_name");
-
-                    b.HasKey("Id")
-                        .HasName("pk_service_types");
-
-                    b.HasIndex("NormalizedServiceName")
-                        .IsUnique()
-                        .HasDatabaseName("ix_service_types_normalized_service_name");
-
-                    b.ToTable("service_types", (string)null);
                 });
 
             modelBuilder.Entity("ReforaTec.Api.Entities.Species", b =>
@@ -1108,15 +1101,47 @@ namespace ReforaTec.Api.Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ReforaTec.Api.Entities.Inspection", b =>
+            modelBuilder.Entity("ReforaTec.Api.Entities.CareLog", b =>
                 {
-                    b.HasOne("ReforaTec.Api.Entities.User", "Inspector")
+                    b.HasOne("ReforaTec.Api.Entities.CareType", "CareType")
                         .WithMany()
-                        .HasForeignKey("InspectorId")
+                        .HasForeignKey("CareTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_inspections_users_inspector_id");
+                        .HasConstraintName("fk_care_logs_care_types_care_type_id");
 
+                    b.HasOne("ReforaTec.Api.Entities.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_care_logs_tenants_tenant_id");
+
+                    b.HasOne("ReforaTec.Api.Entities.Tree", "Tree")
+                        .WithMany()
+                        .HasForeignKey("TreeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_care_logs_trees_tree_id");
+
+                    b.HasOne("ReforaTec.Api.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_care_logs_users_user_id");
+
+                    b.Navigation("CareType");
+
+                    b.Navigation("Tenant");
+
+                    b.Navigation("Tree");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ReforaTec.Api.Entities.Inspection", b =>
+                {
                     b.HasOne("ReforaTec.Api.Entities.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
@@ -1131,22 +1156,22 @@ namespace ReforaTec.Api.Database.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_inspections_trees_tree_id");
 
-                    b.Navigation("Inspector");
+                    b.HasOne("ReforaTec.Api.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_inspections_users_user_id");
 
                     b.Navigation("Tenant");
 
                     b.Navigation("Tree");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ReforaTec.Api.Entities.Measurement", b =>
                 {
-                    b.HasOne("ReforaTec.Api.Entities.User", "Inspector")
-                        .WithMany()
-                        .HasForeignKey("InspectorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_measurements_users_inspector_id");
-
                     b.HasOne("ReforaTec.Api.Entities.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
@@ -1161,11 +1186,18 @@ namespace ReforaTec.Api.Database.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_measurements_trees_tree_id");
 
-                    b.Navigation("Inspector");
+                    b.HasOne("ReforaTec.Api.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_measurements_users_user_id");
 
                     b.Navigation("Tenant");
 
                     b.Navigation("Tree");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ReforaTec.Api.Entities.RefreshToken", b =>
@@ -1178,53 +1210,6 @@ namespace ReforaTec.Api.Database.Migrations
                         .HasConstraintName("fk_auth_refresh_tokens_users_user_id");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ReforaTec.Api.Entities.Service", b =>
-                {
-                    b.HasOne("ReforaTec.Api.Entities.Campaign", "Campaign")
-                        .WithMany()
-                        .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_services_campaigns_campaign_id");
-
-                    b.HasOne("ReforaTec.Api.Entities.ServiceType", "ServiceType")
-                        .WithMany()
-                        .HasForeignKey("ServiceTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_services_service_types_service_type_id");
-
-                    b.HasOne("ReforaTec.Api.Entities.User", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_services_users_student_id");
-
-                    b.HasOne("ReforaTec.Api.Entities.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_services_tenants_tenant_id");
-
-                    b.HasOne("ReforaTec.Api.Entities.Tree", "Tree")
-                        .WithMany()
-                        .HasForeignKey("TreeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_services_trees_tree_id");
-
-                    b.Navigation("Campaign");
-
-                    b.Navigation("ServiceType");
-
-                    b.Navigation("Student");
-
-                    b.Navigation("Tenant");
-
-                    b.Navigation("Tree");
                 });
 
             modelBuilder.Entity("ReforaTec.Api.Entities.Tree", b =>

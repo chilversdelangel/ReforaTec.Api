@@ -7,38 +7,34 @@ namespace ReforaTec.Api.IntegrationTests.Fixtures;
 
 public abstract partial class IntegrationTestBase
 {
-    protected async Task<Service> CreateTreeServiceAsync(
+    protected async Task<CareLog> CreateCareLogAsync(
         int treeId,
-        int studentId,
-        int serviceTypeId = 1,
-        int? campaignId = null,
+        int userId,
+        int careTypeId = 1,
         int tenantId = 1,
-        
+        DateTime? performedAt = null,
         DateTime? deviceCapturedAt = null,
-        DateTime? serverSyncedAt = null,
-        string? comment = null)
+        string? notes = null)
     {
         using var scope = Factory.Services.CreateScope();
         var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         var now = DateTime.UtcNow;
 
-        var service = new Service
+        var careLog = new CareLog
         {
             TenantId = tenantId,
             TreeId = treeId,
-            StudentId = studentId,
-            ServiceTypeId = serviceTypeId,
-            CampaignId = campaignId,
-            
+            UserId = userId,
+            CareTypeId = careTypeId,
+            PerformedAt = performedAt ?? now,
             DeviceCapturedAt = deviceCapturedAt ?? now,
-            ServerSyncedAt = serverSyncedAt ?? now,
-            Comment = comment
+            Notes = notes
         };
 
-        appDbContext.Services.Add(service);
+        appDbContext.CareLogs.Add(careLog);
         await appDbContext.SaveChangesAsync();
 
-        return service;
+        return careLog;
     }
 }

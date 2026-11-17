@@ -18,7 +18,7 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     #region Master Catalogs
     public DbSet<Species> Species { get; set; }
     public DbSet<Virtue> Virtues { get; set; }
-    public DbSet<ServiceType> ServiceTypes { get; set; }
+    public DbSet<CareType> CareTypes { get; set; }
     #endregion
 
     #region Core Domain Entities
@@ -32,7 +32,7 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     #endregion
 
     #region Field Activity Logs
-    public DbSet<Service> Services { get; set; }
+    public DbSet<CareLog> CareLogs { get; set; }
     public DbSet<Measurement> Measurements { get; set; }
     public DbSet<Inspection> Inspections { get; set; }
     #endregion

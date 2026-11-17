@@ -19,7 +19,7 @@ internal sealed class MeasurementConfiguration : IEntityTypeConfiguration<Measur
 
         builder.HasIndex(measurement => measurement.TenantId);
         builder.HasIndex(measurement => measurement.TreeId);
-        builder.HasIndex(measurement => measurement.InspectorId);
+        builder.HasIndex(measurement => measurement.UserId);
 
         builder.HasOne(measurement => measurement.Tenant)
             .WithMany()
@@ -31,9 +31,9 @@ internal sealed class MeasurementConfiguration : IEntityTypeConfiguration<Measur
             .HasForeignKey(measurement => measurement.TreeId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(measurement => measurement.Inspector)
+        builder.HasOne(measurement => measurement.User)
             .WithMany()
-            .HasForeignKey(measurement => measurement.InspectorId)
+            .HasForeignKey(measurement => measurement.UserId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

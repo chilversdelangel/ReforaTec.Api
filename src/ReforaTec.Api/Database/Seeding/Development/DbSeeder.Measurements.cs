@@ -32,7 +32,7 @@ internal static partial class DbSeeder
         {
             TenantId = user.TenantId,
             TreeId = tree.Id,
-            InspectorId = user.Id,
+            UserId = user.Id,
             HeightCentimeters = 145m,
             DiameterCentimeters = 14.5m,
             PhotoUrl = "https://images.reforatec.org/evidence/tree1_baseline.jpg",
@@ -43,7 +43,7 @@ internal static partial class DbSeeder
         {
             TenantId = user.TenantId,
             TreeId = tree.Id,
-            InspectorId = user.Id,
+            UserId = user.Id,
             HeightCentimeters = 150.5m,
             DiameterCentimeters = 15.2m,
             PhotoUrl = "https://images.reforatec.org/evidence/tree1_latest.jpg",

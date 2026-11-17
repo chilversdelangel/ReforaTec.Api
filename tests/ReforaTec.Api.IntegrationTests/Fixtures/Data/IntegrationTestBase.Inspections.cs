@@ -10,7 +10,7 @@ public abstract partial class IntegrationTestBase
 {
     protected async Task<Inspection> RecordInspectionAsync(
         int treeId,
-        int inspectorId,
+        int userId,
         int tenantId = 1,
         TreeHealthState healthState = TreeHealthState.Healthy,
         string? notes = null,
@@ -23,7 +23,7 @@ public abstract partial class IntegrationTestBase
         {
             TenantId = tenantId,
             TreeId = treeId,
-            InspectorId = inspectorId,
+            UserId = userId,
             HealthState = healthState,
             Notes = notes,
             DeviceCapturedAt = deviceCapturedAt ?? DateTime.UtcNow

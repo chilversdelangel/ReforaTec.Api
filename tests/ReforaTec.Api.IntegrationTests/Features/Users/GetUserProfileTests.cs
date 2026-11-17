@@ -117,7 +117,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         var tree = await CreateTreeAsync();
 
         await AssignTreeToUserAsync(tree.Id, user.Id, campaign.Id);
-        await CreateTreeServiceAsync(tree.Id, user.Id, campaign.Id);
+        await CreateCareLogAsync(tree.Id, user.Id);
 
         // Act
         var response = await Client.GetAsync(ApiRoutes.Users.Profile);

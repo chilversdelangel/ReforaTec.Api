@@ -5,14 +5,14 @@ using ReforaTec.Api.Infrastructure.Mapping;
 using ReforaTec.Api.Infrastructure.OpenApi;
 using ReforaTec.Api.Infrastructure.Security.CurrentUser;
 
-namespace ReforaTec.Api.Features.Trees.CreateTreeService;
+namespace ReforaTec.Api.Features.Trees.CreateTreeCareLog;
 
-internal sealed class CreateTreeService : IEndpoint
+internal sealed class CreateTreeCareLog : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/trees/{treeId:int}/services", HandleRequest)
-            .WithName("CreateTreeService")
+        app.MapPost("/trees/{treeId:int}/care-logs", HandleRequest)
+            .WithName("CreateTreeCareLog")
             .WithTags(OpenApiTags.Trees)
             .RequireAuthorization()
             .AddEndpointFilter<ValidationFilter<Request>>()
@@ -21,8 +21,8 @@ internal sealed class CreateTreeService : IEndpoint
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesValidationProblem()
-            .WithSummary("Log a tree maintenance service")
-            .WithDescription("Registers a service log (watering, pruning, etc.) for a tree assigned to the authenticated student.");
+            .WithSummary("Log a tree care activity")
+            .WithDescription("Registers a care log (watering, pruning, etc.) for a tree assigned to the authenticated student.");
     }
 
     private static async Task<IResult> HandleRequest(
@@ -46,7 +46,7 @@ internal sealed class CreateTreeService : IEndpoint
             cancellationToken);
 
         return result.Match(
-            response => Results.CreatedAtRoute("GetTreeServices", new { treeId }, response),
+            response => Results.CreatedAtRoute("GetTreeCareLogs", new { treeId }, response),
             errors => errors.ToProblem());
     }
 }

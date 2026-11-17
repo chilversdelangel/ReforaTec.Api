@@ -68,10 +68,10 @@ internal static class Handler
         UserIdentity loggedUser,
         CancellationToken cancellationToken)
     {
-        return context.Services
+        return context.CareLogs
             .AsNoTracking()
-            .Where(service => service.TenantId == loggedUser.TenantId)
-            .Where(service => service.StudentId == loggedUser.UserId)
+            .Where(careLog => careLog.TenantId == loggedUser.TenantId)
+            .Where(careLog => careLog.UserId == loggedUser.UserId)
             .CountAsync(cancellationToken);
     }
 

@@ -9,7 +9,7 @@ public abstract partial class IntegrationTestBase
 {
     protected async Task<Measurement> RecordMeasurementAsync(
         int treeId,
-        int inspectorId,
+        int userId,
         int tenantId = 1,
         decimal heightCentimeters = 150.0m,
         decimal diameterCentimeters = 15.0m,
@@ -23,7 +23,7 @@ public abstract partial class IntegrationTestBase
         {
             TenantId = tenantId,
             TreeId = treeId,
-            InspectorId = inspectorId,
+            UserId = userId,
             HeightCentimeters = heightCentimeters,
             DiameterCentimeters = diameterCentimeters,
             PhotoUrl = photoUrl,

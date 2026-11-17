@@ -106,7 +106,7 @@ public class ReforaTecWebApplicationFactory : WebApplicationFactory<Program>, IA
                 "tenants",
                 "species",
                 "virtues",
-                "service_types",
+                "care_types",
                 "notification_templates"
             ]
         });

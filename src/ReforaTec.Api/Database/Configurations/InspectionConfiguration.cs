@@ -16,7 +16,7 @@ internal sealed class InspectionConfiguration : IEntityTypeConfiguration<Inspect
 
         builder.HasIndex(inspection => inspection.TenantId);
         builder.HasIndex(inspection => inspection.TreeId);
-        builder.HasIndex(inspection => inspection.InspectorId);
+        builder.HasIndex(inspection => inspection.UserId);
 
         builder.HasOne(inspection => inspection.Tenant)
             .WithMany()
@@ -28,9 +28,9 @@ internal sealed class InspectionConfiguration : IEntityTypeConfiguration<Inspect
             .HasForeignKey(inspection => inspection.TreeId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(inspection => inspection.Inspector)
+        builder.HasOne(inspection => inspection.User)
             .WithMany()
-            .HasForeignKey(inspection => inspection.InspectorId)
+            .HasForeignKey(inspection => inspection.UserId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

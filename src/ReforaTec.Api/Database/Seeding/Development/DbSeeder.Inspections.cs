@@ -34,7 +34,7 @@ internal static partial class DbSeeder
         {
             TenantId = user.TenantId,
             TreeId = trees[0].Id,
-            InspectorId = user.Id,
+            UserId = user.Id,
             HealthState = TreeHealthState.Healthy,
             Notes = "Árbol muy pequeño pero verde.",
             DeviceCapturedAt = DateTime.UtcNow.AddDays(-2)
@@ -44,7 +44,7 @@ internal static partial class DbSeeder
         {
             TenantId = user.TenantId,
             TreeId = trees[1].Id,
-            InspectorId = user.Id,
+            UserId = user.Id,
             HealthState = TreeHealthState.NeedsAttention,
             Notes = "Árbol recién registrado sin medidas iniciales.",
             DeviceCapturedAt = DateTime.UtcNow.AddDays(-1)

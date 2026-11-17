@@ -11,8 +11,8 @@ public sealed class Inspection : AuditableEntity
     public int TreeId { get; set; }
     public Tree? Tree { get; set; }
 
-    public int InspectorId { get; set; }
-    public User? Inspector { get; set; }
+    public int UserId { get; set; }
+    public User? User { get; set; }
 
     public TreeHealthState HealthState { get; set; } = TreeHealthState.Healthy;
     public string? Notes { get; set; }
