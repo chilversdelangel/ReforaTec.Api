@@ -3,7 +3,10 @@
 ## 1. Engine & ORM
 * **Database Engine:** PostgreSQL 18
 * **ORM:** Entity Framework Core 10 (Npgsql.EntityFrameworkCore.PostgreSQL)
-* **Migrations:** Code-First EF Core Migrations located in `src/ReforaTec.Api/Database/Migrations/`
+* **Migrations:** Code-First EF Core Migrations strictly consolidated in `src/ReforaTec.Api/Database/Migrations/` (namespace `ReforaTec.Api.Database.Migrations`). Never place migrations in a root `Migrations/` directory.
+  ```bash
+  dotnet ef migrations add <MigrationName> --project src/ReforaTec.Api --startup-project src/ReforaTec.Api --output-dir Database/Migrations
+  ```
 
 ---
 
@@ -50,7 +53,7 @@ All read-only queries MUST explicitly declare `.AsNoTracking()` to bypass EF Cor
 When relating entities without direct EF Core navigation properties, prefer subquery expressions using `IQueryable.Contains(...)`:
 
 ```csharp
-var assignedTreeIds = context.UserCaresForTrees
+var assignedTreeIds = context.CareAssignments
     .Where(assignment => assignment.UserId == userId && assignment.EndDate == null)
     .Select(assignment => assignment.TreeId);
 
@@ -63,3 +66,12 @@ PostgreSQL compiles this to high-performance `Nested Loop Semi Join` operations 
 
 ### Query Decomposition Rule
 Handlers executing multiple queries, aggregations, or complex lookups MUST decompose each independent operation into private static helper methods, keeping the top-level `Handle` orchestrator flat and readable.
+
+---
+
+## 4. Standardized Schema Overview
+* **Trees (`trees`):** Physical tree identity and location (`TenantId`, `Folio` / `NormalizedFolio` unique per tenant, `PlantingDate`, `VirtueId`, `SpeciesId`, `Location`). Current biometrics and health states are projected from `measurements` and `inspections` rather than duplicated on `trees`.
+* **Campaign Enrollments (`campaign_enrollments`):** Student enrollment and end-of-campaign evaluation per campaign (`UNIQUE (CampaignId, UserId)`).
+* **Care Assignments (`care_assignments`):** Caretaking history per `(CampaignId, UserId, TreeId)` with `StartDate` and nullable `EndDate`, enforced by partial unique index `WHERE end_date IS NULL` and check constraint `end_date IS NULL OR end_date >= start_date`.
+* **Care Types & Logs (`care_types`, `care_logs`):** Catalog of care activities (`Name` / `NormalizedName`) and logged student care records (`UserId`, `TreeId`, `CareTypeId`, `PerformedAt`, `DeviceCapturedAt`, `Notes`).
+* **Measurements & Inspections (`measurements`, `inspections`):** Separated field records both keyed by `UserId`, `TreeId`, and `DeviceCapturedAt` — `measurements` stores biometric snapshots (`HeightCentimeters`, `DiameterCentimeters`, optional `PhotoUrl`), while `inspections` stores health diagnostics (`HealthState`, `Notes`).

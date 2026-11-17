@@ -55,13 +55,20 @@ ReforaTec/
 * **Unique Text Fields:** Unique text properties MUST implement `INormalizable` (handled by `AppDbContext`).
 * **Soft Delete:** Entities implementing soft delete MUST filter out deleted records (`!x.IsDeleted`).
 * **User-Scoped Routing:** Endpoints operating on or projecting data for the authenticated user MUST use the `/users/me/...` route hierarchy (e.g. `GET /users/me/profile`, `PATCH /users/me`).
+* **Phone Number Format & E.164 Standard:**
+  * Phone number fields in validators MUST use the standardized regex pattern:
+    ```csharp
+    ^(\+[1-9]\d{6,14}|\d{10})$
+    ```
+  * **Rationale:** Adheres strictly to the real-world ITU-T E.164 specification (global minimum of 7 digits: 3-digit country code + 4-digit subscriber, up to 15 digits maximum), while supporting 10-digit national Mexican numbers without country code. Rejects invalid short junk (< 7 digits).
+  * **Normalization:** Entities implementing phone storage MUST automatically normalize 10-digit national numbers by prepending `+52` and preserving international `+` numbers as-is in UTC/E.164. Avoid pulling in heavy external telecommunication libraries (YAGNI).
 * **Security:** Never leak user existence in authentication flows (OWASP User Enumeration Prevention).
 * **Language:** ALL code, identifiers, XML docs, comments, git commits, and documentation in English.
 
 ---
 
 ## 4. Code Conventions
-* **Encapsulation:** DTOs (`Request`, `Response`) and `Validator` classes MUST be `internal sealed`. Handlers MUST be `internal static`.
+* **Encapsulation:** DTOs (`Request`, `Response`) and `Validator` classes MUST be `internal sealed`. Handlers MUST be `internal static`. EF Core `IEntityTypeConfiguration<T>` classes MUST be `internal sealed`. Concrete domain entities MUST be `public sealed` (kept `public` so `IntegrationTestBase` fixture helpers avoid `CS0051`).
 * **Timezones:** DTOs accepting timestamps MUST use `DateTimeOffset`. Database entities store `.UtcDateTime`.
 * **Read Performance:** All read-only database queries MUST use `.AsNoTracking()`.
 * **LINQ Style:** Always use **Fluent Method Syntax** (`context.Entity.AsNoTracking().Where(...).Select(...)`). Never use Query Syntax (`from ... join ... select`). For unmapped relations, use subqueries with `IQueryable.Contains(...)`.
@@ -81,6 +88,8 @@ ReforaTec/
   * Favor early exits and guard clauses to minimize indentation (strictly maximum 2-3 indentation levels; no arrow-shaped callback pyramids).
   * Use expression-bodied members (`=>`) for concise single-statement methods and properties.
   * Always use descriptive lambda parameter names (`tree => tree.Id`, `request => request.ServiceTypeId`), strictly avoiding single-letter abbreviations (`x =>`, `t =>`).
+  * Use domain-qualified ID parameter names in route templates and handlers (`int treeId`, `int campaignId`) instead of generic `int id`.
+  * Group related fields with blank lines in `Response` DTO records and constructor mappings (6+ parameters) to reduce visual fatigue.
 * **OpenAPI Documentation:** Every endpoint MUST declare `.WithName()`, `.WithTags()`, `.WithSummary()`, `.WithDescription()`, and explicit `.Produces<T>()` status codes.
 
 ---
@@ -102,6 +111,9 @@ ReforaTec/
 ## 6. Deterministic Verification Commands
 
 ```bash
+# Generate an EF Core migration (strictly inside Database/Migrations)
+dotnet ef migrations add {MigrationName} --project src/ReforaTec.Api --startup-project src/ReforaTec.Api --output-dir Database/Migrations
+
 # Verify build health with zero warnings and zero errors
 dotnet build --disable-build-servers
 
@@ -120,6 +132,15 @@ dotnet test --no-build --filter "FullyQualifiedName~{UseCase}Tests"
   * **Test Architect Agent (Phase 1 Red):** Operates strictly within `tests/ReforaTec.Api.IntegrationTests/`.
   * **Implementer Agent (Phase 2 Green):** Operates strictly within `src/ReforaTec.Api/`.
   * **Reviewer Agent (Phase 3 Refactor):** Read-only inspection against this file and zero-warning verification.
+* **Reviewable Increment Limit (applies to ALL agents, parallel or interactive):**
+  * Every unit of work handed to the user for review MUST be **<= 200 changed lines (target) and NEVER > 400 lines** (SmartBear/Cisco code review research: defect detection drops sharply beyond 200-400 LOC per session).
+  * **Silent limit:** Enforce it internally. Do NOT narrate line counts or mention the limit in messages; just deliver right-sized steps.
+  * **Plan first:** When a task would exceed the limit, propose the split upfront as a short numbered list of steps (what each step does), then wait for approval before starting step 1.
+  * **Self-contained increments:** Each step = one atomic commit that compiles, passes tests, and makes sense on its own (no step may leave the build broken or depend on a later step).
+  * **No diffs in chat:** After each step, state what was done in 1-2 lines. The user reviews the diff in the IDE; paste code in chat only when asked.
+  * **Review-before-commit:** After verifying build and tests for an increment, present the modified files for IDE review and WAIT for explicit user approval before running `git commit` or starting the next step.
+  * Generated code (EF Core migrations, snapshots) is excluded from the count.
+  * Parallel subagents MUST follow the same rules per agent: deliver one increment, report back, and never chain further work autonomously.
 
 ---
 

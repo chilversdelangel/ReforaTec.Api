@@ -20,21 +20,23 @@ internal static class Handler
         }
 
         var totalTrees = await GetAssignedTreesCountAsync(context, loggedUser, cancellationToken);
-        var totalServices = await GetServicesCountAsync(context, loggedUser, cancellationToken);
-        var currentCampaign = await GetCurrentCampaignNameAsync(context, loggedUser, cancellationToken);
+        var totalCareLogs = await GetCareLogsCountAsync(context, loggedUser, cancellationToken);
+        var isEnrolledInActiveCampaign = await IsEnrolledInActiveCampaignAsync(context, loggedUser, cancellationToken);
 
         return new Response(
             GivenName: userEntity.GivenName,
             FamilyName: userEntity.FamilyName,
             SecondFamilyName: userEntity.SecondFamilyName,
             DisplayName: userEntity.DisplayName,
+
             ControlNumber: userEntity.ControlNumber,
             PhoneNumber: userEntity.PhoneNumber,
             Gender: userEntity.Gender,
             Email: userEntity.Email,
-            CurrentCampaign: currentCampaign,
+
+            IsEnrolledInActiveCampaign: isEnrolledInActiveCampaign,
             TotalTrees: totalTrees,
-            TotalServices: totalServices);
+            TotalCareLogs: totalCareLogs);
     }
 
     private static Task<User?> FindUserAsync(
@@ -55,7 +57,7 @@ internal static class Handler
         UserIdentity loggedUser,
         CancellationToken cancellationToken)
     {
-        return context.UserCaresForTrees
+        return context.CareAssignments
             .AsNoTracking()
             .Where(assignment => assignment.TenantId == loggedUser.TenantId)
             .Where(assignment => assignment.UserId == loggedUser.UserId)
@@ -63,35 +65,33 @@ internal static class Handler
             .CountAsync(cancellationToken);
     }
 
-    private static Task<int> GetServicesCountAsync(
+    private static Task<int> GetCareLogsCountAsync(
         AppDbContext context,
         UserIdentity loggedUser,
         CancellationToken cancellationToken)
     {
-        return context.Services
+        return context.CareLogs
             .AsNoTracking()
-            .Where(service => service.TenantId == loggedUser.TenantId)
-            .Where(service => service.StudentId == loggedUser.UserId)
+            .Where(careLog => careLog.TenantId == loggedUser.TenantId)
+            .Where(careLog => careLog.UserId == loggedUser.UserId)
             .CountAsync(cancellationToken);
     }
 
-    private static Task<string?> GetCurrentCampaignNameAsync(
+    private static Task<bool> IsEnrolledInActiveCampaignAsync(
         AppDbContext context,
         UserIdentity loggedUser,
         CancellationToken cancellationToken)
     {
-        var activeTreeIds = context.UserCaresForTrees
-            .Where(assignment => assignment.TenantId == loggedUser.TenantId)
-            .Where(assignment => assignment.UserId == loggedUser.UserId)
-            .Where(assignment => assignment.EndDate == null)
-            .Select(assignment => assignment.TreeId);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        return context.CampaignManagesTrees
+        return context.CampaignEnrollments
             .AsNoTracking()
-            .Where(campaignTree => campaignTree.TenantId == loggedUser.TenantId)
-            .Where(campaignTree => campaignTree.EndDate == null)
-            .Where(campaignTree => activeTreeIds.Contains(campaignTree.TreeId))
-            .Select(campaignTree => campaignTree.Campaign!.CampaignName)
-            .FirstOrDefaultAsync(cancellationToken);
+            .Where(enrollment => enrollment.TenantId == loggedUser.TenantId)
+            .Where(enrollment => enrollment.UserId == loggedUser.UserId)
+            .Where(enrollment => enrollment.IsApproved == null)
+            .Where(enrollment =>
+                enrollment.Campaign!.Period.EndDate == null ||
+                enrollment.Campaign.Period.EndDate >= today)
+            .AnyAsync(cancellationToken);
     }
 }

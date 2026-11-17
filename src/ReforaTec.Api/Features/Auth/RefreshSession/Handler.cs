@@ -36,7 +36,7 @@ internal static class Handler
         var tokenRequest = new TokenGenerationRequest(
             existingToken.UserId,
             existingToken.User.TenantId,
-            existingToken.User.CurrentRole,
+            existingToken.User.Role,
             request.Audience);
         var newAccessToken = jwtTokenService.GenerateAccessToken(tokenRequest);
 

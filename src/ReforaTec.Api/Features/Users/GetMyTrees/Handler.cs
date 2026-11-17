@@ -1,126 +1,131 @@
-using System.Security.Claims;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Database;
-using ReforaTec.Api.Infrastructure.Security;
+using ReforaTec.Api.Entities;
+using ReforaTec.Api.Entities.Enums;
+using ReforaTec.Api.Infrastructure.Security.CurrentUser;
 
 namespace ReforaTec.Api.Features.Users.GetMyTrees;
 
 internal static class Handler
 {
-    public static async Task<ErrorOr<List<Response>>> Handle(
-        ClaimsPrincipal user,
+    public static async Task<ErrorOr<Response>> Handle(
+        UserIdentity loggedUser,
         AppDbContext context,
         CancellationToken cancellationToken)
     {
-        var userId = user.GetUserId();
+        var (userId, tenantId) = loggedUser;
 
-        if (userId is null)
+        var userExists = await UserExistsAsync(context, tenantId, userId, cancellationToken);
+        if (!userExists)
         {
-            return Error.Unauthorized(
-                code: ErrorCodes.Unauthorized,
-                description: "User identity could not be determined from the authentication token.");
+            return Errors.UserNotFound(userId);
         }
 
-        var tenantId = await GetUserTenantIdAsync(context, userId.Value, cancellationToken);
-
-        if (tenantId is null)
+        var activeAssignments = 
+            await GetActiveAssignmentsAsync(context, tenantId, userId, cancellationToken);
+        if (activeAssignments.Count == 0)
         {
-            return Error.NotFound(
-                code: ErrorCodes.UserNotFound,
-                description: $"User with ID {userId} was not found.");
+            return new Response([]);
         }
 
-        var assignedCareRecords =
-            await GetActiveAssignmentsAsync(context, tenantId.Value, userId.Value, cancellationToken);
+        var treeIds = activeAssignments
+            .Select(assignment => assignment.TreeId)
+            .Distinct()
+            .ToList();
 
-        if (assignedCareRecords.Count == 0)
-        {
-            return new List<Response>();
-        }
+        var snapshotsByTreeId = 
+            await GetTreeSnapshotsAsync(context, tenantId, treeIds, cancellationToken);
 
-        var treeIds = assignedCareRecords.Select(assignment => assignment.TreeId).ToList();
+        var assignedTrees = activeAssignments
+            .Select(assignment => MapToAssignedTreeDto(assignment, snapshotsByTreeId[assignment.TreeId]))
+            .ToList();
 
-        var activeCampaignByTreeId =
-            await GetActiveCampaignsAsync(context, tenantId.Value, treeIds, cancellationToken);
-
-        var latestPhotoByTreeId =
-            await GetLatestPhotosAsync(context, tenantId.Value, treeIds, cancellationToken);
-
-        var response = assignedCareRecords.Select(assignment =>
-        {
-            var tree = assignment.Tree!;
-            
-            var campaignRecord = activeCampaignByTreeId.GetValueOrDefault(tree.Id);
-            var latestPhotoUrl = latestPhotoByTreeId.GetValueOrDefault(tree.Id);
-
-            return new Response(
-                Id: tree.Id,
-                
-                SpeciesId: tree.SpeciesId,
-                CommonName: tree.Species!.CommonName,
-                ScientificName: tree.Species!.ScientificName,
-                SpeciesImageUrl: tree.Species!.ImageUrl,
-                
-                ValueName: tree.Value!.ValueName,
-                
-                CurrentCampaignName: campaignRecord?.Campaign?.CampaignName,
-                CurrentCampaignFolio: campaignRecord?.CampaignFolio,
-                
-                HealthState: tree.HealthState.ToString(),
-                PlantingDate: tree.PlantingDate,
-                
-                CurrentHeightCentimeters: tree.HeightCentimeters,
-                CurrentDiameterCentimeters: tree.DiameterCentimeters,
-                
-                LatestPhotoUrl: latestPhotoUrl);
-        }).ToList();
-
-        return response;
+        return new Response(assignedTrees);
     }
 
-    private static async Task<List<Entities.UserCaresForTree>> GetActiveAssignmentsAsync(
+    private static Task<bool> UserExistsAsync(
         AppDbContext context,
         int tenantId,
         int userId,
         CancellationToken cancellationToken)
     {
-        return await context.UserCaresForTrees
+        return context.Users
+            .AsNoTracking()
+            .Where(user => user.TenantId == tenantId)
+            .Where(user => user.Id == userId)
+            .Where(user => !user.IsDeleted)
+            .AnyAsync(cancellationToken);
+    }
+
+    private static async Task<List<CareAssignment>> GetActiveAssignmentsAsync(
+        AppDbContext context,
+        int tenantId,
+        int userId,
+        CancellationToken cancellationToken)
+    {
+        return await context.CareAssignments
             .AsNoTracking()
             .Where(assignment => assignment.TenantId == tenantId)
             .Where(assignment => assignment.UserId == userId)
             .Where(assignment => assignment.EndDate == null)
             .Where(assignment => assignment.Tree != null)
             .Include(assignment => assignment.Tree)
-            .ThenInclude(t => t!.Species)
+            .ThenInclude(tree => tree!.Species)
             .Include(assignment => assignment.Tree)
-            .ThenInclude(t => t!.Value)
+            .ThenInclude(tree => tree!.Virtue)
             .OrderBy(assignment => assignment.TreeId)
             .ToListAsync(cancellationToken);
     }
 
-    private static Task<int?> GetUserTenantIdAsync(AppDbContext context, int userId, CancellationToken cancellationToken)
-    {
-        return context.Users
-            .Where(user => user.Id == userId)
-            .Where(user => !user.IsDeleted)
-            .Select(user => (int?)user.TenantId)
-            .FirstOrDefaultAsync(cancellationToken);
-    }
-
-    private static Task<Dictionary<int, Entities.CampaignManagesTree>> GetActiveCampaignsAsync(
+    private static async Task<Dictionary<int, TreeSnapshot>> GetTreeSnapshotsAsync(
         AppDbContext context,
         int tenantId,
         List<int> treeIds,
         CancellationToken cancellationToken)
     {
-        return context.CampaignManagesTrees
+        var measurements = 
+            await GetLatestMeasurementsAsync(context, tenantId, treeIds, cancellationToken);
+        var photos = 
+            await GetLatestPhotosAsync(context, tenantId, treeIds, cancellationToken);
+        var healthStates = 
+            await GetLatestHealthStatesAsync(context, tenantId, treeIds, cancellationToken);
+
+        return treeIds.ToDictionary(
+            treeId => treeId,
+            treeId =>
+            {
+                var measurement = measurements.GetValueOrDefault(treeId);
+
+                return new TreeSnapshot(
+                    measurement?.HeightCentimeters,
+                    measurement?.DiameterCentimeters,
+                    photos.GetValueOrDefault(treeId),
+                    healthStates.GetValueOrDefault(treeId, TreeHealthState.Healthy));
+            });
+    }
+
+    private static Task<Dictionary<int, LatestMeasurementSnapshot>> GetLatestMeasurementsAsync(
+        AppDbContext context,
+        int tenantId,
+        List<int> treeIds,
+        CancellationToken cancellationToken)
+    {
+        return context.Measurements
             .AsNoTracking()
-            .Where(campaignRecord => campaignRecord.TenantId == tenantId)
-            .Where(campaignRecord => treeIds.Contains(campaignRecord.TreeId))
-            .Where(campaignRecord => campaignRecord.EndDate == null)
-            .Include(campaignRecord => campaignRecord.Campaign)
-            .ToDictionaryAsync(campaignRecord => campaignRecord.TreeId, cancellationToken);
+            .Where(measurement => measurement.TenantId == tenantId)
+            .Where(measurement => treeIds.Contains(measurement.TreeId))
+            .GroupBy(measurement => measurement.TreeId)
+            .Select(treeGroup => treeGroup
+                .OrderByDescending(measurement => measurement.DeviceCapturedAt)
+                .Select(measurement => new LatestMeasurementSnapshot(
+                    measurement.TreeId,
+                    measurement.HeightCentimeters,
+                    measurement.DiameterCentimeters))
+                .First())
+            .ToDictionaryAsync(
+                snapshot => snapshot.TreeId,
+                cancellationToken);
     }
 
     private static Task<Dictionary<int, string?>> GetLatestPhotosAsync(
@@ -133,19 +138,81 @@ internal static class Handler
             .AsNoTracking()
             .Where(measurement => measurement.TenantId == tenantId)
             .Where(measurement => treeIds.Contains(measurement.TreeId))
-            .Where(measurement => measurement.EvidencePhotoUrl != null)
+            .Where(measurement => measurement.PhotoUrl != null)
             .GroupBy(measurement => measurement.TreeId)
-            .Select(treeGroup => new LatestPhotoResult(
-                treeGroup.Key,
-                treeGroup.OrderByDescending(measurement => measurement.DeviceCapturedAt)
-                    .Select(measurement => measurement.EvidencePhotoUrl)
-                    .FirstOrDefault()
-            ))
+            .Select(treeGroup => treeGroup
+                .OrderByDescending(measurement => measurement.DeviceCapturedAt)
+                .Select(measurement => new LatestPhotoSnapshot(
+                    measurement.TreeId,
+                    measurement.PhotoUrl))
+                .First())
             .ToDictionaryAsync(
-                result => result.TreeId, 
-                result => result.LatestPhotoUrl, 
+                snapshot => snapshot.TreeId,
+                snapshot => snapshot.LatestPhotoUrl,
                 cancellationToken);
     }
 
-    private sealed record LatestPhotoResult(int TreeId, string? LatestPhotoUrl);
+    private static Task<Dictionary<int, TreeHealthState>> GetLatestHealthStatesAsync(
+        AppDbContext context,
+        int tenantId,
+        List<int> treeIds,
+        CancellationToken cancellationToken)
+    {
+        return context.Inspections
+            .AsNoTracking()
+            .Where(inspection => inspection.TenantId == tenantId)
+            .Where(inspection => treeIds.Contains(inspection.TreeId))
+            .GroupBy(inspection => inspection.TreeId)
+            .Select(treeGroup => treeGroup
+                .OrderByDescending(inspection => inspection.DeviceCapturedAt)
+                .Select(inspection => new LatestHealthStateSnapshot(
+                    inspection.TreeId,
+                    inspection.HealthState))
+                .First())
+            .ToDictionaryAsync(
+                snapshot => snapshot.TreeId,
+                snapshot => snapshot.HealthState,
+                cancellationToken);
+    }
+
+    private static AssignedTreeDto MapToAssignedTreeDto(
+        CareAssignment assignment,
+        TreeSnapshot snapshot)
+    {
+        var tree = assignment.Tree!;
+
+        return new AssignedTreeDto(
+            Id: tree.Id,
+            Folio: tree.Folio,
+
+            SpeciesId: tree.SpeciesId,
+            CommonName: tree.Species!.CommonName,
+            ScientificName: tree.Species.ScientificName,
+            SpeciesImageUrl: tree.Species.ImageUrl,
+
+            VirtueName: tree.Virtue!.Name,
+
+            HealthState: snapshot.HealthState.ToString(),
+            PlantingDate: tree.PlantingDate,
+
+            CurrentHeightCentimeters: snapshot.HeightCentimeters,
+            CurrentDiameterCentimeters: snapshot.DiameterCentimeters,
+
+            LatestPhotoUrl: snapshot.LatestPhotoUrl);
+    }
+
+    private sealed record TreeSnapshot(
+        decimal? HeightCentimeters,
+        decimal? DiameterCentimeters,
+        string? LatestPhotoUrl,
+        TreeHealthState HealthState);
+
+    private sealed record LatestMeasurementSnapshot(
+        int TreeId,
+        decimal HeightCentimeters,
+        decimal DiameterCentimeters);
+
+    private sealed record LatestPhotoSnapshot(int TreeId, string? LatestPhotoUrl);
+
+    private sealed record LatestHealthStateSnapshot(int TreeId, TreeHealthState HealthState);
 }

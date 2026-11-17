@@ -38,6 +38,26 @@ Group changes so that each commit addresses a specific logical concern. Examples
 - **Automated Tests**: Unit or integration test suites for a specific feature.
 - **Refactoring**: Code restructuring, renaming, or cleanup without functional changes.
 
+### Step 2.1: Clean State Verification (Empirical Isolation Testing)
+When authoring multi-commit atomic chains with interdependent code (e.g., test fixtures used by new test suites):
+1. Stage ONLY the files for the commit under test:
+   ```bash
+   git add <commit-files>
+   ```
+2. Stash all unstaged and untracked changes temporarily:
+   ```bash
+   git stash push --keep-index -u -m "wip-isolation-verification"
+   ```
+3. Run deterministic verification on the isolated commit state:
+   ```bash
+   dotnet test --disable-build-servers
+   ```
+4. Verify that tests pass 100% and build succeeds with zero errors.
+5. Pop the stash to proceed with the next atomic commit in the sequence:
+   ```bash
+   git stash pop
+   ```
+
 ### Step 3: Stage and Commit
 - Format: `type(scope): concise imperative description in English`
 - **Single-Line Invariant:** MUST strictly be a single-line commit (`git commit -m "type(scope): description"`). NEVER use multi-line commit messages, secondary `-m` flags, or bullet points in git commit bodies. All detailed summaries, rationale, and 3-prisms evaluations belong strictly in the **Pull Request description**.

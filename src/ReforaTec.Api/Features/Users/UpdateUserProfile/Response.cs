@@ -12,4 +12,4 @@ internal sealed record Response(
     string? PhoneNumber,
     Gender Gender,
     string Email,
-    UserRole CurrentRole);
+    UserRole Role);

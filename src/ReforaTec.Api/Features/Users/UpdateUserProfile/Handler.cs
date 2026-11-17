@@ -25,7 +25,10 @@ internal static class Handler
 
         userEntity.Normalize();
 
-        await context.SaveChangesAsync(cancellationToken);
+        if (context.ChangeTracker.HasChanges())
+        {
+            await context.SaveChangesAsync(cancellationToken);
+        }
 
         return new Response(
             Id: userEntity.Id,
@@ -37,7 +40,7 @@ internal static class Handler
             PhoneNumber: userEntity.PhoneNumber,
             Gender: userEntity.Gender,
             Email: userEntity.Email,
-            CurrentRole: userEntity.CurrentRole);
+            Role: userEntity.Role);
     }
 
     private static void ApplyUpdates(User userEntity, Request request)

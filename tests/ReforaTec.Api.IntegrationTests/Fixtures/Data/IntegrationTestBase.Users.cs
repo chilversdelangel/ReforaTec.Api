@@ -17,6 +17,9 @@ public abstract partial class IntegrationTestBase
         string? controlNumber = null,
         string givenName = "Juan",
         string familyName = "Pérez",
+        string? secondFamilyName = null,
+        string? displayName = null,
+        string? phoneNumber = null,
         
         Gender gender = Gender.Male,
         UserRole role = UserRole.Student,
@@ -38,8 +41,12 @@ public abstract partial class IntegrationTestBase
             GivenName = givenName,
             FamilyName = familyName,
             
+            SecondFamilyName = secondFamilyName,
+            DisplayName = displayName,
+            PhoneNumber = phoneNumber,
+            
             Gender = gender,
-            CurrentRole = role,
+            Role = role,
             
             IsDeleted = isDeleted,
             DeletedAt = isDeleted ? now : null

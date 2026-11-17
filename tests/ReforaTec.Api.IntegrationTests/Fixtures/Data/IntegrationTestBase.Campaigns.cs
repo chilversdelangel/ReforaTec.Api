@@ -10,12 +10,8 @@ public abstract partial class IntegrationTestBase
 {
     protected async Task<Campaign> CreateCampaignAsync(
         int tenantId = 1,
-        
-        string? campaignName = null,
-        string? inscriptionCode = null,
-        
-        Period? period = null,
-        Location? location = null)
+        string? code = null,
+        Period? period = null)
     {
         using var scope = Factory.Services.CreateScope();
         var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -23,16 +19,12 @@ public abstract partial class IntegrationTestBase
         var campaign = new Campaign
         {
             TenantId = tenantId,
-
-            CampaignName = campaignName ?? $"Campaign {Guid.NewGuid().ToString("N")[..8]}",
-            InscriptionCode = inscriptionCode ?? $"C-{Guid.NewGuid().ToString("N")[..8]}",
-
+            Code = code ?? $"C-{Guid.NewGuid().ToString("N")[..8]}",
             Period = period ?? new Period
             {
                 StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-1)),
                 EndDate = null
-            },
-            Location = location
+            }
         };
 
         campaign.Normalize();

@@ -142,7 +142,7 @@ internal static class Handler
         user.ControlNumber = request.ControlNumber;
         user.PhoneNumber = request.PhoneNumber;
         user.Gender = request.Gender;
-        user.CurrentRole = UserRole.Student;
+        user.Role = UserRole.Student;
     }
 
     private static Response MapToResponse(User user)
@@ -158,7 +158,7 @@ internal static class Handler
             user.ControlNumber,
             user.PhoneNumber,
             user.Gender,
-            user.CurrentRole,
+            user.Role,
             user.CreatedAt);
     }
 }

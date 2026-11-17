@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using ReforaTec.Api.Entities;
-using ReforaTec.Api.Entities.Enums;
 
 namespace ReforaTec.Api.Database.Seeding;
 
@@ -24,11 +23,7 @@ internal static partial class DbSeeder
             .OrderBy(tree => tree.Id)
             .FirstOrDefaultAsync();
 
-        var campaign = await context.Campaigns
-            .Where(campaign => campaign.TenantId == user.TenantId)
-            .FirstOrDefaultAsync();
-
-        if (tree is null || campaign is null)
+        if (tree is null)
         {
             return;
         }
@@ -37,13 +32,10 @@ internal static partial class DbSeeder
         {
             TenantId = user.TenantId,
             TreeId = tree.Id,
-            InspectorId = user.Id,
-            CampaignId = campaign.Id,
-            InspectionType = MeasurementType.Baseline,
-            DetectedHealthState = TreeHealthState.Healthy,
+            UserId = user.Id,
             HeightCentimeters = 145m,
             DiameterCentimeters = 14.5m,
-            EvidencePhotoUrl = "https://images.reforatec.org/evidence/tree1_baseline.jpg",
+            PhotoUrl = "https://images.reforatec.org/evidence/tree1_baseline.jpg",
             DeviceCapturedAt = DateTime.UtcNow.AddMonths(-1)
         };
 
@@ -51,19 +43,14 @@ internal static partial class DbSeeder
         {
             TenantId = user.TenantId,
             TreeId = tree.Id,
-            InspectorId = user.Id,
-            CampaignId = campaign.Id,
-            InspectionType = MeasurementType.MidCampaign,
-            DetectedHealthState = TreeHealthState.Healthy,
+            UserId = user.Id,
             HeightCentimeters = 150.5m,
             DiameterCentimeters = 15.2m,
-            EvidencePhotoUrl = "https://images.reforatec.org/evidence/tree1_latest.jpg",
+            PhotoUrl = "https://images.reforatec.org/evidence/tree1_latest.jpg",
             DeviceCapturedAt = DateTime.UtcNow.AddDays(-2)
         };
 
-        context.Measurements.Add(measurement1);
-        context.Measurements.Add(measurement2);
-
+        context.Measurements.AddRange(measurement1, measurement2);
         await context.SaveChangesAsync();
     }
 }

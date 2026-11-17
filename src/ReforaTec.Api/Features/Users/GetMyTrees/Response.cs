@@ -1,16 +1,22 @@
 namespace ReforaTec.Api.Features.Users.GetMyTrees;
 
-internal sealed record Response(
+internal sealed record Response(IReadOnlyList<AssignedTreeDto> Trees);
+
+internal sealed record AssignedTreeDto(
     int Id,
+    string Folio,
+    
     int SpeciesId,
     string CommonName,
     string ScientificName,
-    string ValueName,
-    string? CurrentCampaignName,
-    string? CurrentCampaignFolio,
+    string? SpeciesImageUrl,
+    
+    string VirtueName,
+    
     string HealthState,
     DateOnly? PlantingDate,
+    
     decimal? CurrentHeightCentimeters,
     decimal? CurrentDiameterCentimeters,
-    string? SpeciesImageUrl,
+    
     string? LatestPhotoUrl);

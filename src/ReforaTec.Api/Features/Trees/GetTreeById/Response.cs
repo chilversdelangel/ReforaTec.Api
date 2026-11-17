@@ -2,17 +2,21 @@ namespace ReforaTec.Api.Features.Trees.GetTreeById;
 
 internal sealed record Response(
     int Id,
-    string? CurrentCampaignFolio,
+    string Folio,
+    
     string HealthState,
     DateOnly? PlantingDate,
     string? Observations,
-    string Value,
+    
+    string Virtue,
     string Species,
     string SpeciesScientificName,
     string? SpeciesImageUrl,
+    
     decimal? CurrentHeightCentimeters,
     decimal? CurrentDiameterCentimeters,
     string? LatestPhotoUrl,
+    
     LocationDto? Location,
     List<AssignedStudentDto> CurrentAssignedStudents);
 

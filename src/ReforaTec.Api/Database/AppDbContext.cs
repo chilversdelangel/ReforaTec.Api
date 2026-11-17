@@ -6,7 +6,7 @@ using ReforaTec.Api.Entities.Common;
 
 namespace ReforaTec.Api.Database;
 
-public class AppDbContext(DbContextOptions options) : DbContext(options)
+public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
 {
     #region Multi-Tenant & Identity
     public DbSet<Tenant> Tenants { get; set; }
@@ -17,8 +17,8 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 
     #region Master Catalogs
     public DbSet<Species> Species { get; set; }
-    public DbSet<Value> Values { get; set; }
-    public DbSet<ServiceType> ServiceTypes { get; set; }
+    public DbSet<Virtue> Virtues { get; set; }
+    public DbSet<CareType> CareTypes { get; set; }
     #endregion
 
     #region Core Domain Entities
@@ -27,14 +27,14 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     #endregion
 
     #region Domain Junction Entities
-    public DbSet<UserInspectsCampaign> UserInspectsCampaigns { get; set; }
-    public DbSet<CampaignManagesTree> CampaignManagesTrees { get; set; }
-    public DbSet<UserCaresForTree> UserCaresForTrees { get; set; }
+    public DbSet<CampaignEnrollment> CampaignEnrollments { get; set; }
+    public DbSet<CareAssignment> CareAssignments { get; set; }
     #endregion
 
     #region Field Activity Logs
-    public DbSet<Service> Services { get; set; }
+    public DbSet<CareLog> CareLogs { get; set; }
     public DbSet<Measurement> Measurements { get; set; }
+    public DbSet<Inspection> Inspections { get; set; }
     #endregion
 
     #region Push Notifications & Devices
@@ -74,7 +74,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         }
 
         var normalizableEntries = ChangeTracker.Entries<INormalizable>()
-            .Where(e => e.State is EntityState.Added or EntityState.Modified);
+            .Where(entry => entry.State is EntityState.Added or EntityState.Modified);
 
         foreach (var entry in normalizableEntries)
         {

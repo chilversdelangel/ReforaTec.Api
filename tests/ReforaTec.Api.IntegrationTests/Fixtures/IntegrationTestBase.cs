@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Entities;
+using ReforaTec.Api.Entities.Enums;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
 
 namespace ReforaTec.Api.IntegrationTests.Fixtures;
@@ -19,15 +20,22 @@ public abstract partial class IntegrationTestBase(ReforaTecWebApplicationFactory
 
     public virtual Task DisposeAsync() => Task.CompletedTask;
 
-    protected void Authenticate(User user, string audience = Audience.StudentMobileApp)
+    protected void Authenticate(User user, string audience = Audience.StudentMobileApp) =>
+        AuthenticateWithClaims(user.Id, user.TenantId, user.Role, audience);
+
+    protected void AuthenticateWithClaims(
+        int userId,
+        int tenantId = TestTenants.Primary,
+        UserRole role = UserRole.Student,
+        string audience = Audience.StudentMobileApp)
     {
         using var scope = Factory.Services.CreateScope();
         var jwtService = scope.ServiceProvider.GetRequiredService<IJwtTokenService>();
 
         var token = jwtService.GenerateAccessToken(new TokenGenerationRequest(
-            user.Id,
-            user.TenantId,
-            user.CurrentRole,
+            userId,
+            tenantId,
+            role,
             audience));
 
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);

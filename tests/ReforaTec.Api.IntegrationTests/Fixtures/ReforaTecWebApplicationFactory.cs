@@ -105,8 +105,8 @@ public class ReforaTecWebApplicationFactory : WebApplicationFactory<Program>, IA
                 "__EFMigrationsHistory",
                 "tenants",
                 "species",
-                "values",
-                "service_types",
+                "virtues",
+                "care_types",
                 "notification_templates"
             ]
         });

@@ -1,8 +1,8 @@
-using System.Security.Claims;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Mapping;
 using ReforaTec.Api.Infrastructure.OpenApi;
+using ReforaTec.Api.Infrastructure.Security.CurrentUser;
 
 namespace ReforaTec.Api.Features.Users.GetMyTrees;
 
@@ -13,7 +13,7 @@ internal sealed class GetMyTrees : IEndpoint
         app.MapGet("/users/me/trees", HandleRequest)
             .WithName("GetMyAssignedTrees")
             .WithTags(OpenApiTags.Users)
-            .Produces<List<Response>>(StatusCodes.Status200OK)
+            .Produces<Response>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Get assigned trees for current user")
@@ -22,11 +22,20 @@ internal sealed class GetMyTrees : IEndpoint
     }
 
     private static async Task<IResult> HandleRequest(
-        ClaimsPrincipal user,
+        ICurrentUserService currentUser,
         AppDbContext context,
         CancellationToken cancellationToken)
     {
-        var result = await Handler.Handle(user, context, cancellationToken);
+        var identityResult = currentUser.GetIdentity();
+        if (identityResult.IsError)
+        {
+            return identityResult.Errors.ToProblem();
+        }
+
+        var result = await Handler.Handle(
+            identityResult.Value,
+            context,
+            cancellationToken);
 
         return result.Match(
             Results.Ok,

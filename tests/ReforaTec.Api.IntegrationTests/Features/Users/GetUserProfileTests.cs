@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using ReforaTec.Api.Entities;
 using ReforaTec.Api.Entities.Enums;
 using ReforaTec.Api.Features.Users.GetUserProfile;
 using ReforaTec.Api.IntegrationTests.Fixtures;
@@ -25,23 +24,15 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
     [Fact]
     public async Task GetUserProfile_WhenUserBelongsToForeignTenant_ShouldReturnNotFound()
     {
-        // Arrange: User is persisted in database under a foreign tenant
-        var foreignUser = await CreateUserAsync(tenantId: TestTenants.Foreign);
-
-        // Authenticate simulating an identity token bound to Primary tenant
-        var tokenUser = new User
-        {
-            Id = foreignUser.Id,
-            TenantId = TestTenants.Primary,
-            CurrentRole = foreignUser.CurrentRole
-        };
-        Authenticate(tokenUser);
+        // Arrange
+        var user = await CreateUserAsync();
+        AuthenticateWithClaims(userId: user.Id, tenantId: TestTenants.Foreign);
 
         // Act
         var response = await Client.GetAsync(ApiRoutes.Users.Profile);
 
         // Assert
-        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(foreignUser.Id));
+        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(user.Id));
     }
 
     // --- 2. Validation ---
@@ -52,20 +43,14 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
     public async Task GetUserProfile_WhenUserDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
-        var nonExistentUser = new User
-        {
-            Id = 99999,
-            TenantId = TestTenants.Primary,
-            CurrentRole = UserRole.Student,
-            Email = "ghost@cdmadero.tecnm.mx"
-        };
-        Authenticate(nonExistentUser);
+        const int nonExistentUserId = 99999;
+        AuthenticateWithClaims(userId: nonExistentUserId);
 
         // Act
         var response = await Client.GetAsync(ApiRoutes.Users.Profile);
 
         // Assert
-        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(nonExistentUser.Id));
+        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.UserNotFound(nonExistentUserId));
     }
 
     [Fact]
@@ -107,9 +92,9 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
             PhoneNumber: null,
             Gender: Gender.Male,
             Email: user.Email,
-            CurrentCampaign: null,
+            IsEnrolledInActiveCampaign: false,
             TotalTrees: 0,
-            TotalServices: 0);
+            TotalCareLogs: 0);
 
         // Act
         var response = await Client.GetAsync(ApiRoutes.Users.Profile);
@@ -131,9 +116,9 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         var campaign = await CreateCampaignAsync();
         var tree = await CreateTreeAsync();
 
-        await AddTreeToCampaignAsync(tree.Id, campaign.Id);
+        await EnrollUserInCampaignAsync(campaign.Id, user.Id);
         await AssignTreeToUserAsync(tree.Id, user.Id, campaign.Id);
-        await CreateTreeServiceAsync(tree.Id, user.Id, campaign.Id);
+        await CreateCareLogAsync(tree.Id, user.Id);
 
         // Act
         var response = await Client.GetAsync(ApiRoutes.Users.Profile);
@@ -144,7 +129,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         var profile = await response.Content.ReadFromJsonAsync<Response>();
         profile.Should().NotBeNull();
         profile.TotalTrees.Should().Be(1);
-        profile.TotalServices.Should().Be(1);
-        profile.CurrentCampaign.Should().Be(campaign.CampaignName);
+        profile.TotalCareLogs.Should().Be(1);
+        profile.IsEnrolledInActiveCampaign.Should().BeTrue();
     }
 }

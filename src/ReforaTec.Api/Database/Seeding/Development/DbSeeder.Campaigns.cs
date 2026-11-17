@@ -18,8 +18,7 @@ internal static partial class DbSeeder
         var campaign = new Campaign
         {
             TenantId = tenant.Id,
-            CampaignName = "ReforaTec 2026-A",
-            InscriptionCode = "ITCM-2026A",
+            Code = "ITCM-2026-A",
             Period = new Period
             {
                 StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-2)),

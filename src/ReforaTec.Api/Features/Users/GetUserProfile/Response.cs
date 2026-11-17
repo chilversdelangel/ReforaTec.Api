@@ -7,10 +7,12 @@ internal sealed record Response(
     string FamilyName,
     string? SecondFamilyName,
     string? DisplayName,
+
     string? ControlNumber,
     string? PhoneNumber,
     Gender Gender,
     string Email,
-    string? CurrentCampaign,
+
+    bool IsEnrolledInActiveCampaign,
     int TotalTrees,
-    int TotalServices);
+    int TotalCareLogs);

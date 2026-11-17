@@ -42,49 +42,47 @@
 ## 3. Campaign Dynamics, Enrollment & Tree Assignment
 
 ### 3.1. Student Enrollment (Hybrid Flow)
-1. The Coordinator creates a semester campaign (e.g. `ReforaTec 2026-A`) and the system provisions an alphanumeric `InscriptionCode` (e.g. `ITCM-2026A`).
-2. The Student logs into the mobile app using their institutional email (`@cdmadero.tecnm.mx`) and enrolls in the campaign by submitting the `InscriptionCode`.
-3. The Coordinator assigns one or more cataloged trees to the student via the web dashboard.
+1. The Coordinator creates a semester campaign with a unique `Code` (e.g. `ITCM-2026-A`) and `Period` (`StartDate`, `EndDate`).
+2. The Student logs into the mobile app using their institutional email (`@cdmadero.tecnm.mx`) and enrolls in the campaign (`CampaignEnrollment`) by submitting the campaign `Code`.
+3. The Coordinator assigns one or more cataloged trees to the student via the web dashboard (`CareAssignment`).
 
 ### 3.2. Collaborative Care (Team Assignment per Tree)
 * A student may care for **one or multiple trees** (typically a cohort of 1 to 5 trees).
-* **Shared Caretaking:** An individual tree may have **two or more students actively assigned simultaneously** within the same campaign (`UserCaresForTree` records with `EndDate == null`).
-* **Shared Authorization:** Any student actively assigned to a tree holds legitimate authorization to log maintenance services on behalf of the care team.
+* **Shared Caretaking:** An individual tree may have **two or more students actively assigned simultaneously** within the same campaign (`CareAssignment` records with `EndDate == null`).
+* **Shared Authorization:** Any student actively assigned to a tree holds legitimate authorization to log care activities on behalf of the care team.
 
 ---
 
-## 4. Care Services vs. Technical Inspections (Ubiquitous Language)
+## 4. Care Logs vs. Technical Inspections & Measurements (Ubiquitous Language)
 
-The domain strictly delineates between **student routine care logs** (`Service`) and **impartial inspector audits** (`TreeInspection`):
+The domain strictly delineates between **student routine care logs** (`CareLog`), **weekly inspector health checks** (`Inspection`), and **milestone biometric measurements** (`Measurement`):
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────┐
-│                      STUDENT ROUTINE SERVICES                          │
-│ Service Catalog: Watering, Pruning, Fertilizing, Fumigation, Weeding   │
+│                       STUDENT ROUTINE CARE LOGS                        │
+│ CareType Catalog: Watering, Pruning, Fertilizing, Fumigation, Weeding  │
 │ • Focus: Encourage daily care routines with zero unnecessary friction. │
 │ • Logical Anti-Spam: The API enforces logical cooldown limits to       │
-│   prevent batch gaming (e.g., max 1 watering service per tree/day).    │
+│   prevent batch gaming (e.g., max 1 watering care log per tree/day).   │
 └──────────────────────────────────┬─────────────────────────────────────┘
                                    │
                                    ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│                     INSPECTOR TREE INSPECTIONS                         │
-│ Performed weekly by assigned inspectors (`UserInspectsCampaign`):      │
+│              INSPECTOR INSPECTIONS & BIOMETRIC MEASUREMENTS            │
+│ Performed across the campus by authorized inspectors/coordinators:     │
 │                                                                        │
-│ 1. WeeklyRoutine (90% of visits):                                      │
+│ 1. Weekly Inspections (`Inspection` - 90% of visits):                  │
 │    • Qualitative Health Check: TreeHealthState (Healthy,               │
-│      NeedsAttention, Critical, Dead) + ObservationNotes.               │
-│    • Height, diameter, and photo remain null.                          │
+│      NeedsAttention, Critical, Dead) + Notes + DeviceCapturedAt.       │
 │                                                                        │
-│ 2. Milestone Inspections (Baseline & FinalDelivery):                   │
+│ 2. Milestone Measurements (`Measurement` - Baseline & FinalDelivery):  │
 │    • Baseline: Captured once for newly planted trees.                  │
 │    • FinalDelivery: Captured at semester conclusion with coordinator.  │
-│    • Mandatory Metrics: Height (cm), Diameter (mm), EvidencePhotoUrl.  │
+│    • Metrics: HeightCentimeters, DiameterCentimeters, PhotoUrl.        │
 │                                                                        │
 │ 3. Automated Health Alerts:                                            │
-│    • If health drops to 'NeedsAttention' or 'Critical', the tree's     │
-│      status updates immediately and an automated Push Alert (FCM) is   │
-│      dispatched to all assigned student caretakers.                    │
+│    • If health drops to 'NeedsAttention' or 'Critical', an automated   │
+│      Push Alert (FCM) is dispatched to all assigned student caretakers.│
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -127,11 +125,11 @@ Upon reaching the campaign's scheduled conclusion (`Campaign.Period.EndDate`):
 ## 7. Physical Identification & Campus Digitalization
 
 ### Current Physical Reality
-* Historically, every tree on campus is tagged with an embossed metal plaque or identification number (`CampaignFolio`).
+* Historically, every tree on campus is tagged with an embossed metal plaque or identification number (`Tree.Folio`).
 * Campus locations were traditionally maintained on hand-drawn physical maps.
 
 ### ReforaTec Digital Innovation
-* **Satellite / GPS Mapping:** ReforaTec enriches the physical `CampaignFolio` with high-precision **GPS coordinates (Latitude and Longitude)** and campus zone descriptors.
+* **Satellite / GPS Mapping:** ReforaTec enriches the physical `Tree.Folio` with high-precision **GPS coordinates (Latitude and Longitude)** and campus zone descriptors.
 * **Interactive Map:** Both Students and Inspectors view a live digital map within the mobile app, navigating directly to individual trees across academic buildings, plazas, and green spaces.
 
 ---
@@ -139,9 +137,10 @@ Upon reaching the campaign's scheduled conclusion (`Campaign.Period.EndDate`):
 ## 8. Mobile Offline-First Architecture
 
 Given intermittent Wi-Fi and cellular coverage across expansive campus grounds and perimeter gardens:
-1. **Dual Timestamping:**
-   * `DeviceCapturedAt`: Local timestamp recorded by the mobile device when the service or inspection is captured (used for chronological business logic).
-   * `ServerSyncedAt`: Exact UTC timestamp when the record is persisted into PostgreSQL.
+1. **Timestamping:**
+   * `PerformedAt` (on `CareLog`): Field timestamp when the student actually performed the care activity.
+   * `DeviceCapturedAt`: Local timestamp recorded by the mobile device when the care log, inspection, or measurement is created in local SQLite/Room.
+   * `CreatedAt`: Exact UTC timestamp when the record is received and persisted into PostgreSQL.
 2. **Batch Synchronization:**
    * Mobile clients persist actions locally in SQLite/Room and upload queued records in batches once connectivity is restored.
    * Endpoints guarantee idempotent processing and graceful ingestion of burst synchronizations.
