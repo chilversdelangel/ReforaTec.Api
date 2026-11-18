@@ -1,9 +1,11 @@
+using ReforaTec.Api.Entities.Enums;
+
 namespace ReforaTec.Api.Infrastructure.Security.Jwt;
 
 /// <summary>
 /// Binds JWT secret key, issuer, audience, expiration, and session limit settings from configuration.
 /// </summary>
-public class JwtOptions
+internal sealed class JwtOptions
 {
     public const string SectionName = "Jwt";
 
@@ -18,4 +20,8 @@ public class JwtOptions
     /// Keys must match the <see cref="ReforaTec.Api.Entities.Enums.UserRole"/> enum names.
     /// </summary>
     public Dictionary<string, int> MaxSessionsPerRole { get; set; } = new();
+
+    // Fallback >= 1 prevents EnforceMaxSessionsAsync from blocking all logins if a role is omitted in config.
+    public int GetMaxSessionsForRole(UserRole role) =>
+        MaxSessionsPerRole.GetValueOrDefault(role.ToString(), 2);
 }

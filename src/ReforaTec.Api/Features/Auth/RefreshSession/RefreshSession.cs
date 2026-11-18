@@ -25,10 +25,10 @@ internal sealed class RefreshSession : IEndpoint
     private static async Task<IResult> HandleRequest(
         Request request,
         AppDbContext context,
-        IJwtTokenService jwtTokenService,
+        IJwtService jwtService,
         CancellationToken cancellationToken)
     {
-        var result = await Handler.Handle(request, context, jwtTokenService, cancellationToken);
+        var result = await Handler.Handle(request, context, jwtService, cancellationToken);
 
         return result.Match(
             response => Results.Ok(response),

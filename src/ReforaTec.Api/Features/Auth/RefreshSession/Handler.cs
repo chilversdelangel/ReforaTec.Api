@@ -11,11 +11,11 @@ internal static class Handler
     public static async Task<ErrorOr<Response>> Handle(
         Request request,
         AppDbContext context,
-        IJwtTokenService jwtTokenService,
+        IJwtService jwtService,
         CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
-        var hashedInputToken = jwtTokenService.HashRefreshToken(request.RefreshToken);
+        var hashedInputToken = jwtService.HashRefreshToken(request.RefreshToken);
 
         var existingToken = await context.RefreshTokens
             .Include(refreshToken => refreshToken.User)
@@ -41,20 +41,19 @@ internal static class Handler
             existingToken.User.Role,
             request.Audience);
 
-        var newAccessToken = jwtTokenService.GenerateAccessToken(tokenRequest);
-        var newRawRefreshToken = jwtTokenService.GenerateRawRefreshToken();
-        var newHashedRefreshToken = jwtTokenService.HashRefreshToken(newRawRefreshToken);
+        var newAccessToken = jwtService.GenerateAccessToken(tokenRequest);
+        var refreshToken = jwtService.GenerateRefreshToken(now);
 
         context.RefreshTokens.Add(new RefreshToken
         {
             UserId = existingToken.UserId,
-            HashedToken = newHashedRefreshToken,
+            HashedToken = refreshToken.HashedToken,
             Audience = request.Audience,
-            ExpiresAt = DateTime.UtcNow.AddDays(21)
+            ExpiresAt = refreshToken.ExpiresAt
         });
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new Response(newAccessToken, newRawRefreshToken);
+        return new Response(newAccessToken, refreshToken.RawToken);
     }
 }

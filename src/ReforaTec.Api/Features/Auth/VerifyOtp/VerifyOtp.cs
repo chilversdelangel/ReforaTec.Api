@@ -5,6 +5,7 @@ using ReforaTec.Api.Infrastructure.Filters;
 using ReforaTec.Api.Infrastructure.Mapping;
 using ReforaTec.Api.Infrastructure.OpenApi;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
+using ReforaTec.Api.Infrastructure.Security.Otp;
 
 namespace ReforaTec.Api.Features.Auth.VerifyOtp;
 
@@ -26,12 +27,20 @@ internal sealed class VerifyOtp : IEndpoint
     private static async Task<IResult> HandleRequest(
         Request request,
         AppDbContext context,
-        IJwtTokenService jwtTokenService,
+        IJwtService jwtService,
         IOptionsSnapshot<JwtOptions> jwtOptions,
+        IOptionsSnapshot<OtpOptions> otpOptions,
         IWebHostEnvironment env,
         CancellationToken cancellationToken)
     {
-        var result = await Handler.Handle(request, context, jwtTokenService, jwtOptions, env, cancellationToken);
+        var result = await Handler.Handle(
+            request,
+            context,
+            jwtService,
+            jwtOptions.Value,
+            otpOptions.Value,
+            env,
+            cancellationToken);
 
         return result.Match(
             response => Results.Ok(response),

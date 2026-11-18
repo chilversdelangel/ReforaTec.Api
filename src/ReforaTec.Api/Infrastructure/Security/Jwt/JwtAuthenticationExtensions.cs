@@ -7,16 +7,16 @@ namespace ReforaTec.Api.Infrastructure.Security.Jwt;
 
 internal static class JwtAuthenticationExtensions
 {
-    public static IServiceCollection AddJwtAuthentication<TTokenService>(
+    public static IServiceCollection AddJwtService<TTokenService>(
         this IServiceCollection services,
         IConfiguration configuration)
-        where TTokenService : class, IJwtTokenService
+        where TTokenService : class, IJwtService
     {
         var jwtSection = configuration.GetSection(JwtOptions.SectionName);
         var jwtOptions = jwtSection.Get<JwtOptions>()!;
 
         services.Configure<JwtOptions>(jwtSection);
-        services.AddSingleton<IJwtTokenService, TTokenService>();
+        services.AddSingleton<IJwtService, TTokenService>();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options => options.TokenValidationParameters = CreateTokenValidationParameters(jwtOptions));

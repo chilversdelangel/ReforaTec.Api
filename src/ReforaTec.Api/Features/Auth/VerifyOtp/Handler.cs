@@ -1,11 +1,10 @@
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using ReforaTec.Api.Common.Helpers;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Entities;
-using ReforaTec.Api.Entities.Enums;
 using ReforaTec.Api.Infrastructure.Security.Jwt;
+using ReforaTec.Api.Infrastructure.Security.Otp;
 
 namespace ReforaTec.Api.Features.Auth.VerifyOtp;
 
@@ -14,8 +13,9 @@ internal static class Handler
     public static async Task<ErrorOr<Response>> Handle(
         Request request,
         AppDbContext context,
-        IJwtTokenService jwtTokenService,
-        IOptionsSnapshot<JwtOptions> jwtOptions,
+        IJwtService jwtService,
+        JwtOptions jwtOptions,
+        OtpOptions otpOptions,
         IWebHostEnvironment env,
         CancellationToken cancellationToken = default)
     {
@@ -30,50 +30,52 @@ internal static class Handler
             return Errors.InvalidCredentials;
         }
 
-        var persistedOtpCode = await context.AuthOtpCodes
+        var persistedOtp = await context.OneTimePasswords
             .FirstOrDefaultAsync(otp => otp.UserId == user.Id, cancellationToken);
 
-        if (persistedOtpCode is null)
+        if (persistedOtp is null)
         {
             return Errors.InvalidCredentials;
         }
 
         // In-memory OTP rule check
-        var otpValidationResult = ValidateOtp(persistedOtpCode, request.OtpCode, env, now);
+        var otpValidationResult = 
+            ValidateOtp(persistedOtp, request.OtpCode, otpOptions.MaxFailedAttempts, env, now);
 
         if (otpValidationResult.IsError)
         {
-            await UpdateOtpStateAsync(context, persistedOtpCode, otpValidationResult.FirstError, cancellationToken);
+            await UpdateOtpStateAsync(context, persistedOtp, otpValidationResult.FirstError, cancellationToken);
             return otpValidationResult.Errors;
         }
         
-        context.AuthOtpCodes.Remove(persistedOtpCode);
+        context.OneTimePasswords.Remove(persistedOtp);
         
         if (!user.IsEmailVerified)
         {
             user.IsEmailVerified = true;
         }
         
-        await EnforceMaxSessionsAsync(context, user.Id, user.Role, jwtOptions, cancellationToken);
+        var maxAllowedSessions = jwtOptions.GetMaxSessionsForRole(user.Role);
+        await EnforceMaxSessionsAsync(context, user.Id, maxAllowedSessions, cancellationToken);
 
-        var accessToken = jwtTokenService.GenerateAccessToken(
+        var accessToken = jwtService.GenerateAccessToken(
             new TokenGenerationRequest(user.Id, user.TenantId, user.Role, request.Audience));
 
-        var rawRefreshToken = jwtTokenService.GenerateRawRefreshToken();
-        var hashedRefreshToken = jwtTokenService.HashRefreshToken(rawRefreshToken);
+        var refreshToken = jwtService.GenerateRefreshToken(now);
         context.RefreshTokens.Add(
-            CreateRefreshTokenEntity(user.Id, hashedRefreshToken, request.Audience));
+            CreateRefreshTokenEntity(user.Id, refreshToken.HashedToken, request.Audience, refreshToken.ExpiresAt));
 
         await context.SaveChangesAsync(cancellationToken);
 
-        var expiresInSeconds = jwtOptions.Value.AccessTokenExpirationHours * 3600;
+        var expiresInSeconds = jwtOptions.AccessTokenExpirationHours * 3600;
 
-        return new Response(accessToken, rawRefreshToken, "Bearer", expiresInSeconds);
+        return new Response(accessToken, refreshToken.RawToken, "Bearer", expiresInSeconds);
     }
 
     private static ErrorOr<Success> ValidateOtp(
-        AuthOtpCode persistedOtpCode,
+        OneTimePassword persistedOtp,
         string requestedOtpCode,
+        int maxFailedAttempts,
         IWebHostEnvironment env,
         DateTime now)
     {
@@ -83,21 +85,21 @@ internal static class Handler
             return Result.Success;
         }
 
-        if (persistedOtpCode.ExpiresAt < now)
+        if (persistedOtp.ExpiresAt < now)
         {
             return Errors.OtpExpired;
         }
 
-        if (persistedOtpCode.FailedAttempts >= AuthOtpCode.MaxFailedAttempts)
+        if (persistedOtp.FailedAttempts >= maxFailedAttempts)
         {
             return Errors.TooManyAttempts;
         }
 
-        if (persistedOtpCode.VerificationCode != requestedOtpCode)
+        if (persistedOtp.Code != requestedOtpCode)
         {
-            persistedOtpCode.FailedAttempts++;
+            persistedOtp.FailedAttempts++;
 
-            return persistedOtpCode.FailedAttempts >= AuthOtpCode.MaxFailedAttempts
+            return persistedOtp.FailedAttempts >= maxFailedAttempts
                 ? Errors.TooManyAttemptsDestroyed
                 : Errors.InvalidCredentials;
         }
@@ -107,13 +109,13 @@ internal static class Handler
 
     private static async Task UpdateOtpStateAsync(
         AppDbContext context,
-        AuthOtpCode otpRecord,
+        OneTimePassword persistedOtp,
         Error error,
         CancellationToken cancellationToken)
     {
         if (error == Errors.OtpExpired || error == Errors.TooManyAttempts)
         {
-            context.AuthOtpCodes.Remove(otpRecord);
+            context.OneTimePasswords.Remove(persistedOtp);
         }
 
         await context.SaveChangesAsync(cancellationToken);
@@ -122,32 +124,32 @@ internal static class Handler
     private static async Task EnforceMaxSessionsAsync(
         AppDbContext context,
         int userId,
-        UserRole role,
-        IOptionsSnapshot<JwtOptions> jwtOptions,
+        int maxAllowedSessions,
         CancellationToken cancellationToken)
     {
-        var roleKey = role.ToString();
-        var maxAllowed = jwtOptions.Value.MaxSessionsPerRole.GetValueOrDefault(roleKey, 2);
-
         var activeSessions = await context.RefreshTokens
             .Where(refreshToken => refreshToken.UserId == userId)
             .OrderBy(refreshToken => refreshToken.CreatedAt)
             .ToListAsync(cancellationToken);
 
-        if (activeSessions.Count >= maxAllowed)
+        if (activeSessions.Count >= maxAllowedSessions)
         {
-            var sessionsToRemoveCount = activeSessions.Count - maxAllowed + 1;
+            var sessionsToRemoveCount = activeSessions.Count - maxAllowedSessions + 1;
             var oldestSessions = activeSessions.Take(sessionsToRemoveCount);
             context.RefreshTokens.RemoveRange(oldestSessions);
         }
     }
 
-    private static RefreshToken CreateRefreshTokenEntity(int userId, string hashedToken, string audience) =>
+    private static RefreshToken CreateRefreshTokenEntity(
+        int userId,
+        string hashedToken,
+        string audience,
+        DateTime expiresAt) =>
         new()
         {
             UserId = userId,
             HashedToken = hashedToken,
             Audience = audience,
-            ExpiresAt = DateTime.UtcNow.AddDays(21)
+            ExpiresAt = expiresAt
         };
 }

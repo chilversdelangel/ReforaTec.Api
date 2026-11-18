@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ReforaTec.Api.Infrastructure.Security.Jwt;
 
-internal sealed class JwtTokenService(IOptions<JwtOptions> jwtOptions) : IJwtTokenService
+internal sealed class JwtService(IOptions<JwtOptions> jwtOptions) : IJwtService
 {
     private readonly JwtOptions _options = jwtOptions.Value;
     private readonly SigningCredentials _signingCredentials = CreateSigningCredentials(jwtOptions.Value.SecretKey);
@@ -35,10 +35,14 @@ internal sealed class JwtTokenService(IOptions<JwtOptions> jwtOptions) : IJwtTok
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public string GenerateRawRefreshToken()
+    public GeneratedRefreshToken GenerateRefreshToken(DateTime issuedAt)
     {
         var randomBytes = RandomNumberGenerator.GetBytes(64);
-        return Convert.ToBase64String(randomBytes);
+        var rawToken = Convert.ToBase64String(randomBytes);
+        var hashedToken = HashRefreshToken(rawToken);
+        var expiresAt = issuedAt.AddDays(_options.RefreshTokenExpirationDays);
+
+        return new GeneratedRefreshToken(rawToken, hashedToken, expiresAt);
     }
 
     public string HashRefreshToken(string rawRefreshToken)

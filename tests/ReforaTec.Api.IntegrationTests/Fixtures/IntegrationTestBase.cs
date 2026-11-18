@@ -30,7 +30,7 @@ public abstract partial class IntegrationTestBase(ReforaTecWebApplicationFactory
         string audience = Audience.StudentMobileApp)
     {
         using var scope = Factory.Services.CreateScope();
-        var jwtService = scope.ServiceProvider.GetRequiredService<IJwtTokenService>();
+        var jwtService = scope.ServiceProvider.GetRequiredService<IJwtService>();
 
         var token = jwtService.GenerateAccessToken(new TokenGenerationRequest(
             userId,
