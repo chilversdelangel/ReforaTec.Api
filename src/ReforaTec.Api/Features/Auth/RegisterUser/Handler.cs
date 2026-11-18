@@ -87,7 +87,7 @@ internal static class Handler
     {
         return context.Tenants
             .FirstOrDefaultAsync(
-                tenant => tenant.InstitutionalEmailDomain == emailDomain && !tenant.IsDeleted,
+                tenant => tenant.InstitutionalEmailDomain == emailDomain,
                 cancellationToken);
     }
 

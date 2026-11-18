@@ -48,7 +48,6 @@ internal static class Handler
             .AsNoTracking()
             .Where(user => user.TenantId == loggedUser.TenantId)
             .Where(user => user.Id == loggedUser.UserId)
-            .Where(user => !user.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken);
     }
 

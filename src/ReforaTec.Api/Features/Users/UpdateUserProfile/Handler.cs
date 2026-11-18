@@ -84,7 +84,6 @@ internal static class Handler
         return await context.Users
             .Where(userEntity => userEntity.TenantId == loggedUser.TenantId)
             .Where(userEntity => userEntity.Id == loggedUser.UserId)
-            .Where(userEntity => !userEntity.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken);
     }
 }
