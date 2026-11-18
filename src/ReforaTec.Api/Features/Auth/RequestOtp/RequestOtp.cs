@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Infrastructure.Email;
 using ReforaTec.Api.Infrastructure.Endpoints;
@@ -31,9 +32,16 @@ internal sealed class RequestOtp : IEndpoint
         AppDbContext context,
         IOtpService otpService,
         IEmailQueue emailQueue,
+        IOptionsSnapshot<OtpOptions> otpOptions,
         CancellationToken cancellationToken)
     {
-        var result = await Handler.Handle(request, context, otpService, emailQueue, cancellationToken);
+        var result = await Handler.Handle(
+            request,
+            context,
+            otpService,
+            emailQueue,
+            otpOptions.Value,
+            cancellationToken);
 
         return result.Match(
             success => Results.NoContent(),

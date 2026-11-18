@@ -10,17 +10,20 @@ internal static class Handler
     public static async Task<ErrorOr<Success>> Handle(
         Request request,
         AppDbContext context,
-        IJwtTokenService jwtTokenService,
+        IJwtService jwtService,
         CancellationToken cancellationToken = default)
     {
         var inputToken = request.RefreshToken;
-        var hashedToken = jwtTokenService.HashRefreshToken(inputToken);
+        var hashedToken = jwtService.HashRefreshToken(inputToken);
 
         var existingToken = await context.RefreshTokens
-            .FirstOrDefaultAsync(r => r.HashedToken == hashedToken, cancellationToken);
+            .FirstOrDefaultAsync(refreshToken => refreshToken.HashedToken == hashedToken, cancellationToken);
 
-        if (existingToken is null) return Result.Success;
-        
+        if (existingToken is null)
+        {
+            return Result.Success;
+        }
+
         context.RefreshTokens.Remove(existingToken);
         await context.SaveChangesAsync(cancellationToken);
 

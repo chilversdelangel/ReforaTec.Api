@@ -11,7 +11,7 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     #region Multi-Tenant & Identity
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<AuthOtpCode> AuthOtpCodes { get; set; }
+    public DbSet<OneTimePassword> OneTimePasswords { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     #endregion
 

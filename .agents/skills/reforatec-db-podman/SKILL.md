@@ -90,7 +90,7 @@ podman exec -i reforatec-db psql -U postgres -d reforatec -c \
 ### Inspect Active OTP Codes
 ```bash
 podman exec -i reforatec-db psql -U postgres -d reforatec -c \
-  "SELECT user_id, verification_code, failed_attempts, expires_at FROM auth_otp_codes;"
+  "SELECT user_id, code, failed_attempts, expires_at FROM one_time_passwords;"
 ```
 
 ### Inspect Active Sessions & Refresh Tokens

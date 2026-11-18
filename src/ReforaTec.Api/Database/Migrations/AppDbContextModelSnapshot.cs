@@ -22,32 +22,6 @@ namespace ReforaTec.Api.Database.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ReforaTec.Api.Entities.AuthOtpCode", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expires_at");
-
-                    b.Property<int>("FailedAttempts")
-                        .HasColumnType("integer")
-                        .HasColumnName("failed_attempts");
-
-                    b.Property<string>("VerificationCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("verification_code");
-
-                    b.HasKey("UserId")
-                        .HasName("pk_auth_otp_codes");
-
-                    b.ToTable("auth_otp_codes", (string)null);
-                });
-
             modelBuilder.Entity("ReforaTec.Api.Entities.Campaign", b =>
                 {
                     b.Property<int>("Id")
@@ -498,6 +472,32 @@ namespace ReforaTec.Api.Database.Migrations
                     b.ToTable("notification_templates", (string)null);
                 });
 
+            modelBuilder.Entity("ReforaTec.Api.Entities.OneTimePassword", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("code");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at");
+
+                    b.Property<int>("FailedAttempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("failed_attempts");
+
+                    b.HasKey("UserId")
+                        .HasName("pk_one_time_passwords");
+
+                    b.ToTable("one_time_passwords", (string)null);
+                });
+
             modelBuilder.Entity("ReforaTec.Api.Entities.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -537,19 +537,19 @@ namespace ReforaTec.Api.Database.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
-                        .HasName("pk_auth_refresh_tokens");
+                        .HasName("pk_refresh_tokens");
 
                     b.HasIndex("ExpiresAt")
-                        .HasDatabaseName("ix_auth_refresh_tokens_expires_at");
+                        .HasDatabaseName("ix_refresh_tokens_expires_at");
 
                     b.HasIndex("HashedToken")
                         .IsUnique()
-                        .HasDatabaseName("ix_auth_refresh_tokens_hashed_token");
+                        .HasDatabaseName("ix_refresh_tokens_hashed_token");
 
                     b.HasIndex("UserId", "CreatedAt")
-                        .HasDatabaseName("ix_auth_refresh_tokens_user_id_created_at");
+                        .HasDatabaseName("ix_refresh_tokens_user_id_created_at");
 
-                    b.ToTable("auth_refresh_tokens", (string)null);
+                    b.ToTable("refresh_tokens", (string)null);
                 });
 
             modelBuilder.Entity("ReforaTec.Api.Entities.Species", b =>
@@ -935,18 +935,6 @@ namespace ReforaTec.Api.Database.Migrations
                     b.ToTable("virtues", (string)null);
                 });
 
-            modelBuilder.Entity("ReforaTec.Api.Entities.AuthOtpCode", b =>
-                {
-                    b.HasOne("ReforaTec.Api.Entities.User", "User")
-                        .WithOne()
-                        .HasForeignKey("ReforaTec.Api.Entities.AuthOtpCode", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_auth_otp_codes_users_user_id");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ReforaTec.Api.Entities.Campaign", b =>
                 {
                     b.HasOne("ReforaTec.Api.Entities.Tenant", "Tenant")
@@ -1153,6 +1141,18 @@ namespace ReforaTec.Api.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ReforaTec.Api.Entities.OneTimePassword", b =>
+                {
+                    b.HasOne("ReforaTec.Api.Entities.User", "User")
+                        .WithOne()
+                        .HasForeignKey("ReforaTec.Api.Entities.OneTimePassword", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_one_time_passwords_users_user_id");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ReforaTec.Api.Entities.RefreshToken", b =>
                 {
                     b.HasOne("ReforaTec.Api.Entities.User", "User")
@@ -1160,7 +1160,7 @@ namespace ReforaTec.Api.Database.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_auth_refresh_tokens_users_user_id");
+                        .HasConstraintName("fk_refresh_tokens_users_user_id");
 
                     b.Navigation("User");
                 });

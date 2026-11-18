@@ -4,32 +4,30 @@ using ReforaTec.Api.Entities;
 
 namespace ReforaTec.Api.Database.Configurations;
 
-public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
+internal sealed class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 {
     public void Configure(EntityTypeBuilder<RefreshToken> builder)
     {
-        builder.ToTable("auth_refresh_tokens");
-
-        builder.Property(rt => rt.HashedToken)
+        builder.Property(refreshToken => refreshToken.HashedToken)
             .HasMaxLength(64)
             .IsFixedLength(); // SHA-256 in hex is always 64 characters
 
-        builder.Property(rt => rt.Audience)
+        builder.Property(refreshToken => refreshToken.Audience)
             .HasMaxLength(100);
 
-        builder.HasOne(rt => rt.User)
+        builder.HasOne(refreshToken => refreshToken.User)
             .WithMany()
-            .HasForeignKey(rt => rt.UserId)
+            .HasForeignKey(refreshToken => refreshToken.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // O(1) Lookups when receiving a refresh token
-        builder.HasIndex(rt => rt.HashedToken)
+        builder.HasIndex(refreshToken => refreshToken.HashedToken)
             .IsUnique();
 
         // Optimized query for MaxSessionsPerRole (finding the oldest session for a user)
-        builder.HasIndex(rt => new { rt.UserId, rt.CreatedAt });
+        builder.HasIndex(refreshToken => new { refreshToken.UserId, refreshToken.CreatedAt });
 
         // Optimization for Background Job (Garbage Collection of expired tokens)
-        builder.HasIndex(rt => rt.ExpiresAt);
+        builder.HasIndex(refreshToken => refreshToken.ExpiresAt);
     }
 }

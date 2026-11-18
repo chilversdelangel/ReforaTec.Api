@@ -15,8 +15,10 @@ internal static class Handler
         AppDbContext context,
         IOtpService otpService,
         IEmailQueue emailQueue,
+        OtpOptions otpOptions,
         CancellationToken cancellationToken = default)
     {
+        var now = DateTime.UtcNow;
         var normalizedEmail = request.Email.ToNormalized();
 
         var user = await context.Users
@@ -29,23 +31,23 @@ internal static class Handler
         }
 
         var otpCode = otpService.GenerateOtp();
-        var expiresAt = DateTime.UtcNow.AddMinutes(5);
+        var expiresAt = now.AddMinutes(otpOptions.ExpirationMinutes);
 
-        var existingOtp = await context.AuthOtpCodes
+        var existingOtp = await context.OneTimePasswords
             .FirstOrDefaultAsync(otp => otp.UserId == user.Id, cancellationToken);
 
         if (existingOtp is not null)
         {
-            existingOtp.VerificationCode = otpCode;
+            existingOtp.Code = otpCode;
             existingOtp.FailedAttempts = 0;
             existingOtp.ExpiresAt = expiresAt;
         }
         else
         {
-            context.AuthOtpCodes.Add(new AuthOtpCode
+            context.OneTimePasswords.Add(new OneTimePassword
             {
                 UserId = user.Id,
-                VerificationCode = otpCode,
+                Code = otpCode,
                 FailedAttempts = 0,
                 ExpiresAt = expiresAt
             });
