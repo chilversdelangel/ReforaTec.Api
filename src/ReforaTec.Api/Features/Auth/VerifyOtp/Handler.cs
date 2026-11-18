@@ -100,7 +100,7 @@ internal static class Handler
             persistedOtp.FailedAttempts++;
 
             return persistedOtp.FailedAttempts >= maxFailedAttempts
-                ? Errors.TooManyAttemptsDestroyed
+                ? Errors.TooManyAttempts
                 : Errors.InvalidCredentials;
         }
 

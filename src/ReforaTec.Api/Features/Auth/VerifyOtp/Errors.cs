@@ -15,8 +15,4 @@ internal static class Errors
     public static readonly Error TooManyAttempts = Error.Unauthorized(
         code: "auth/otp-too-many-attempts",
         description: "Too many failed attempts. Please request a new OTP code.");
-
-    public static readonly Error TooManyAttemptsDestroyed = Error.Unauthorized(
-        code: "auth/otp-too-many-attempts",
-        description: "Too many failed attempts. OTP code destroyed.");
 }
