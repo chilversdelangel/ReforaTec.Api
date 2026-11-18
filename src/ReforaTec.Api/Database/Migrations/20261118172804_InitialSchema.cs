@@ -207,50 +207,6 @@ namespace ReforaTec.Api.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "auth_otp_codes",
-                columns: table => new
-                {
-                    user_id = table.Column<int>(type: "integer", nullable: false),
-                    verification_code = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    failed_attempts = table.Column<int>(type: "integer", nullable: false),
-                    expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_auth_otp_codes", x => x.user_id);
-                    table.ForeignKey(
-                        name: "fk_auth_otp_codes_users_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "auth_refresh_tokens",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    hashed_token = table.Column<string>(type: "character(64)", fixedLength: true, maxLength: 64, nullable: false),
-                    user_id = table.Column<int>(type: "integer", nullable: false),
-                    audience = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    revoked_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_auth_refresh_tokens", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_auth_refresh_tokens_users_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "campaign_enrollments",
                 columns: table => new
                 {
@@ -285,6 +241,50 @@ namespace ReforaTec.Api.Database.Migrations
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "one_time_passwords",
+                columns: table => new
+                {
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    code = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    failed_attempts = table.Column<int>(type: "integer", nullable: false),
+                    expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_one_time_passwords", x => x.user_id);
+                    table.ForeignKey(
+                        name: "fk_one_time_passwords_users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "refresh_tokens",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    hashed_token = table.Column<string>(type: "character(64)", fixedLength: true, maxLength: 64, nullable: false),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    audience = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    revoked_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_refresh_tokens", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_refresh_tokens_users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -487,22 +487,6 @@ namespace ReforaTec.Api.Database.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "ix_auth_refresh_tokens_expires_at",
-                table: "auth_refresh_tokens",
-                column: "expires_at");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_auth_refresh_tokens_hashed_token",
-                table: "auth_refresh_tokens",
-                column: "hashed_token",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "ix_auth_refresh_tokens_user_id_created_at",
-                table: "auth_refresh_tokens",
-                columns: new[] { "user_id", "created_at" });
-
-            migrationBuilder.CreateIndex(
                 name: "ix_campaign_enrollments_campaign_id_user_id",
                 table: "campaign_enrollments",
                 columns: new[] { "campaign_id", "user_id" },
@@ -618,6 +602,22 @@ namespace ReforaTec.Api.Database.Migrations
                 column: "type");
 
             migrationBuilder.CreateIndex(
+                name: "ix_refresh_tokens_expires_at",
+                table: "refresh_tokens",
+                column: "expires_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_refresh_tokens_hashed_token",
+                table: "refresh_tokens",
+                column: "hashed_token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_refresh_tokens_user_id_created_at",
+                table: "refresh_tokens",
+                columns: new[] { "user_id", "created_at" });
+
+            migrationBuilder.CreateIndex(
                 name: "ix_species_normalized_common_name",
                 table: "species",
                 column: "normalized_common_name");
@@ -700,12 +700,6 @@ namespace ReforaTec.Api.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "auth_otp_codes");
-
-            migrationBuilder.DropTable(
-                name: "auth_refresh_tokens");
-
-            migrationBuilder.DropTable(
                 name: "campaign_enrollments");
 
             migrationBuilder.DropTable(
@@ -722,6 +716,12 @@ namespace ReforaTec.Api.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "notification_templates");
+
+            migrationBuilder.DropTable(
+                name: "one_time_passwords");
+
+            migrationBuilder.DropTable(
+                name: "refresh_tokens");
 
             migrationBuilder.DropTable(
                 name: "user_devices");
