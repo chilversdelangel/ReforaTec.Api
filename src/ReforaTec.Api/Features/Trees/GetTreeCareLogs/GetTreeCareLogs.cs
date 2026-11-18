@@ -15,9 +15,10 @@ internal sealed class GetTreeCareLogs : IEndpoint
             .WithTags(OpenApiTags.Trees)
             .Produces<Response>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Get tree care log history")
-            .WithDescription("Retrieves the list of all care logs registered for a specific tree, ordered by capture date descending.")
+            .WithDescription("Retrieves the list of all care logs registered for a specific tree, ordered by performed date descending.")
             .RequireAuthorization();
     }
 

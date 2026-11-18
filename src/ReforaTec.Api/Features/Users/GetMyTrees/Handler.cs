@@ -14,7 +14,7 @@ internal static class Handler
         AppDbContext context,
         CancellationToken cancellationToken)
     {
-        var (userId, tenantId) = loggedUser;
+        var (userId, tenantId, _) = loggedUser;
 
         var userExists = await UserExistsAsync(context, tenantId, userId, cancellationToken);
         if (!userExists)
