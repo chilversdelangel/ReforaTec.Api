@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using ReforaTec.Api.Entities.Enums;
 using ReforaTec.Api.Features.Trees.GetTreeCareLogs;
 using ReforaTec.Api.IntegrationTests.Fixtures;
 using ReforaTec.Api.IntegrationTests.Fixtures.Assertions;
@@ -40,8 +41,47 @@ public class GetTreeCareLogsTests(ReforaTecWebApplicationFactory factory) : Inte
         await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.TreeNotFound(foreignTree.Id));
     }
 
+    [Fact]
+    public async Task GetTreeCareLogs_WhenStudentIsNotAssignedToTree_ShouldReturnForbidden()
+    {
+        // Arrange
+        var student = await CreateUserAsync(role: UserRole.Student);
+        Authenticate(student);
+
+        var tree = await CreateTreeAsync();
+
+        // Act
+        var response = await Client.GetAsync(ApiRoutes.Trees.CareLogs(tree.Id));
+
+        // Assert
+        await response.ShouldBeProblemAsync(HttpStatusCode.Forbidden, Errors.UserNotAssignedToTree);
+    }
+
+    [Fact]
+    public async Task GetTreeCareLogs_WhenStudentAssignmentHasEnded_ShouldReturnForbidden()
+    {
+        // Arrange
+        var student = await CreateUserAsync(role: UserRole.Student);
+        Authenticate(student);
+
+        var campaign = await CreateCampaignAsync();
+        var tree = await CreateTreeAsync();
+        await AssignTreeToUserAsync(
+            tree.Id,
+            student.Id,
+            campaign.Id,
+            startDate: DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)),
+            endDate: DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)));
+
+        // Act
+        var response = await Client.GetAsync(ApiRoutes.Trees.CareLogs(tree.Id));
+
+        // Assert
+        await response.ShouldBeProblemAsync(HttpStatusCode.Forbidden, Errors.UserNotAssignedToTree);
+    }
+
     // --- 2. Validation ---
-    // Validation: N/A — route constraint :int handles non-integer paths
+    // Validation: N/A — route constraint :int handles noninteger paths
 
     // --- 3. Business Errors ---
     [Fact]
@@ -67,7 +107,9 @@ public class GetTreeCareLogsTests(ReforaTecWebApplicationFactory factory) : Inte
         var user = await CreateUserAsync();
         Authenticate(user);
 
+        var campaign = await CreateCampaignAsync();
         var tree = await CreateTreeAsync();
+        await AssignTreeToUserAsync(tree.Id, user.Id, campaign.Id);
 
         // Act
         var response = await Client.GetAsync(ApiRoutes.Trees.CareLogs(tree.Id));
@@ -80,6 +122,25 @@ public class GetTreeCareLogsTests(ReforaTecWebApplicationFactory factory) : Inte
         result.CareLogs.Should().BeEmpty();
     }
 
+    [Theory]
+    [InlineData(UserRole.Inspector)]
+    [InlineData(UserRole.Coordinator)]
+    [InlineData(UserRole.SystemAdmin)]
+    public async Task GetTreeCareLogs_WhenPrivilegedRoleIsNotAssignedToTree_ShouldReturnOk(UserRole role)
+    {
+        // Arrange
+        var user = await CreateUserAsync(role: role);
+        Authenticate(user);
+
+        var tree = await CreateTreeAsync();
+
+        // Act
+        var response = await Client.GetAsync(ApiRoutes.Trees.CareLogs(tree.Id));
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
     [Fact]
     public async Task GetTreeCareLogs_WhenTreeHasCareLogs_ShouldReturnOkOrderedByDeviceCapturedAtDescending()
     {
@@ -87,7 +148,9 @@ public class GetTreeCareLogsTests(ReforaTecWebApplicationFactory factory) : Inte
         var user = await CreateUserAsync();
         Authenticate(user);
 
+        var campaign = await CreateCampaignAsync();
         var tree = await CreateTreeAsync();
+        await AssignTreeToUserAsync(tree.Id, user.Id, campaign.Id);
         var careType = await QueryDbAsync(context => context.CareTypes.OrderBy(type => type.Id).FirstAsync());
 
         var olderCapturedAt = DateTime.UtcNow.AddDays(-3);
