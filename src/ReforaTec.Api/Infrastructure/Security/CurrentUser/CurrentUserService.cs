@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using ErrorOr;
+using ReforaTec.Api.Entities.Enums;
 
 namespace ReforaTec.Api.Infrastructure.Security.CurrentUser;
 
@@ -17,14 +18,28 @@ internal sealed class CurrentUserService(IHttpContextAccessor httpContextAccesso
 
     public int? TenantId => GetClaimAsInt(CustomClaims.TenantId);
 
+    public UserRole? Role => GetRoleClaim();
+
     public ErrorOr<UserIdentity> GetIdentity()
     {
-        if (!IsAuthenticated || UserId is null || TenantId is null)
+        if (!IsAuthenticated || UserId is null || TenantId is null || Role is null)
         {
             return UnauthorizedError;
         }
 
-        return new UserIdentity(UserId.Value, TenantId.Value);
+        return new UserIdentity(UserId.Value, TenantId.Value, Role.Value);
+    }
+
+    private UserRole? GetRoleClaim()
+    {
+        var claimValue = _user?.FindFirstValue(ClaimTypes.Role);
+
+        if (Enum.TryParse<UserRole>(claimValue, out var role))
+        {
+            return role;
+        }
+
+        return null;
     }
 
     private int? GetClaimAsInt(string claimType)
