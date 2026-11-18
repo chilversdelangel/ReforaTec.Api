@@ -37,7 +37,7 @@ public class GetTreeByIdTests(ReforaTecWebApplicationFactory factory) : Integrat
         var response = await Client.GetAsync(ApiRoutes.Trees.ById(foreignTree.Id));
 
         // Assert
-        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.TreeNotFound);
+        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.TreeNotFound(foreignTree.Id));
     }
 
     // --- 2. Validation ---
@@ -57,7 +57,7 @@ public class GetTreeByIdTests(ReforaTecWebApplicationFactory factory) : Integrat
         var response = await Client.GetAsync(ApiRoutes.Trees.ById(nonExistentTreeId));
 
         // Assert
-        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.TreeNotFound);
+        await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.TreeNotFound(nonExistentTreeId));
     }
 
     // --- 4. Happy Path ---

@@ -20,7 +20,7 @@ internal static class Handler
         var normalizedEmail = request.Email.ToNormalized();
 
         var user = await context.Users
-            .FirstOrDefaultAsync(user => user.Email == normalizedEmail && !user.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(user => user.Email == normalizedEmail, cancellationToken);
 
         // OWASP User Enumeration Prevention: Do not leak user existence
         if (user is null)

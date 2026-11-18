@@ -20,7 +20,7 @@ internal static class Handler
         var tree = await FindTreeWithDetailsAsync(context, tenantId, treeId, cancellationToken);
         if (tree is null)
         {
-            return Errors.TreeNotFound;
+            return Errors.TreeNotFound(treeId);
         }
 
         var snapshot = await GetTreeSnapshotAsync(context, tenantId, treeId, cancellationToken);
@@ -124,7 +124,6 @@ internal static class Handler
             .Where(assignment => assignment.TreeId == treeId)
             .Where(assignment => assignment.EndDate == null)
             .Where(assignment => assignment.User != null)
-            .Where(assignment => !assignment.User!.IsDeleted)
             .Select(assignment => new AssignedStudentDto(
                 assignment.User!.Id,
                 assignment.User.ControlNumber,

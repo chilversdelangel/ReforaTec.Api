@@ -14,21 +14,23 @@ internal static class Handler
         IJwtTokenService jwtTokenService,
         CancellationToken cancellationToken = default)
     {
-        var inputToken = request.RefreshToken;
-        var hashedInputToken = jwtTokenService.HashRefreshToken(inputToken);
+        var now = DateTime.UtcNow;
+        var hashedInputToken = jwtTokenService.HashRefreshToken(request.RefreshToken);
 
         var existingToken = await context.RefreshTokens
-            .Include(r => r.User)
-            .FirstOrDefaultAsync(r => r.HashedToken == hashedInputToken, cancellationToken);
+            .Include(refreshToken => refreshToken.User)
+            .FirstOrDefaultAsync(refreshToken => refreshToken.HashedToken == hashedInputToken, cancellationToken);
 
-        if (existingToken?.User is null || existingToken.User.IsDeleted || existingToken.Audience != request.Audience)
-            return Error.Unauthorized(ErrorCodes.InvalidToken, "Invalid refresh token.");
+        if (existingToken?.User is null || existingToken.Audience != request.Audience)
+        {
+            return Errors.InvalidToken;
+        }
 
-        if (existingToken.ExpiresAt < DateTime.UtcNow)
+        if (existingToken.ExpiresAt < now)
         {
             context.RefreshTokens.Remove(existingToken);
             await context.SaveChangesAsync(cancellationToken);
-            return Error.Unauthorized(ErrorCodes.TokenExpired, "Refresh token has expired. Please log in again.");
+            return Errors.TokenExpired;
         }
 
         context.RefreshTokens.Remove(existingToken);
@@ -38,8 +40,8 @@ internal static class Handler
             existingToken.User.TenantId,
             existingToken.User.Role,
             request.Audience);
-        var newAccessToken = jwtTokenService.GenerateAccessToken(tokenRequest);
 
+        var newAccessToken = jwtTokenService.GenerateAccessToken(tokenRequest);
         var newRawRefreshToken = jwtTokenService.GenerateRawRefreshToken();
         var newHashedRefreshToken = jwtTokenService.HashRefreshToken(newRawRefreshToken);
 

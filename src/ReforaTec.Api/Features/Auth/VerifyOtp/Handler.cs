@@ -19,30 +19,35 @@ internal static class Handler
         IWebHostEnvironment env,
         CancellationToken cancellationToken = default)
     {
+        var now = DateTime.UtcNow;
         var normalizedEmail = request.Email.ToNormalized();
 
         var user = await context.Users
-            .FirstOrDefaultAsync(u => u.Email == normalizedEmail && !u.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(user => user.Email == normalizedEmail, cancellationToken);
 
         if (user is null)
-            return Error.Unauthorized(ErrorCodes.InvalidCredentials, "Invalid email or OTP code.");
+        {
+            return Errors.InvalidCredentials;
+        }
 
-        var otpCode = await context.AuthOtpCodes
-            .FirstOrDefaultAsync(o => o.UserId == user.Id, cancellationToken);
+        var persistedOtpCode = await context.AuthOtpCodes
+            .FirstOrDefaultAsync(otp => otp.UserId == user.Id, cancellationToken);
 
-        if (otpCode is null)
-            return Error.Unauthorized(ErrorCodes.InvalidCredentials, "Invalid email or OTP code.");
+        if (persistedOtpCode is null)
+        {
+            return Errors.InvalidCredentials;
+        }
 
         // In-memory OTP rule check
-        var otpValidationResult = ValidateOtp(otpCode, request.OtpCode, env);
+        var otpValidationResult = ValidateOtp(persistedOtpCode, request.OtpCode, env, now);
 
         if (otpValidationResult.IsError)
         {
-            await UpdateOtpStateAsync(context, otpCode, otpValidationResult.FirstError, cancellationToken);
+            await UpdateOtpStateAsync(context, persistedOtpCode, otpValidationResult.FirstError, cancellationToken);
             return otpValidationResult.Errors;
         }
         
-        context.AuthOtpCodes.Remove(otpCode);
+        context.AuthOtpCodes.Remove(persistedOtpCode);
         
         if (!user.IsEmailVerified)
         {
@@ -66,27 +71,35 @@ internal static class Handler
         return new Response(accessToken, rawRefreshToken, "Bearer", expiresInSeconds);
     }
 
-    private static ErrorOr<Success> ValidateOtp(AuthOtpCode otpCode, string inputOtpCode, IWebHostEnvironment env)
+    private static ErrorOr<Success> ValidateOtp(
+        AuthOtpCode persistedOtpCode,
+        string requestedOtpCode,
+        IWebHostEnvironment env,
+        DateTime now)
     {
         // QA OTP Backdoor
-        if (!env.IsProduction() && inputOtpCode == "000000")
+        if (!env.IsProduction() && requestedOtpCode == "000000")
         {
             return Result.Success;
         }
 
-        if (otpCode.ExpiresAt < DateTime.UtcNow)
-            return Error.Unauthorized(ErrorCodes.OtpExpired, "OTP code has expired. Please request a new one.");
-
-        if (otpCode.FailedAttempts >= AuthOtpCode.MaxFailedAttempts)
-            return Error.Unauthorized(ErrorCodes.TooManyAttempts, "Too many failed attempts. Please request a new OTP code.");
-
-        if (otpCode.VerificationCode != inputOtpCode)
+        if (persistedOtpCode.ExpiresAt < now)
         {
-            otpCode.FailedAttempts++;
+            return Errors.OtpExpired;
+        }
 
-            return otpCode.FailedAttempts >= AuthOtpCode.MaxFailedAttempts
-                ? Error.Unauthorized(ErrorCodes.TooManyAttempts, "Too many failed attempts. OTP code destroyed.")
-                : Error.Unauthorized(ErrorCodes.InvalidCredentials, "Invalid email or OTP code.");
+        if (persistedOtpCode.FailedAttempts >= AuthOtpCode.MaxFailedAttempts)
+        {
+            return Errors.TooManyAttempts;
+        }
+
+        if (persistedOtpCode.VerificationCode != requestedOtpCode)
+        {
+            persistedOtpCode.FailedAttempts++;
+
+            return persistedOtpCode.FailedAttempts >= AuthOtpCode.MaxFailedAttempts
+                ? Errors.TooManyAttemptsDestroyed
+                : Errors.InvalidCredentials;
         }
 
         return Result.Success;
@@ -98,7 +111,7 @@ internal static class Handler
         Error error,
         CancellationToken cancellationToken)
     {
-        if (error.Code is ErrorCodes.OtpExpired or ErrorCodes.TooManyAttempts)
+        if (error == Errors.OtpExpired || error == Errors.TooManyAttempts)
         {
             context.AuthOtpCodes.Remove(otpRecord);
         }
@@ -117,8 +130,8 @@ internal static class Handler
         var maxAllowed = jwtOptions.Value.MaxSessionsPerRole.GetValueOrDefault(roleKey, 2);
 
         var activeSessions = await context.RefreshTokens
-            .Where(r => r.UserId == userId)
-            .OrderBy(r => r.CreatedAt)
+            .Where(refreshToken => refreshToken.UserId == userId)
+            .OrderBy(refreshToken => refreshToken.CreatedAt)
             .ToListAsync(cancellationToken);
 
         if (activeSessions.Count >= maxAllowed)
