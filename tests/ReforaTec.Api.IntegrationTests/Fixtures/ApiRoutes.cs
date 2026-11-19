@@ -25,6 +25,7 @@ public static class ApiRoutes
         public const string BaseRoute = $"{Base}/trees";
         public static string ById(int id) => $"{Base}/trees/{id}";
         public static string CareLogs(int treeId) => $"{Base}/trees/{treeId}/care-logs";
+        public static string Inspections(int treeId) => $"{Base}/trees/{treeId}/inspections";
     }
 
     public static class Campaigns
