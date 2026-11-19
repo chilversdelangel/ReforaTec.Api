@@ -1,4 +1,5 @@
 using FluentValidation;
+using ReforaTec.Api.Entities.Enums;
 
 namespace ReforaTec.Api.Features.Trees.CreateTreeInspection;
 
@@ -7,7 +8,8 @@ internal sealed class Validator : AbstractValidator<Request>
     public Validator()
     {
         RuleFor(request => request.HealthState)
-            .IsInEnum();
+            .NotEmpty()
+            .IsEnumName(typeof(TreeHealthState), caseSensitive: false);
 
         RuleFor(request => request.Notes)
             .MaximumLength(500)

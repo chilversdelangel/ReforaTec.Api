@@ -19,7 +19,7 @@ public sealed class CreateTreeInspectionTests(ReforaTecWebApplicationFactory fac
     {
         // Arrange
         var tree = await CreateTreeAsync();
-        var request = new Request(TreeHealthState.Healthy, null, DateTimeOffset.UtcNow);
+        var request = new Request(nameof(TreeHealthState.Healthy), null, DateTimeOffset.UtcNow);
 
         // Act
         var response = await Client.PostAsJsonAsync(ApiRoutes.Trees.Inspections(tree.Id), request);
@@ -35,7 +35,7 @@ public sealed class CreateTreeInspectionTests(ReforaTecWebApplicationFactory fac
         var student = await CreateUserAsync(role: UserRole.Student);
         Authenticate(student);
         var tree = await CreateTreeAsync();
-        var request = new Request(TreeHealthState.Healthy, null, DateTimeOffset.UtcNow);
+        var request = new Request(nameof(TreeHealthState.Healthy), null, DateTimeOffset.UtcNow);
 
         // Act
         var response = await Client.PostAsJsonAsync(ApiRoutes.Trees.Inspections(tree.Id), request);
@@ -51,7 +51,7 @@ public sealed class CreateTreeInspectionTests(ReforaTecWebApplicationFactory fac
         var inspector = await CreateUserAsync(role: UserRole.Inspector);
         Authenticate(inspector);
         var foreignTree = await CreateTreeAsync(tenantId: TestTenants.Foreign);
-        var request = new Request(TreeHealthState.Healthy, null, DateTimeOffset.UtcNow);
+        var request = new Request(nameof(TreeHealthState.Healthy), null, DateTimeOffset.UtcNow);
 
         // Act
         var response = await Client.PostAsJsonAsync(ApiRoutes.Trees.Inspections(foreignTree.Id), request);
@@ -69,7 +69,7 @@ public sealed class CreateTreeInspectionTests(ReforaTecWebApplicationFactory fac
         Authenticate(inspector);
         var tree = await CreateTreeAsync();
         var tooLongNotes = new string('a', 501);
-        var request = new Request(TreeHealthState.NeedsAttention, tooLongNotes, DateTimeOffset.UtcNow);
+        var request = new Request(nameof(TreeHealthState.NeedsAttention), tooLongNotes, DateTimeOffset.UtcNow);
 
         // Act
         var response = await Client.PostAsJsonAsync(ApiRoutes.Trees.Inspections(tree.Id), request);
@@ -85,7 +85,7 @@ public sealed class CreateTreeInspectionTests(ReforaTecWebApplicationFactory fac
         var inspector = await CreateUserAsync(role: UserRole.Inspector);
         Authenticate(inspector);
         var tree = await CreateTreeAsync();
-        var request = new Request(TreeHealthState.Healthy, null, DateTimeOffset.UtcNow.AddHours(1));
+        var request = new Request(nameof(TreeHealthState.Healthy), null, DateTimeOffset.UtcNow.AddHours(1));
 
         // Act
         var response = await Client.PostAsJsonAsync(ApiRoutes.Trees.Inspections(tree.Id), request);
@@ -94,14 +94,16 @@ public sealed class CreateTreeInspectionTests(ReforaTecWebApplicationFactory fac
         await response.ShouldBeValidationProblemAsync(nameof(Request.DeviceCapturedAt));
     }
 
-    [Fact]
-    public async Task CreateTreeInspection_WhenHealthStateIsInvalid_ShouldReturnBadRequest()
+    [Theory]
+    [InlineData("")]
+    [InlineData("InvalidState")]
+    public async Task CreateTreeInspection_WhenHealthStateIsInvalid_ShouldReturnBadRequest(string invalidHealthState)
     {
         // Arrange
         var inspector = await CreateUserAsync(role: UserRole.Inspector);
         Authenticate(inspector);
         var tree = await CreateTreeAsync();
-        var request = new Request((TreeHealthState)999, null, DateTimeOffset.UtcNow);
+        var request = new Request(invalidHealthState, null, DateTimeOffset.UtcNow);
 
         // Act
         var response = await Client.PostAsJsonAsync(ApiRoutes.Trees.Inspections(tree.Id), request);
@@ -118,7 +120,7 @@ public sealed class CreateTreeInspectionTests(ReforaTecWebApplicationFactory fac
         var inspector = await CreateUserAsync(role: UserRole.Inspector);
         Authenticate(inspector);
         const int nonExistentTreeId = 999_999;
-        var request = new Request(TreeHealthState.Healthy, null, DateTimeOffset.UtcNow);
+        var request = new Request(nameof(TreeHealthState.Healthy), null, DateTimeOffset.UtcNow);
 
         // Act
         var response = await Client.PostAsJsonAsync(ApiRoutes.Trees.Inspections(nonExistentTreeId), request);
@@ -139,10 +141,7 @@ public sealed class CreateTreeInspectionTests(ReforaTecWebApplicationFactory fac
         Authenticate(user);
         var tree = await CreateTreeAsync();
         const string notes = "Hojas amarillas.";
-        var request = new Request(
-            TreeHealthState.NeedsAttention,
-            notes,
-            DateTimeOffset.UtcNow.AddMinutes(-2));
+        var request = new Request(nameof(TreeHealthState.NeedsAttention), notes, DateTimeOffset.UtcNow.AddMinutes(-2));
 
         // Act
         var response = await Client.PostAsJsonAsync(ApiRoutes.Trees.Inspections(tree.Id), request);
@@ -153,7 +152,7 @@ public sealed class CreateTreeInspectionTests(ReforaTecWebApplicationFactory fac
         payload.Should().NotBeNull();
         payload.Id.Should().BeGreaterThan(0);
         payload.TreeId.Should().Be(tree.Id);
-        payload.HealthState.Should().Be(TreeHealthState.NeedsAttention);
+        payload.HealthState.Should().Be(nameof(TreeHealthState.NeedsAttention));
         payload.Notes.Should().Be(notes);
 
         using var scope = Factory.Services.CreateScope();
@@ -169,10 +168,7 @@ public sealed class CreateTreeInspectionTests(ReforaTecWebApplicationFactory fac
         var inspector = await CreateUserAsync(role: UserRole.Inspector);
         Authenticate(inspector);
         var tree = await CreateTreeAsync();
-        var request = new Request(
-            TreeHealthState.Healthy,
-            null, 
-            DateTimeOffset.UtcNow.AddMinutes(-1));
+        var request = new Request(nameof(TreeHealthState.Healthy), null, DateTimeOffset.UtcNow.AddMinutes(-1));
 
         // Act
         var response = await Client.PostAsJsonAsync(ApiRoutes.Trees.Inspections(tree.Id), request);
