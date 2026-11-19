@@ -457,7 +457,6 @@ namespace ReforaTec.Api.Database.Migrations
                     tree_id = table.Column<int>(type: "integer", nullable: false),
                     user_id = table.Column<int>(type: "integer", nullable: false),
                     height_centimeters = table.Column<decimal>(type: "numeric(7,2)", precision: 7, scale: 2, nullable: false),
-                    diameter_centimeters = table.Column<decimal>(type: "numeric(7,2)", precision: 7, scale: 2, nullable: false),
                     photo_url = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: true),
                     device_captured_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),

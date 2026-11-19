@@ -34,7 +34,6 @@ internal static partial class DbSeeder
             TreeId = tree.Id,
             UserId = user.Id,
             HeightCentimeters = 145m,
-            DiameterCentimeters = 14.5m,
             PhotoUrl = "https://images.reforatec.org/evidence/tree1_baseline.jpg",
             DeviceCapturedAt = DateTime.UtcNow.AddMonths(-1)
         };
@@ -45,7 +44,6 @@ internal static partial class DbSeeder
             TreeId = tree.Id,
             UserId = user.Id,
             HeightCentimeters = 150.5m,
-            DiameterCentimeters = 15.2m,
             PhotoUrl = "https://images.reforatec.org/evidence/tree1_latest.jpg",
             DeviceCapturedAt = DateTime.UtcNow.AddDays(-2)
         };

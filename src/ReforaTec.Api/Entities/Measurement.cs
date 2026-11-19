@@ -14,7 +14,6 @@ public sealed class Measurement : AuditableEntity
     public User? User { get; set; }
 
     public decimal HeightCentimeters { get; set; }
-    public decimal DiameterCentimeters { get; set; }
 
     public string? PhotoUrl { get; set; }
 

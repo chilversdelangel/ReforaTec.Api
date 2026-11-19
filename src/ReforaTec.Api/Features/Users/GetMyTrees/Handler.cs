@@ -92,19 +92,13 @@ internal static class Handler
 
         return treeIds.ToDictionary(
             treeId => treeId,
-            treeId =>
-            {
-                var measurement = measurements.GetValueOrDefault(treeId);
-
-                return new TreeSnapshot(
-                    measurement?.HeightCentimeters,
-                    measurement?.DiameterCentimeters,
-                    photos.GetValueOrDefault(treeId),
-                    healthStates.GetValueOrDefault(treeId, TreeHealthState.Healthy));
-            });
+            treeId => new TreeSnapshot(
+                measurements.GetValueOrDefault(treeId),
+                photos.GetValueOrDefault(treeId),
+                healthStates.GetValueOrDefault(treeId, TreeHealthState.Healthy)));
     }
 
-    private static Task<Dictionary<int, LatestMeasurementSnapshot>> GetLatestMeasurementsAsync(
+    private static Task<Dictionary<int, decimal?>> GetLatestMeasurementsAsync(
         AppDbContext context,
         int tenantId,
         List<int> treeIds,
@@ -117,13 +111,15 @@ internal static class Handler
             .GroupBy(measurement => measurement.TreeId)
             .Select(treeGroup => treeGroup
                 .OrderByDescending(measurement => measurement.DeviceCapturedAt)
-                .Select(measurement => new LatestMeasurementSnapshot(
+                .Select(measurement => new
+                {
                     measurement.TreeId,
-                    measurement.HeightCentimeters,
-                    measurement.DiameterCentimeters))
+                    measurement.HeightCentimeters
+                })
                 .First())
             .ToDictionaryAsync(
                 snapshot => snapshot.TreeId,
+                snapshot => (decimal?)snapshot.HeightCentimeters,
                 cancellationToken);
     }
 
@@ -141,13 +137,15 @@ internal static class Handler
             .GroupBy(measurement => measurement.TreeId)
             .Select(treeGroup => treeGroup
                 .OrderByDescending(measurement => measurement.DeviceCapturedAt)
-                .Select(measurement => new LatestPhotoSnapshot(
+                .Select(measurement => new
+                {
                     measurement.TreeId,
-                    measurement.PhotoUrl))
+                    measurement.PhotoUrl
+                })
                 .First())
             .ToDictionaryAsync(
                 snapshot => snapshot.TreeId,
-                snapshot => snapshot.LatestPhotoUrl,
+                snapshot => snapshot.PhotoUrl,
                 cancellationToken);
     }
 
@@ -164,9 +162,11 @@ internal static class Handler
             .GroupBy(inspection => inspection.TreeId)
             .Select(treeGroup => treeGroup
                 .OrderByDescending(inspection => inspection.DeviceCapturedAt)
-                .Select(inspection => new LatestHealthStateSnapshot(
+                .Select(inspection => new
+                {
                     inspection.TreeId,
-                    inspection.HealthState))
+                    inspection.HealthState
+                })
                 .First())
             .ToDictionaryAsync(
                 snapshot => snapshot.TreeId,
@@ -195,23 +195,12 @@ internal static class Handler
             PlantingDate: tree.PlantingDate,
 
             CurrentHeightCentimeters: snapshot.HeightCentimeters,
-            CurrentDiameterCentimeters: snapshot.DiameterCentimeters,
 
             LatestPhotoUrl: snapshot.LatestPhotoUrl);
     }
 
     private sealed record TreeSnapshot(
         decimal? HeightCentimeters,
-        decimal? DiameterCentimeters,
         string? LatestPhotoUrl,
         TreeHealthState HealthState);
-
-    private sealed record LatestMeasurementSnapshot(
-        int TreeId,
-        decimal HeightCentimeters,
-        decimal DiameterCentimeters);
-
-    private sealed record LatestPhotoSnapshot(int TreeId, string? LatestPhotoUrl);
-
-    private sealed record LatestHealthStateSnapshot(int TreeId, TreeHealthState HealthState);
 }

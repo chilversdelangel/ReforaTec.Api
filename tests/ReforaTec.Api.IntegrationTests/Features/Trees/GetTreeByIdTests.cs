@@ -106,7 +106,6 @@ public class GetTreeByIdTests(ReforaTecWebApplicationFactory factory) : Integrat
             SpeciesImageUrl: expectedSpecies.ImageUrl,
 
             CurrentHeightCentimeters: measurement.HeightCentimeters,
-            CurrentDiameterCentimeters: measurement.DiameterCentimeters,
             LatestPhotoUrl: measurement.PhotoUrl,
 
             Location: null,
