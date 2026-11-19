@@ -17,6 +17,5 @@ internal sealed record AssignedTreeDto(
     DateOnly? PlantingDate,
     
     decimal? CurrentHeightCentimeters,
-    decimal? CurrentDiameterCentimeters,
     
     string? LatestPhotoUrl);

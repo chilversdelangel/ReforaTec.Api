@@ -11,9 +11,6 @@ internal sealed class MeasurementConfiguration : IEntityTypeConfiguration<Measur
         builder.Property(measurement => measurement.HeightCentimeters)
             .HasPrecision(7, 2);
 
-        builder.Property(measurement => measurement.DiameterCentimeters)
-            .HasPrecision(7, 2);
-
         builder.Property(measurement => measurement.PhotoUrl)
             .HasMaxLength(300);
 

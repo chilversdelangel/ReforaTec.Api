@@ -78,7 +78,7 @@ The domain strictly delineates between **student routine care logs** (`CareLog`)
 │ 2. Milestone Measurements (`Measurement` - Baseline & FinalDelivery):  │
 │    • Baseline: Captured once for newly planted trees.                  │
 │    • FinalDelivery: Captured at semester conclusion with coordinator.  │
-│    • Metrics: HeightCentimeters, DiameterCentimeters, PhotoUrl.        │
+│    • Metrics: HeightCentimeters, PhotoUrl.                             │
 │                                                                        │
 │ 3. Automated Health Alerts:                                            │
 │    • If health drops to 'NeedsAttention' or 'Critical', an automated   │

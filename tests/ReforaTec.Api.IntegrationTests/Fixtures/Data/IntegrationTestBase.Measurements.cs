@@ -12,7 +12,6 @@ public abstract partial class IntegrationTestBase
         int userId,
         int tenantId = 1,
         decimal heightCentimeters = 150.0m,
-        decimal diameterCentimeters = 15.0m,
         string? photoUrl = null,
         DateTime? deviceCapturedAt = null)
     {
@@ -25,7 +24,6 @@ public abstract partial class IntegrationTestBase
             TreeId = treeId,
             UserId = userId,
             HeightCentimeters = heightCentimeters,
-            DiameterCentimeters = diameterCentimeters,
             PhotoUrl = photoUrl,
             DeviceCapturedAt = deviceCapturedAt ?? DateTime.UtcNow
         };

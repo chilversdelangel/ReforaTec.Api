@@ -55,14 +55,13 @@ internal static class Handler
         var latestInspection = await GetLatestInspectionAsync(context, tenantId, treeId, cancellationToken);
 
         return new TreeSnapshot(
-            latestMeasurement?.HeightCentimeters,
-            latestMeasurement?.DiameterCentimeters,
+            latestMeasurement,
             latestPhotoUrl,
             latestInspection?.HealthState ?? TreeHealthState.Healthy,
             latestInspection?.Notes);
     }
 
-    private static Task<LatestMeasurementSnapshot?> GetLatestMeasurementAsync(
+    private static Task<decimal> GetLatestMeasurementAsync(
         AppDbContext context,
         int tenantId,
         int treeId,
@@ -73,9 +72,7 @@ internal static class Handler
             .Where(measurement => measurement.TenantId == tenantId)
             .Where(measurement => measurement.TreeId == treeId)
             .OrderByDescending(measurement => measurement.DeviceCapturedAt)
-            .Select(measurement => new LatestMeasurementSnapshot(
-                measurement.HeightCentimeters,
-                measurement.DiameterCentimeters))
+            .Select(measurement => measurement.HeightCentimeters)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -162,7 +159,6 @@ internal static class Handler
             SpeciesImageUrl: tree.Species.ImageUrl,
 
             CurrentHeightCentimeters: snapshot.HeightCentimeters,
-            CurrentDiameterCentimeters: snapshot.DiameterCentimeters,
             LatestPhotoUrl: snapshot.LatestPhotoUrl,
 
             Location: locationDto,
@@ -171,14 +167,9 @@ internal static class Handler
 
     private sealed record TreeSnapshot(
         decimal? HeightCentimeters,
-        decimal? DiameterCentimeters,
         string? LatestPhotoUrl,
         TreeHealthState HealthState,
         string? Notes);
-
-    private sealed record LatestMeasurementSnapshot(
-        decimal HeightCentimeters,
-        decimal DiameterCentimeters);
 
     private sealed record LatestInspectionSnapshot(
         TreeHealthState HealthState,

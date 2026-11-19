@@ -12,7 +12,7 @@ using ReforaTec.Api.Database;
 namespace ReforaTec.Api.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261118172804_InitialSchema")]
+    [Migration("20261119143005_InitialSchema")]
     partial class InitialSchema
     {
         /// <inheritdoc />
@@ -378,11 +378,6 @@ namespace ReforaTec.Api.Database.Migrations
                     b.Property<DateTime>("DeviceCapturedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("device_captured_at");
-
-                    b.Property<decimal>("DiameterCentimeters")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("numeric(7,2)")
-                        .HasColumnName("diameter_centimeters");
 
                     b.Property<decimal>("HeightCentimeters")
                         .HasPrecision(7, 2)

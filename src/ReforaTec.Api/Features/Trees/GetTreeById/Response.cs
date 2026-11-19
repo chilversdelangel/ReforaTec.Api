@@ -14,7 +14,6 @@ internal sealed record Response(
     string? SpeciesImageUrl,
     
     decimal? CurrentHeightCentimeters,
-    decimal? CurrentDiameterCentimeters,
     string? LatestPhotoUrl,
     
     LocationDto? Location,
