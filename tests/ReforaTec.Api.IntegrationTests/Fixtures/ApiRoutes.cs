@@ -26,6 +26,7 @@ public static class ApiRoutes
         public static string ById(int id) => $"{Base}/trees/{id}";
         public static string CareLogs(int treeId) => $"{Base}/trees/{treeId}/care-logs";
         public static string Inspections(int treeId) => $"{Base}/trees/{treeId}/inspections";
+        public static string Measurements(int treeId) => $"{Base}/trees/{treeId}/measurements";
     }
 
     public static class Campaigns
