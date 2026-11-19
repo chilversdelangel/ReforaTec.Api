@@ -23,14 +23,17 @@ public class ReforaTecWebApplicationFactory : WebApplicationFactory<Program>, IA
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        const string notificationsEmailProvider = "Notifications:Email:Provider";
         const string connectionStringKey = "ConnectionStrings:DefaultConnection";
-
-        const string emailProvider = "None";
-        var connectionString = _dbContainer.GetConnectionString();
+        const string notificationsEmailProvider = "Notifications:Email:Provider";
+        const string globalRateLimitKey = "RateLimiting:GlobalMaxRequests";
         
-        builder.UseSetting(notificationsEmailProvider, emailProvider);
+        var connectionString = _dbContainer.GetConnectionString();
+        const string emailProvider = "None";
+        const string globalRateLimit = "10000";
+        
         builder.UseSetting(connectionStringKey, connectionString);
+        builder.UseSetting(notificationsEmailProvider, emailProvider);
+        builder.UseSetting(globalRateLimitKey, globalRateLimit);
     }
 
     public async Task InitializeAsync()
