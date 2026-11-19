@@ -153,7 +153,7 @@ public sealed class CreateTreeInspectionTests(ReforaTecWebApplicationFactory fac
         payload.Should().NotBeNull();
         payload.Id.Should().BeGreaterThan(0);
         payload.TreeId.Should().Be(tree.Id);
-        payload.HealthState.Should().Be(TreeHealthState.NeedsAttention);
+        payload.HealthState.Should().Be(nameof(TreeHealthState.NeedsAttention));
         payload.Notes.Should().Be(notes);
 
         using var scope = Factory.Services.CreateScope();

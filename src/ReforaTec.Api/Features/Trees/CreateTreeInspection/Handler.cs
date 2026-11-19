@@ -47,7 +47,7 @@ internal static class Handler
         return new Response(
             Id: inspection.Id,
             TreeId: treeId,
-            HealthState: inspection.HealthState,
+            HealthState: inspection.HealthState.ToString(),
             Notes: inspection.Notes,
             DeviceCapturedAt: inspection.DeviceCapturedAt,
             CreatedAt: inspection.CreatedAt);
