@@ -31,12 +31,14 @@ internal static class Handler
             return Errors.TreeNotFound(treeId);
         }
 
+        var healthState = Enum.Parse<TreeHealthState>(request.HealthState, ignoreCase: true);
+
         var inspection = new Inspection
         {
             TenantId = loggedUser.TenantId,
             TreeId = treeId,
             UserId = loggedUser.UserId,
-            HealthState = request.HealthState,
+            HealthState = healthState,
             Notes = request.Notes,
             DeviceCapturedAt = request.DeviceCapturedAt.UtcDateTime
         };
