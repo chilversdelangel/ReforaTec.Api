@@ -1,5 +1,3 @@
-using ReforaTec.Api.Entities.Enums;
-
 namespace ReforaTec.Api.Features.Users.UpdateUserProfile;
 
 internal sealed record Response(
@@ -10,6 +8,6 @@ internal sealed record Response(
     string? DisplayName,
     string? ControlNumber,
     string? PhoneNumber,
-    Gender Gender,
+    string Gender,
     string Email,
-    UserRole Role);
+    string Role);

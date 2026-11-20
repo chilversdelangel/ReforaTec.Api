@@ -1,8 +1,7 @@
-using ReforaTec.Api.Entities.Enums;
-
 namespace ReforaTec.Api.Features.Users.GetUserProfile;
 
 internal sealed record Response(
+    int Id,
     string GivenName,
     string FamilyName,
     string? SecondFamilyName,
@@ -10,9 +9,6 @@ internal sealed record Response(
 
     string? ControlNumber,
     string? PhoneNumber,
-    Gender Gender,
+    string Gender,
     string Email,
-
-    bool IsEnrolledInActiveCampaign,
-    int TotalTrees,
-    int TotalCareLogs);
+    string Role);
