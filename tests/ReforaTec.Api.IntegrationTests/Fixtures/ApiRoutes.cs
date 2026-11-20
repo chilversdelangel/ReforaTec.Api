@@ -8,30 +8,30 @@ public static class ApiRoutes
     {
         public const string OtpCodes = $"{Base}/otp-codes";
         public const string Sessions = $"{Base}/sessions";
-        public const string RefreshSession = $"{Base}/sessions/refresh";
-        public const string RevokeSession = $"{Base}/sessions/revoke";
+        public const string RefreshSession = $"{Sessions}/refresh";
+        public const string RevokeSession = $"{Sessions}/revoke";
         public const string Register = $"{Base}/users";
     }
 
     public static class Users
     {
         public const string Me = $"{Base}/users/me";
-        public const string Profile = $"{Base}/users/me/profile";
-        public const string MyTrees = $"{Base}/users/me/trees";
+        public const string Profile = $"{Me}/profile";
+        public const string MyTrees = $"{Me}/trees";
     }
 
     public static class Trees
     {
         public const string BaseRoute = $"{Base}/trees";
-        public static string ById(int id) => $"{Base}/trees/{id}";
-        public static string CareLogs(int treeId) => $"{Base}/trees/{treeId}/care-logs";
-        public static string Inspections(int treeId) => $"{Base}/trees/{treeId}/inspections";
-        public static string Measurements(int treeId) => $"{Base}/trees/{treeId}/measurements";
+        public static string ById(int id) => $"{BaseRoute}/{id}";
+        public static string CareLogs(int treeId) => $"{BaseRoute}/{treeId}/care-logs";
+        public static string Inspections(int treeId) => $"{BaseRoute}/{treeId}/inspections";
+        public static string Measurements(int treeId) => $"{BaseRoute}/{treeId}/measurements";
     }
 
     public static class Campaigns
     {
         public const string BaseRoute = $"{Base}/campaigns";
-        public static string ById(int id) => $"{Base}/campaigns/{id}";
+        public static string ById(int id) => $"{BaseRoute}/{id}";
     }
 }
