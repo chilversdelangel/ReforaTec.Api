@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
+using ReforaTec.Api.Entities.Common;
 using ReforaTec.Api.Entities.Enums;
 using ReforaTec.Api.Features.Trees.GetTrees;
 using ReforaTec.Api.IntegrationTests.Fixtures;
@@ -67,7 +68,8 @@ public class GetTreesTests(ReforaTecWebApplicationFactory factory) : Integration
         var student2 = await CreateUserAsync();
         var inactiveStudent = await CreateUserAsync();
 
-        var tree = await CreateTreeAsync();
+        var expectedLocation = new Location { Latitude = 22.253612, Longitude = -97.854291 };
+        var tree = await CreateTreeAsync(location: expectedLocation);
         var campaign = await CreateCampaignAsync();
         await CreateCareAssignmentAsync(tree.Id, student1.Id, campaign.Id);
         await CreateCareAssignmentAsync(tree.Id, student2.Id, campaign.Id);
@@ -91,6 +93,9 @@ public class GetTreesTests(ReforaTecWebApplicationFactory factory) : Integration
         item.Id.Should().Be(tree.Id);
         item.Folio.Should().Be(tree.Folio);
         item.HealthState.Should().Be(nameof(TreeHealthState.Healthy));
+        item.Location.Should().NotBeNull();
+        item.Location.Latitude.Should().Be(expectedLocation.Latitude);
+        item.Location.Longitude.Should().Be(expectedLocation.Longitude);
         item.AssignedStudents.Should().HaveCount(2);
         item.AssignedStudents.Select(student => student.Id).Should().BeEquivalentTo([student1.Id, student2.Id]);
     }

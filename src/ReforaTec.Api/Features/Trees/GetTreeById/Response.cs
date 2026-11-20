@@ -21,10 +21,7 @@ internal sealed record Response(
 
 internal sealed record LocationDto(
     double? Latitude,
-    double? Longitude,
-    string Street,
-    string Neighborhood,
-    string StreetNumber);
+    double? Longitude);
 
 internal sealed record AssignedStudentDto(
     int Id,
