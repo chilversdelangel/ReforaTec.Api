@@ -1197,21 +1197,6 @@ namespace ReforaTec.Api.Database.Migrations
                                 .HasColumnType("double precision")
                                 .HasColumnName("location_longitude");
 
-                            b1.Property<string>("Neighborhood")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("location_neighborhood");
-
-                            b1.Property<string>("Street")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("location_street");
-
-                            b1.Property<string>("StreetNumber")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("location_street_number");
-
                             b1.HasKey("TreeId");
 
                             b1.ToTable("trees");

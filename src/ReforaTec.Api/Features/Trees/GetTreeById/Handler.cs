@@ -139,10 +139,7 @@ internal static class Handler
         var locationDto = tree.Location is not null
             ? new LocationDto(
                 tree.Location.Latitude,
-                tree.Location.Longitude,
-                tree.Location.Street,
-                tree.Location.Neighborhood,
-                tree.Location.StreetNumber)
+                tree.Location.Longitude)
             : null;
 
         return new Response(

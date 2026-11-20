@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using ReforaTec.Api.Entities.Common;
 using ReforaTec.Api.Features.Trees.GetTreeById;
 using ReforaTec.Api.IntegrationTests.Fixtures;
 using ReforaTec.Api.IntegrationTests.Fixtures.Assertions;
@@ -75,10 +76,12 @@ public class GetTreeByIdTests(ReforaTecWebApplicationFactory factory) : Integrat
         var expectedSpecies = await QueryDbAsync(context => context.Species.FirstAsync());
         var expectedVirtue = await QueryDbAsync(context => context.Virtues.FirstAsync());
 
+        var expectedLocation = new Location { Latitude = 22.253612, Longitude = -97.854291 };
         var tree = await CreateTreeAsync(
             speciesId: expectedSpecies.Id,
             virtueId: expectedVirtue.Id,
-            folio: folio);
+            folio: folio,
+            location: expectedLocation);
 
         await AssignTreeToUserAsync(tree.Id, student.Id, campaign.Id);
         var measurement = await RecordMeasurementAsync(tree.Id, student.Id);
@@ -108,7 +111,7 @@ public class GetTreeByIdTests(ReforaTecWebApplicationFactory factory) : Integrat
             CurrentHeightCentimeters: measurement.HeightCentimeters,
             LatestPhotoUrl: measurement.PhotoUrl,
 
-            Location: null,
+            Location: new LocationDto(expectedLocation.Latitude, expectedLocation.Longitude),
             CurrentAssignedStudents: [expectedStudent]);
 
         // Act
@@ -119,5 +122,25 @@ public class GetTreeByIdTests(ReforaTecWebApplicationFactory factory) : Integrat
 
         var result = await response.Content.ReadFromJsonAsync<Response>();
         result.Should().BeEquivalentTo(expectedResponse);
+    }
+
+    [Fact]
+    public async Task GetTreeById_WhenTreeHasNoLocation_ShouldReturnNullLocation()
+    {
+        // Arrange
+        var user = await CreateUserAsync();
+        Authenticate(user);
+
+        var tree = await CreateTreeAsync();
+
+        // Act
+        var response = await Client.GetAsync(ApiRoutes.Trees.ById(tree.Id));
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Content.ReadFromJsonAsync<Response>();
+        result.Should().NotBeNull();
+        result.Location.Should().BeNull();
     }
 }
