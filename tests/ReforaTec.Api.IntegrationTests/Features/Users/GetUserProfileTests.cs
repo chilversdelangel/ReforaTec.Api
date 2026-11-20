@@ -84,17 +84,16 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
         Authenticate(user);
 
         var expectedProfile = new Response(
+            Id: user.Id,
             GivenName: givenName,
             FamilyName: familyName,
             SecondFamilyName: null,
             DisplayName: null,
             ControlNumber: controlNumber,
             PhoneNumber: null,
-            Gender: Gender.Male,
+            Gender: nameof(Gender.Male),
             Email: user.Email,
-            IsEnrolledInActiveCampaign: false,
-            TotalTrees: 0,
-            TotalCareLogs: 0);
+            Role: user.Role.ToString());
 
         // Act
         var response = await Client.GetAsync(ApiRoutes.Users.Profile);
@@ -107,18 +106,11 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
     }
 
     [Fact]
-    public async Task GetUserProfile_WhenUserHasActivity_ShouldReturnCalculatedStats()
+    public async Task GetUserProfile_WhenAuthenticatedAsInspector_ShouldReturnInspectorRole()
     {
         // Arrange
-        var user = await CreateUserAsync();
-        Authenticate(user);
-
-        var campaign = await CreateCampaignAsync();
-        var tree = await CreateTreeAsync();
-
-        await EnrollUserInCampaignAsync(campaign.Id, user.Id);
-        await AssignTreeToUserAsync(tree.Id, user.Id, campaign.Id);
-        await CreateCareLogAsync(tree.Id, user.Id);
+        var inspector = await CreateUserAsync(role: UserRole.Inspector);
+        Authenticate(inspector);
 
         // Act
         var response = await Client.GetAsync(ApiRoutes.Users.Profile);
@@ -128,8 +120,7 @@ public class GetUserProfileTests(ReforaTecWebApplicationFactory factory) : Integ
 
         var profile = await response.Content.ReadFromJsonAsync<Response>();
         profile.Should().NotBeNull();
-        profile.TotalTrees.Should().Be(1);
-        profile.TotalCareLogs.Should().Be(1);
-        profile.IsEnrolledInActiveCampaign.Should().BeTrue();
+        profile.Role.Should().Be(nameof(UserRole.Inspector));
+        profile.Id.Should().Be(inspector.Id);
     }
 }

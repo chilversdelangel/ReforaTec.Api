@@ -17,8 +17,8 @@ internal sealed class GetUserProfile : IEndpoint
             .Produces<Response>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .WithSummary("Get authenticated user profile and stats")
-            .WithDescription("Retrieves personal details and activity statistics (assigned trees count, completed services count, and active campaign name) for the currently authenticated user.");
+            .WithSummary("Get authenticated user profile")
+            .WithDescription("Retrieves personal identity details and institutional role for the currently authenticated user.");
     }
 
     private static async Task<IResult> HandleRequest(

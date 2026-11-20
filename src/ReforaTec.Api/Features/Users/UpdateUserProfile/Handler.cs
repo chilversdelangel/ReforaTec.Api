@@ -38,9 +38,9 @@ internal static class Handler
             DisplayName: userEntity.DisplayName,
             ControlNumber: userEntity.ControlNumber,
             PhoneNumber: userEntity.PhoneNumber,
-            Gender: userEntity.Gender,
+            Gender: userEntity.Gender.ToString(),
             Email: userEntity.Email,
-            Role: userEntity.Role);
+            Role: userEntity.Role.ToString());
     }
 
     private static void ApplyUpdates(User userEntity, Request request)

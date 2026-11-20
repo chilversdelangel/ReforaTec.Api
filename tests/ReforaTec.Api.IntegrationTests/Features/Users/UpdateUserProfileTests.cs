@@ -170,9 +170,9 @@ public class UpdateUserProfileTests(ReforaTecWebApplicationFactory factory) : In
             DisplayName: user.DisplayName,
             ControlNumber: user.ControlNumber,
             PhoneNumber: user.PhoneNumber,
-            Gender: user.Gender,
+            Gender: user.Gender.ToString(),
             Email: user.Email,
-            Role: user.Role);
+            Role: user.Role.ToString());
 
         // Act
         var response = await Client.PatchAsJsonAsync(ApiRoutes.Users.Me, request);
@@ -212,9 +212,9 @@ public class UpdateUserProfileTests(ReforaTecWebApplicationFactory factory) : In
             DisplayName: request.DisplayName,
             ControlNumber: user.ControlNumber,
             PhoneNumber: $"+52{phoneNumber}",
-            Gender: request.Gender!.Value,
+            Gender: request.Gender!.Value.ToString(),
             Email: user.Email,
-            Role: user.Role);
+            Role: user.Role.ToString());
 
         // Act
         var response = await Client.PatchAsJsonAsync(ApiRoutes.Users.Me, request);
@@ -230,7 +230,12 @@ public class UpdateUserProfileTests(ReforaTecWebApplicationFactory factory) : In
             context.Users.AsNoTracking().FirstOrDefaultAsync(userEntity => userEntity.Id == user.Id));
 
         persisted.Should().NotBeNull();
-        persisted.Should().BeEquivalentTo(expectedResponse);
+        persisted.Should().BeEquivalentTo(expectedResponse, options => options
+            .Excluding(userEntity => userEntity.Gender)
+            .Excluding(userEntity => userEntity.Role));
+        
+        persisted.Gender.ToString().Should().Be(expectedResponse.Gender);
+        persisted.Role.ToString().Should().Be(expectedResponse.Role);
     }
 
     [Fact]
