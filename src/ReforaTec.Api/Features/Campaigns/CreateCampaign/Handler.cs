@@ -24,7 +24,7 @@ internal static class Handler
         }
 
         var normalizedCode = request.Code.ToNormalized();
-        if (await CodeExistsAsync(context, normalizedCode, cancellationToken))
+        if (await CodeExistsAsync(context, loggedUser.TenantId, normalizedCode, cancellationToken))
         {
             return Errors.CodeAlreadyExists(request.Code.ToSanitized());
         }
@@ -51,10 +51,12 @@ internal static class Handler
 
     private static Task<bool> CodeExistsAsync(
         AppDbContext context,
+        int tenantId,
         string normalizedCode,
         CancellationToken cancellationToken) =>
         context.Campaigns
             .AsNoTracking()
+            .Where(campaign => campaign.TenantId == tenantId)
             .Where(campaign => campaign.NormalizedCode == normalizedCode)
             .AnyAsync(cancellationToken);
 }

@@ -20,7 +20,7 @@ internal sealed class CampaignConfiguration : IEntityTypeConfiguration<Campaign>
 
         builder.HasIndex(campaign => campaign.TenantId);
 
-        builder.HasIndex(campaign => campaign.NormalizedCode)
+        builder.HasIndex(campaign => new { campaign.TenantId, campaign.NormalizedCode })
             .IsUnique();
 
         builder.HasOne(campaign => campaign.Tenant)

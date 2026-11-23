@@ -156,4 +156,25 @@ public class CreateCampaignTests(ReforaTecWebApplicationFactory factory) : Integ
         persisted.Period.StartDate.Should().Be(period.StartDate!.Value);
         persisted.Period.EndDate.Should().Be(period.EndDate!.Value);
     }
+
+    [Fact]
+    public async Task CreateCampaign_WhenSameCodeExistsInForeignTenant_ShouldReturnCreated()
+    {
+        // Arrange
+        const string code = "2026-A";
+        var coordinator = await CreateUserAsync(role: UserRole.Coordinator);
+        Authenticate(coordinator);
+
+        await CreateCampaignAsync(tenantId: TestTenants.Foreign, code: code);
+
+        var request = new Request(
+            Code: code,
+            Period: new PeriodDto(new DateOnly(2026, 2, 1), new DateOnly(2026, 6, 30)));
+
+        // Act
+        var response = await Client.PostAsJsonAsync(ApiRoutes.Campaigns.BaseRoute, request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+    }
 }
