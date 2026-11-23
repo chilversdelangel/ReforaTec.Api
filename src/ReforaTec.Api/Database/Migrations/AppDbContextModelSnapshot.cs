@@ -58,12 +58,12 @@ namespace ReforaTec.Api.Database.Migrations
                     b.HasKey("Id")
                         .HasName("pk_campaigns");
 
-                    b.HasIndex("NormalizedCode")
-                        .IsUnique()
-                        .HasDatabaseName("ix_campaigns_normalized_code");
-
                     b.HasIndex("TenantId")
                         .HasDatabaseName("ix_campaigns_tenant_id");
+
+                    b.HasIndex("TenantId", "NormalizedCode")
+                        .IsUnique()
+                        .HasDatabaseName("ix_campaigns_tenant_id_normalized_code");
 
                     b.ToTable("campaigns", (string)null);
                 });
