@@ -34,18 +34,20 @@ src/ReforaTec.Api/Features/{Domain}/{UseCase}/
    - Must inherit `AbstractValidator<Request>`.
    - Must be `internal sealed class`.
    - Use descriptive lambda parameter names: `RuleFor(request => request.Property)`. Avoid single-letter abbreviations (`x =>`).
-   - Prefer built-in validators (`NotEmpty()`, `MaximumLength()`, `GreaterThan()`). Avoid custom `.WithMessage()` unless strictly necessary.
+   - Prefer built-in validators (`NotEmpty()`, `MaximumLength()`, `GreaterThan()`). Avoid custom `.WithMessage()` unless strictly necessary; when overriding (e.g. on `GreaterThan(0)` for foreign key IDs), use `'{PropertyName}'` placeholders (`"'{PropertyName}' must be valid."`).
 
 3. **Domain Errors (`Errors.cs`)**:
    - Must be `internal static class Errors`.
    - Define pre-constructed `public static readonly Error` instances (`Error.NotFound(...)`, `Error.Forbidden(...)`, `Error.Conflict(...)`).
    - Error code pattern: `"entity/kebab-case"` (e.g., `"tree/not-found"`, `"service/already-exists"`).
+   - **No Role Enumeration in `403 Forbidden`:** Never list privileged role names in `Errors.Forbidden` descriptions; describe the denied action generically (`"You do not have permission to..."`).
 
 4. **Business Handler (`Handler.cs`)**:
    - Must be `internal static class`.
    - Authenticated endpoints must accept `UserIdentity user` directly.
    - Enforce tenant isolation on all queries: `TenantId == user.TenantId`.
    - Read-only queries must use `.AsNoTracking()`.
+   - Prefer explicit chained `.Where(...)` clauses over compound predicates inside `.AnyAsync(...)` or `.FirstOrDefaultAsync(...)`.
    - Use descriptive lambda parameters in LINQ queries (`tree => tree.Id`, `assignment => assignment.TreeId`). Avoid single-letter abbreviations (`t =>`, `x =>`).
    - Convert `DateTimeOffset` to `.UtcDateTime` before saving to entities.
    - Return `ErrorOr<Response>` (or `ErrorOr<Success>`). Never throw business exceptions.
