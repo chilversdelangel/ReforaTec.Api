@@ -44,4 +44,9 @@ public static class ApiRoutes
     {
         public const string BaseRoute = $"{Base}/species";
     }
+
+    public static class Virtues
+    {
+        public const string BaseRoute = $"{Base}/virtues";
+    }
 }
