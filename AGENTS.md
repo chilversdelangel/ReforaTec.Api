@@ -54,7 +54,7 @@ ReforaTec/
 * **DTO Boundary:** Endpoints MUST NEVER return EF Core database entities. Always map to immutable `Response` DTO records.
 * **Unique Text Fields:** Unique text properties MUST implement `INormalizable` (handled by `AppDbContext`).
 * **Soft Delete:** Entities implementing soft delete MUST filter out deleted records (`!x.IsDeleted`).
-* **User-Scoped Routing:** Endpoints operating on or projecting data for the authenticated user MUST use the `/users/me/...` route hierarchy (e.g. `GET /users/me/profile`, `PATCH /users/me`).
+* **User-Scoped Routing:** Endpoints operating on or projecting data for the authenticated user MUST use the `/users/me/...` route hierarchy (e.g. `GET /users/me/profile`, `PATCH /users/me`). Event-like resources created once by the user (e.g. campaign enrollments) may live as top-level resources, with identity resolved from the JWT.
 * **Phone Number Format & E.164 Standard:**
   * Phone number fields in validators MUST use the standardized regex pattern:
     ```csharp
