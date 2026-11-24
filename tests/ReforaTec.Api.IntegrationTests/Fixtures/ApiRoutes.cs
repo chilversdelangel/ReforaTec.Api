@@ -20,6 +20,7 @@ public static class ApiRoutes
         public const string Me = $"{BaseRoute}/me";
         public const string Profile = $"{Me}/profile";
         public const string MyTrees = $"{Me}/trees";
+        public const string CampaignEnrollment = $"{Me}/campaign-enrollment";
     }
 
     public static class CampaignEnrollments
