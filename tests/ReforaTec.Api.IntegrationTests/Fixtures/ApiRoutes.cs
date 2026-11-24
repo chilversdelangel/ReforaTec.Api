@@ -15,7 +15,9 @@ public static class ApiRoutes
 
     public static class Users
     {
-        public const string Me = $"{Base}/users/me";
+        public const string BaseRoute = $"{Base}/users";
+        public static string ById(int userId) => $"{BaseRoute}/{userId}";
+        public const string Me = $"{BaseRoute}/me";
         public const string Profile = $"{Me}/profile";
         public const string MyTrees = $"{Me}/trees";
     }
