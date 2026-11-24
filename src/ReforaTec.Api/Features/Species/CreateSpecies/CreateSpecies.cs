@@ -1,102 +1,39 @@
-using ErrorOr;
-using FluentValidation;
-using Mapster;
-using Microsoft.EntityFrameworkCore;
-using ReforaTec.Api.Common.Helpers;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Infrastructure.Endpoints;
 using ReforaTec.Api.Infrastructure.Filters;
+using ReforaTec.Api.Infrastructure.Mapping;
+using ReforaTec.Api.Infrastructure.OpenApi;
+using ReforaTec.Api.Infrastructure.Security.Authorization;
 
 namespace ReforaTec.Api.Features.Species.CreateSpecies;
 
 internal sealed class CreateSpecies : IEndpoint
 {
-    public record Request(
-        string ScientificName,
-        List<string> CommonNames,
-        string Description,
-        string? ImageUrl
-    );
-
-    public record Response(
-        int Id,
-        string ScientificName,
-        List<string> CommonNames,
-        string Description,
-        string? ImageUrl,
-        DateTime CreatedAt,
-        DateTime ModifiedAt
-    );
-
-    private static class ErrorCodes
-    {
-        public const string NameRequired = "species/scientific-name-required";
-        public const string DescriptionRequired = "species/description-required";
-        public const string Duplicate = "species/duplicate";
-    }
-
-    public class Validator : AbstractValidator<Request>
-    {
-        public Validator()
-        {
-            RuleFor(x => x.ScientificName)
-                .NotEmpty().WithErrorCode(ErrorCodes.NameRequired)
-                .MaximumLength(100);
-
-            RuleFor(x => x.CommonNames)
-                .NotNull();
-
-            RuleForEach(x => x.CommonNames)
-                .NotEmpty()
-                .MaximumLength(50);
-
-            RuleFor(x => x.Description)
-                .NotEmpty().WithErrorCode(ErrorCodes.DescriptionRequired)
-                .MaximumLength(1000);
-
-            RuleFor(x => x.ImageUrl)
-                .MaximumLength(2048);
-        }
-    }
-
-    public static async Task<ErrorOr<Response>> Handle(Request request, AppDbContext context)
-    {
-        var normalizedName = request.ScientificName.ToNormalized();
-        var exists = await context.Species
-            .AnyAsync(s => s.NormalizedScientificName == normalizedName);
-
-        if (exists)
-            return Error.Conflict(code: ErrorCodes.Duplicate, description: "Species already exists");
-
-        var newSpecies = request.Adapt<Entities.Species>();
-
-        context.Species.Add(newSpecies);
-        await context.SaveChangesAsync();
-
-        var speciesResponse = newSpecies.Adapt<Response>();
-
-        return speciesResponse;
-    }
-
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/species", async (Request request, AppDbContext context) =>
-            {
-                var result = await Handle(request, context);
-
-                return result.Match(
-                    response => Results.CreatedAtRoute("GetSpeciesById", new { id = response.Id }, response),
-                    errors =>
-                    {
-                        return errors.Any(e => e.Type == ErrorType.Conflict)
-                            ? Results.Conflict(new { detail = errors[0].Description })
-                            : Results.Problem(statusCode: 500, title: "Internal Server Error");
-                    }
-                );
-            })
+        app.MapPost("/species", HandleRequest)
+            .WithName("CreateSpecies")
+            .WithTags(OpenApiTags.Catalogs)
             .AddEndpointFilter<ValidationFilter<Request>>()
             .Produces<Response>(StatusCodes.Status201Created)
             .ProducesValidationProblem()
-            .ExcludeFromDescription();
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .WithSummary("Create a botanical species")
+            .WithDescription("Creates a new tree species in the global botanical catalog.")
+            .RequireAuthorization(Policy.CanManageCatalogs);
+    }
+
+    private static async Task<IResult> HandleRequest(
+        Request request,
+        AppDbContext context,
+        CancellationToken cancellationToken)
+    {
+        var result = await Handler.Handle(request, context, cancellationToken);
+
+        return result.Match(
+            response => Results.Created($"/v1/species/{response.Id}", response),
+            errors => errors.ToProblem());
     }
 }
