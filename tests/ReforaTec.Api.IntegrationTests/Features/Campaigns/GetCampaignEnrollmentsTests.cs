@@ -99,13 +99,14 @@ public class GetCampaignEnrollmentsTests(ReforaTecWebApplicationFactory factory)
         var student1 = await CreateUserAsync(tenantId: actor.TenantId, role: UserRole.Student);
         var student2 = await CreateUserAsync(tenantId: actor.TenantId, role: UserRole.Student);
 
+        const string expectedNotes = "Crédito acreditado con excelencia";
         var enrollment1 = await EnrollUserInCampaignAsync(tenantId: actor.TenantId, campaignId: campaign.Id, userId: student1.Id);
         var enrollment2 = await EnrollUserInCampaignAsync(
             tenantId: actor.TenantId,
             campaignId: campaign.Id,
             userId: student2.Id,
             isApproved: true,
-            evaluationNotes: "Crédito acreditado con excelencia");
+            evaluationNotes: expectedNotes);
 
         Authenticate(actor);
 
@@ -141,7 +142,7 @@ public class GetCampaignEnrollmentsTests(ReforaTecWebApplicationFactory factory)
         second.User.Email.Should().Be(student2.Email);
         second.User.ControlNumber.Should().Be(student2.ControlNumber);
         second.IsApproved.Should().BeTrue();
-        second.EvaluationNotes.Should().Be("Crédito acreditado con excelencia");
+        second.EvaluationNotes.Should().Be(expectedNotes);
         second.EnrolledAt.Should().BeCloseTo(enrollment2.CreatedAt, TimeSpan.FromSeconds(1));
         second.EvaluatedAt.Should().NotBeNull();
         second.EvaluatedAt!.Value.Should().BeCloseTo(enrollment2.ModifiedAt, TimeSpan.FromSeconds(1));
