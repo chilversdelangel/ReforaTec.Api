@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Npgsql;
 using ReforaTec.Api.Database.Seeding;
 
@@ -17,6 +18,10 @@ internal static class DatabaseExtensions
             {
                 options.UseNpgsql(connectionString);
                 options.UseSnakeCaseNamingConvention();
+                // Soft-delete query filters on Tenant and User are intentional;
+                // audit/historical queries opt out via IgnoreQueryFilters() when needed.
+                options.ConfigureWarnings(warnings =>
+                    warnings.Ignore(CoreEventId.PossibleIncorrectRequiredNavigationWithQueryFilterInteractionWarning));
             });
 
             return services;

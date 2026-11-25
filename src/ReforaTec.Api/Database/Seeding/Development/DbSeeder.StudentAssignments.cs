@@ -20,6 +20,7 @@ internal static partial class DbSeeder
 
         var campaign = await context.Campaigns
             .Where(campaign => campaign.TenantId == user.TenantId)
+            .OrderBy(campaign => campaign.Id)
             .FirstOrDefaultAsync();
 
         if (campaign is null)
