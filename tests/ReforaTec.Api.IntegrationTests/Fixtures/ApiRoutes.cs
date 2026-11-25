@@ -26,6 +26,7 @@ public static class ApiRoutes
     public static class CampaignEnrollments
     {
         public const string BaseRoute = $"{Base}/campaign-enrollments";
+        public static string ById(int enrollmentId) => $"{BaseRoute}/{enrollmentId}";
     }
 
     public static class Trees
