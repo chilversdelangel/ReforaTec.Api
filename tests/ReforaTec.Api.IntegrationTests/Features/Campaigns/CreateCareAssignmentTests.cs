@@ -17,10 +17,13 @@ public class CreateCareAssignmentTests(ReforaTecWebApplicationFactory factory) :
     public async Task CreateCareAssignment_WhenUnauthenticated_ShouldReturnUnauthorized()
     {
         // Arrange
-        var request = new Request(UserId: 1, TreeId: 1, StartDate: DateOnly.FromDateTime(DateTime.UtcNow));
+        var student = await CreateUserAsync(role: UserRole.Student);
+        var campaign = await CreateCampaignAsync(tenantId: student.TenantId);
+        var tree = await CreateTreeAsync(tenantId: student.TenantId);
+        var request = new Request(UserId: student.Id, TreeId: tree.Id, StartDate: DateOnly.FromDateTime(DateTime.UtcNow));
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiRoutes.Campaigns.CareAssignments(1), request);
+        var response = await Client.PostAsJsonAsync(ApiRoutes.CareAssignments.ByCampaign(campaign.Id), request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -33,12 +36,15 @@ public class CreateCareAssignmentTests(ReforaTecWebApplicationFactory factory) :
     {
         // Arrange
         var user = await CreateUserAsync(role: role);
+        var student = await CreateUserAsync(tenantId: user.TenantId, role: UserRole.Student);
+        var campaign = await CreateCampaignAsync(tenantId: user.TenantId);
+        var tree = await CreateTreeAsync(tenantId: user.TenantId);
         Authenticate(user);
 
-        var request = new Request(UserId: 1, TreeId: 1, StartDate: DateOnly.FromDateTime(DateTime.UtcNow));
+        var request = new Request(UserId: student.Id, TreeId: tree.Id, StartDate: DateOnly.FromDateTime(DateTime.UtcNow));
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiRoutes.Campaigns.CareAssignments(1), request);
+        var response = await Client.PostAsJsonAsync(ApiRoutes.CareAssignments.ByCampaign(campaign.Id), request);
 
         // Assert
         await response.ShouldBeProblemAsync(HttpStatusCode.Forbidden, Errors.Forbidden);
@@ -52,12 +58,14 @@ public class CreateCareAssignmentTests(ReforaTecWebApplicationFactory factory) :
     {
         // Arrange
         var coordinator = await CreateUserAsync(role: UserRole.Coordinator);
+        var campaign = await CreateCampaignAsync(tenantId: coordinator.TenantId);
+        var tree = await CreateTreeAsync(tenantId: coordinator.TenantId);
         Authenticate(coordinator);
 
-        var request = new Request(UserId: invalidUserId, TreeId: 1, StartDate: DateOnly.FromDateTime(DateTime.UtcNow));
+        var request = new Request(UserId: invalidUserId, TreeId: tree.Id, StartDate: DateOnly.FromDateTime(DateTime.UtcNow));
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiRoutes.Campaigns.CareAssignments(1), request);
+        var response = await Client.PostAsJsonAsync(ApiRoutes.CareAssignments.ByCampaign(campaign.Id), request);
 
         // Assert
         await response.ShouldBeValidationProblemAsync(nameof(Request.UserId));
@@ -70,12 +78,14 @@ public class CreateCareAssignmentTests(ReforaTecWebApplicationFactory factory) :
     {
         // Arrange
         var coordinator = await CreateUserAsync(role: UserRole.Coordinator);
+        var student = await CreateUserAsync(tenantId: coordinator.TenantId, role: UserRole.Student);
+        var campaign = await CreateCampaignAsync(tenantId: coordinator.TenantId);
         Authenticate(coordinator);
 
-        var request = new Request(UserId: 1, TreeId: invalidTreeId, StartDate: DateOnly.FromDateTime(DateTime.UtcNow));
+        var request = new Request(UserId: student.Id, TreeId: invalidTreeId, StartDate: DateOnly.FromDateTime(DateTime.UtcNow));
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiRoutes.Campaigns.CareAssignments(1), request);
+        var response = await Client.PostAsJsonAsync(ApiRoutes.CareAssignments.ByCampaign(campaign.Id), request);
 
         // Assert
         await response.ShouldBeValidationProblemAsync(nameof(Request.TreeId));
@@ -93,7 +103,7 @@ public class CreateCareAssignmentTests(ReforaTecWebApplicationFactory factory) :
         var request = new Request(UserId: 1, TreeId: 1, StartDate: DateOnly.FromDateTime(DateTime.UtcNow));
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiRoutes.Campaigns.CareAssignments(nonExistentCampaignId), request);
+        var response = await Client.PostAsJsonAsync(ApiRoutes.CareAssignments.ByCampaign(nonExistentCampaignId), request);
 
         // Assert
         await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.CampaignNotFound(nonExistentCampaignId));
@@ -113,7 +123,7 @@ public class CreateCareAssignmentTests(ReforaTecWebApplicationFactory factory) :
         var request = new Request(UserId: 1, TreeId: 1, StartDate: today);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiRoutes.Campaigns.CareAssignments(expiredCampaign.Id), request);
+        var response = await Client.PostAsJsonAsync(ApiRoutes.CareAssignments.ByCampaign(expiredCampaign.Id), request);
 
         // Assert
         await response.ShouldBeProblemAsync(HttpStatusCode.Conflict, Errors.CampaignNotActive);
@@ -131,7 +141,7 @@ public class CreateCareAssignmentTests(ReforaTecWebApplicationFactory factory) :
         var request = new Request(UserId: student.Id, TreeId: 1, StartDate: DateOnly.FromDateTime(DateTime.UtcNow));
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiRoutes.Campaigns.CareAssignments(campaign.Id), request);
+        var response = await Client.PostAsJsonAsync(ApiRoutes.CareAssignments.ByCampaign(campaign.Id), request);
 
         // Assert
         await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.EnrollmentNotFound(student.Id, campaign.Id));
@@ -152,7 +162,7 @@ public class CreateCareAssignmentTests(ReforaTecWebApplicationFactory factory) :
         var request = new Request(UserId: student.Id, TreeId: nonExistentTreeId, StartDate: DateOnly.FromDateTime(DateTime.UtcNow));
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiRoutes.Campaigns.CareAssignments(campaign.Id), request);
+        var response = await Client.PostAsJsonAsync(ApiRoutes.CareAssignments.ByCampaign(campaign.Id), request);
 
         // Assert
         await response.ShouldBeProblemAsync(HttpStatusCode.NotFound, Errors.TreeNotFound(nonExistentTreeId));
@@ -180,7 +190,7 @@ public class CreateCareAssignmentTests(ReforaTecWebApplicationFactory factory) :
         var request = new Request(UserId: student.Id, TreeId: tree.Id, StartDate: startDate);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiRoutes.Campaigns.CareAssignments(campaign.Id), request);
+        var response = await Client.PostAsJsonAsync(ApiRoutes.CareAssignments.ByCampaign(campaign.Id), request);
 
         // Assert
         await response.ShouldBeProblemAsync(HttpStatusCode.Conflict, Errors.AlreadyAssigned);
@@ -204,7 +214,7 @@ public class CreateCareAssignmentTests(ReforaTecWebApplicationFactory factory) :
         var request = new Request(UserId: student.Id, TreeId: tree.Id, StartDate: startDate);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiRoutes.Campaigns.CareAssignments(campaign.Id), request);
+        var response = await Client.PostAsJsonAsync(ApiRoutes.CareAssignments.ByCampaign(campaign.Id), request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);

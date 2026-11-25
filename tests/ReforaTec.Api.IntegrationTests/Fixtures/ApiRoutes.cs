@@ -42,8 +42,14 @@ public static class ApiRoutes
     {
         public const string BaseRoute = $"{Base}/campaigns";
         public static string ById(int id) => $"{BaseRoute}/{id}";
-        public static string CareAssignments(int campaignId) => $"{BaseRoute}/{campaignId}/care-assignments";
         public static string Enrollments(int campaignId) => $"{BaseRoute}/{campaignId}/enrollments";
+    }
+
+    public static class CareAssignments
+    {
+        private const string BaseRoute = $"{Base}/care-assignments";
+        public static string ById(int assignmentId) => $"{BaseRoute}/{assignmentId}";
+        public static string ByCampaign(int campaignId) => $"{Campaigns.BaseRoute}/{campaignId}/care-assignments";
     }
 
     public static class CareTypes
