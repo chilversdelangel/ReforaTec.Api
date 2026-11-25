@@ -12,9 +12,17 @@ internal static partial class DbSeeder
             return;
         }
 
-        var tenant = await context.Tenants.FirstAsync(tenant => tenant.Acronym == "ITCM");
-        var speciesList = await context.Species.Take(2).ToListAsync();
-        var virtue = await context.Virtues.FirstAsync();
+        var tenant = await context.Tenants
+            .FirstAsync(tenant => tenant.Acronym == "ITCM");
+        
+        var speciesList = await context.Species
+            .OrderBy(species => species.Id)
+            .Take(2)
+            .ToListAsync();
+        
+        var virtue = await context.Virtues
+            .OrderBy(virtue => virtue.Id)
+            .FirstAsync();
 
         if (speciesList.Count < 2)
         {

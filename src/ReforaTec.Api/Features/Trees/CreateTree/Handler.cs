@@ -45,11 +45,11 @@ internal static class Handler
             SpeciesId = request.SpeciesId,
             VirtueId = request.VirtueId,
             PlantingDate = request.PlantingDate,
-            Location = request.Location is not null
+            Location = request.Location is { Latitude: not null, Longitude: not null }
                 ? new Location
                 {
-                    Latitude = request.Location.Latitude,
-                    Longitude = request.Location.Longitude
+                    Latitude = request.Location.Latitude.Value,
+                    Longitude = request.Location.Longitude.Value
                 }
                 : null
         };
