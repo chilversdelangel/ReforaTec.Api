@@ -158,4 +158,48 @@ public class CloseCampaignTests(ReforaTecWebApplicationFactory factory) : Integr
             .FirstOrDefaultAsync(item => item.Id == closedAssignment.Id));
         persistedClosed!.EndDate.Should().Be(alreadyClosedDate);
     }
+
+    [Fact]
+    public async Task CloseCampaign_WhenEndDateIsNull_ShouldSetEndDateToTodayAndCloseActiveAssignments()
+    {
+        // Arrange
+        var coordinator = await CreateUserAsync(role: UserRole.Coordinator);
+        var student = await CreateUserAsync(tenantId: coordinator.TenantId, role: UserRole.Student);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        var openCampaign = await CreateCampaignAsync(
+            tenantId: coordinator.TenantId,
+            period: new Period { StartDate = today.AddDays(-10), EndDate = null });
+
+        var tree = await CreateTreeAsync(tenantId: coordinator.TenantId);
+        var activeAssignment = await AssignTreeToUserAsync(
+            tenantId: coordinator.TenantId,
+            campaignId: openCampaign.Id,
+            userId: student.Id,
+            treeId: tree.Id,
+            startDate: today.AddDays(-5));
+
+        Authenticate(coordinator);
+
+        // Act
+        var response = await Client.PostAsync(ApiRoutes.Campaigns.Close(openCampaign.Id), null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var payload = await response.Content.ReadFromJsonAsync<Response>();
+        payload.Should().NotBeNull();
+        payload.Period.EndDate.Should().Be(today);
+        payload.ClosedAssignmentsCount.Should().Be(1);
+
+        var persistedCampaign = await QueryDbAsync(context => context.Campaigns
+            .AsNoTracking()
+            .FirstOrDefaultAsync(item => item.Id == openCampaign.Id));
+        persistedCampaign!.Period.EndDate.Should().Be(today);
+
+        var persistedAssignment = await QueryDbAsync(context => context.CareAssignments
+            .AsNoTracking()
+            .FirstOrDefaultAsync(item => item.Id == activeAssignment.Id));
+        persistedAssignment!.EndDate.Should().Be(today);
+    }
 }

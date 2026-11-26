@@ -1,5 +1,6 @@
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
+using ReforaTec.Api.Common.Helpers;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Entities;
 using ReforaTec.Api.Entities.Enums;
@@ -35,19 +36,21 @@ internal static class Handler
             cancellationToken);
 
         // Allow closing an expired campaign if it still has active care assignments to sweep.
-        if (campaign.Period.EndDate < today && activeAssignments.Count == 0)
+        if (campaign.Period.HasEndedBefore(today) && activeAssignments.Count == 0)
         {
             return Errors.AlreadyClosed;
         }
 
-        if (campaign.Period.EndDate > today && today >= campaign.Period.StartDate)
+        if (campaign.Period.IsActiveOn(today))
         {
             campaign.Period.EndDate = today;
         }
 
         foreach (var assignment in activeAssignments)
         {
-            assignment.EndDate = today < assignment.StartDate ? assignment.StartDate : today;
+            assignment.EndDate = today < assignment.StartDate 
+                ? assignment.StartDate 
+                : today;
         }
 
         await context.SaveChangesAsync(cancellationToken);

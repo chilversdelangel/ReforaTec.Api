@@ -35,8 +35,8 @@ internal static class Handler
             Code = request.Code,
             Period = new Period
             {
-                StartDate = request.Period.StartDate!.Value,
-                EndDate = request.Period.EndDate!.Value
+                StartDate = request.Period.StartDate,
+                EndDate = request.Period.EndDate
             }
         };
 
