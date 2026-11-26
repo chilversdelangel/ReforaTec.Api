@@ -33,6 +33,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddMemoryCache();
 builder.Services.AddAuthorizationPolicies();
 builder.Services.AddCustomOpenApi();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -58,6 +59,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Endpoints
+app.MapHealthChecks("/health")
+    .AllowAnonymous()
+    .DisableRateLimiting();
+
 var apiV1 = app.MapGroup("/v1");
 
 apiV1.MapEndpoints();
