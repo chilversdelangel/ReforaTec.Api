@@ -949,7 +949,7 @@ namespace ReforaTec.Api.Database.Migrations
                                 .HasColumnType("date")
                                 .HasColumnName("period_end_date");
 
-                            b1.Property<DateOnly?>("StartDate")
+                            b1.Property<DateOnly>("StartDate")
                                 .HasColumnType("date")
                                 .HasColumnName("period_start_date");
 
@@ -1189,11 +1189,11 @@ namespace ReforaTec.Api.Database.Migrations
                                 .HasColumnType("integer")
                                 .HasColumnName("id");
 
-                            b1.Property<double?>("Latitude")
+                            b1.Property<double>("Latitude")
                                 .HasColumnType("double precision")
                                 .HasColumnName("location_latitude");
 
-                            b1.Property<double?>("Longitude")
+                            b1.Property<double>("Longitude")
                                 .HasColumnType("double precision")
                                 .HasColumnName("location_longitude");
 

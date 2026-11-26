@@ -128,7 +128,9 @@ public class CreateCampaignTests(ReforaTecWebApplicationFactory factory) : Integ
         Authenticate(user);
 
         var code = role == UserRole.Coordinator ? "ITCM-2026-A" : "ITCM-2026-B";
-        var period = new PeriodDto(new DateOnly(2026, 2, 1), new DateOnly(2026, 6, 30));
+        var period = new PeriodDto(
+            new DateOnly(2026, 2, 1), 
+            new DateOnly(2026, 6, 30));
         var request = new Request(Code: code, Period: period);
 
         // Act
@@ -153,7 +155,7 @@ public class CreateCampaignTests(ReforaTecWebApplicationFactory factory) : Integ
         persisted.TenantId.Should().Be(user.TenantId);
         persisted.Code.Should().Be(code);
         persisted.NormalizedCode.Should().Be(code.ToNormalized());
-        persisted.Period.StartDate.Should().Be(period.StartDate!.Value);
+        persisted.Period.StartDate.Should().Be(period.StartDate);
         persisted.Period.EndDate.Should().Be(period.EndDate!.Value);
     }
 
@@ -176,5 +178,29 @@ public class CreateCampaignTests(ReforaTecWebApplicationFactory factory) : Integ
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
+    }
+
+    [Fact]
+    public async Task CreateCampaign_WhenEndDateIsNull_ShouldPersistOpenEndedCampaign()
+    {
+        // Arrange
+        var coordinator = await CreateUserAsync(role: UserRole.Coordinator);
+        Authenticate(coordinator);
+
+        var code = $"OPEN-{Guid.NewGuid().ToString("N")[..6].ToUpperInvariant()}";
+        var startDate = DateOnly.FromDateTime(DateTime.UtcNow);
+        var request = new Request(code, new PeriodDto(startDate, EndDate: null));
+
+        // Act
+        var response = await Client.PostAsJsonAsync(ApiRoutes.Campaigns.BaseRoute, request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var payload = await response.Content.ReadFromJsonAsync<Response>();
+        payload.Should().NotBeNull();
+        payload.Code.Should().Be(code.ToSanitized());
+        payload.Period.StartDate.Should().Be(startDate);
+        payload.Period.EndDate.Should().BeNull();
     }
 }

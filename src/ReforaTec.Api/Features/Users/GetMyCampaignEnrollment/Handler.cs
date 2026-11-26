@@ -17,8 +17,9 @@ internal static class Handler
             .AsNoTracking()
             .Where(enrollment => enrollment.TenantId == loggedUser.TenantId)
             .Where(enrollment => enrollment.UserId == loggedUser.UserId)
-            .Where(enrollment => enrollment.Campaign!.Period.StartDate <= today)
-            .Where(enrollment => enrollment.Campaign!.Period.EndDate >= today)
+            .Select(enrollment => enrollment.Campaign!.Period)
+            .Where(period => period.StartDate <= today)
+            .Where(period => period.EndDate >= today || period.EndDate == null)
             .AnyAsync(cancellationToken);
 
         return new Response(isEnrolled);

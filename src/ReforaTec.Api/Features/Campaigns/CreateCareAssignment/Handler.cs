@@ -1,7 +1,9 @@
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
+using ReforaTec.Api.Common.Helpers;
 using ReforaTec.Api.Database;
 using ReforaTec.Api.Entities;
+using ReforaTec.Api.Entities.Common;
 using ReforaTec.Api.Entities.Enums;
 using ReforaTec.Api.Infrastructure.Security.CurrentUser;
 
@@ -34,7 +36,7 @@ internal static class Handler
             return Errors.CampaignNotFound(campaignId);
         }
 
-        if (campaignPeriod.StartDate > today || campaignPeriod.EndDate < today)
+        if (!campaignPeriod.IsActiveOn(today))
         {
             return Errors.CampaignNotActive;
         }
@@ -76,7 +78,7 @@ internal static class Handler
             assignment.EndDate);
     }
 
-    private static Task<Entities.Common.Period?> GetCampaignPeriodAsync(
+    private static Task<Period?> GetCampaignPeriodAsync(
         AppDbContext context,
         int tenantId,
         int campaignId,

@@ -31,7 +31,7 @@ internal static class Handler
             return Errors.CampaignNotFound(sanitizedCode);
         }
 
-        if (campaign.Period.StartDate > today || campaign.Period.EndDate < today)
+        if (!campaign.Period.IsActiveOn(today))
         {
             return Errors.CampaignNotActive;
         }
