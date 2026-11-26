@@ -112,7 +112,7 @@ namespace ReforaTec.Api.Database.Migrations
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     tenant_id = table.Column<int>(type: "integer", nullable: false),
-                    period_start_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    period_start_date = table.Column<DateOnly>(type: "date", nullable: false),
                     period_end_date = table.Column<DateOnly>(type: "date", nullable: true),
                     code = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     normalized_code = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
@@ -177,9 +177,6 @@ namespace ReforaTec.Api.Database.Migrations
                     species_id = table.Column<int>(type: "integer", nullable: false),
                     location_latitude = table.Column<double>(type: "double precision", nullable: true),
                     location_longitude = table.Column<double>(type: "double precision", nullable: true),
-                    location_street = table.Column<string>(type: "text", nullable: true),
-                    location_neighborhood = table.Column<string>(type: "text", nullable: true),
-                    location_street_number = table.Column<string>(type: "text", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     modified_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -502,15 +499,15 @@ namespace ReforaTec.Api.Database.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_campaigns_normalized_code",
-                table: "campaigns",
-                column: "normalized_code",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "ix_campaigns_tenant_id",
                 table: "campaigns",
                 column: "tenant_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_campaigns_tenant_id_normalized_code",
+                table: "campaigns",
+                columns: new[] { "tenant_id", "normalized_code" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_care_assignments_campaign_id",
