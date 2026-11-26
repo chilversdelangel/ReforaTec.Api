@@ -12,8 +12,8 @@ using ReforaTec.Api.Database;
 namespace ReforaTec.Api.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261126172056_RequirePeriodStartDate")]
-    partial class RequirePeriodStartDate
+    [Migration("20261126230751_InitialSchema")]
+    partial class InitialSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
