@@ -2,6 +2,8 @@ namespace ReforaTec.Api.IntegrationTests.Fixtures;
 
 public static class ApiRoutes
 {
+    public const string Health = "/health";
+
     private const string Base = "/v1";
 
     public static class Auth
